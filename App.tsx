@@ -6,10 +6,8 @@ import CodeblocksZone from "./components/CodeblocksZone";
 import Footer from "./components/Footer";
 import BlockList from "./components/BlockList";
 
-import { useEffect, useState } from "react";
-import CodeBlocksWrapper from "./classes/CodeBlocksWrapper";
+import { useState } from "react";
 import CodeBlockFunction from "./classes/CodeBlockFunction";
-import CodeBlocksTree from "./classes/CodeBlocksTree";
 import CodeBlock from "./classes/CodeBlock";
 import CCodeBlockAsigment from "./classes/CodeBlockAsigment";
 
@@ -17,37 +15,20 @@ export default function App() {
     const [isBlockListVisible, setIsBlockListVisible] =
         useState<Boolean>(false);
 
-    const [functionList, setFunctionList] = useState<Array<CodeBlocksWrapper>>([
-        new CodeBlocksWrapper(
-            new CodeBlockFunction(
-                new CodeBlocksTree(
-                    new CodeBlock(
-                        new CCodeBlockAsigment(),
-                        new CodeBlock(
-                            new CCodeBlockAsigment(),
-                            new CodeBlock(
-                                new CCodeBlockAsigment(),
-                                new CodeBlock(
-                                    new CCodeBlockAsigment(),
-                                    new CodeBlock(
-                                        new CCodeBlockAsigment(),
-                                        null,
-                                        null
-                                    ),
-                                    null
-                                ),
-                                null
-                            ),
-                            null
-                        ),
-                        null
-                    )
-                )
+    const [functionList, setFunctionList] = useState<Array<CodeBlockFunction>>([
+        new CodeBlockFunction(
+            new CodeBlock(
+                new CCodeBlockAsigment(),
+                null,
+                new CodeBlock(new CCodeBlockAsigment(), null)
             )
         ),
     ]);
 
-    const [currentFunction, setCurrentFunction] = useState(0);
+    const [currentFunction, setCurrentFunction] = useState<number>(0);
+    const [currentCodeBlocks, setCurrecCodeBlocks] = useState<CodeBlock>(
+        functionList[currentFunction].codeBlocks
+    );
 
     return (
         <View>
@@ -57,7 +38,7 @@ export default function App() {
             />
             <BlockList isVisible={isBlockListVisible}></BlockList>
             <FunctionNavigator />
-            <CodeblocksZone blocks={functionList[currentFunction]} />
+            <CodeblocksZone blocks={currentCodeBlocks} />
             <Footer />
         </View>
     );

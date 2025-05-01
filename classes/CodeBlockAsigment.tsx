@@ -8,8 +8,8 @@ interface ICodeBlockAsigment {
 class CCodeBlockAsigment implements ICodeBlockAsigment {
     render_ = CodeBlockAsigment;
 
-    get render() {
-        return this.render_;
+    render(props: { key: Key }) {
+        return this.render_(props);
     }
 }
 
