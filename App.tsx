@@ -18,9 +18,9 @@ export default function App() {
     const [functionList, setFunctionList] = useState<Array<CodeBlockFunction>>([
         new CodeBlockFunction(
             new CodeBlock(
-                new CCodeBlockAsigment(),
+                new CCodeBlockAsigment(() => {}),
                 null,
-                new CodeBlock(new CCodeBlockAsigment(), null)
+                new CodeBlock(new CCodeBlockAsigment(() => {}), null)
             )
         ),
     ]);

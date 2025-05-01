@@ -1,17 +1,28 @@
-import { View, Text, StyleSheet } from "react-native";
+import {
+    Animated,
+    Text,
+    StyleSheet,
+    GestureResponderHandlers,
+} from "react-native";
 import { Key } from "react";
 
 interface Props {
     key: Key;
+    panResponderHandlers: GestureResponderHandlers;
+    position: Animated.ValueXY;
 }
 
 const CodeBlockAsigment = (props: Props) => {
     return (
-        <View
-            style={styles.container}
-            key={props.key}>
+        <Animated.View
+            style={[
+                { transform: props.position.getTranslateTransform() },
+                styles.container,
+            ]}
+            key={props.key}
+            {...props.panResponderHandlers}>
             <Text>a = 11</Text>
-        </View>
+        </Animated.View>
     );
 };
 

@@ -6,14 +6,12 @@ interface ICodeBlock {
     content_: RenderContent;
     children: Array<CodeBlock>;
     next_: CodeBlock | null;
-    isWrapper: Boolean;
     render: (props: { key: Key }) => React.JSX.Element;
 }
 
 class CodeBlock implements ICodeBlock {
     content_: RenderContent;
     next_: CodeBlock | null;
-    isWrapper: Boolean = false;
     children: CodeBlock[];
 
     constructor(
