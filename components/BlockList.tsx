@@ -1,43 +1,37 @@
+import { useState } from "react";
 import {
     StyleSheet,
-    useWindowDimensions,
     View,
-    Text,
     PanResponderGestureState,
+    GestureResponderEvent,
 } from "react-native";
-
-import CodeBlock from "../classes/CodeBlock";
-import { Dispatch } from "react";
+import CCodeBlockAsigment from "../classes/CodeBlockAsigment";
+import CCodeBlock from "../classes/CodeBlock";
 
 interface Props {
     isVisible: Boolean;
+    onDrop: (
+        e: GestureResponderEvent,
+        g: PanResponderGestureState,
+        block: CCodeBlock
+    ) => void;
 }
 
 const BlockList = (props: Props, index: Number) => {
-    const onDrop = (g: PanResponderGestureState) => {
-        console.log(g.moveX, g.moveY);
-        //for (let item of props.blocks) {
-        //    if (
-        //        (g.moveY > item.getDropZoneValue?.y &&
-        //            g.moveY <
-        //                item.getDropZoneValue.y +
-        //                    item.getDropZoneValue.height &&
-        //            g.moveX > item.getDropZoneValue?.x &&
-        //            g.moveX <
-        //                item.getDropZoneValue.x +
-        //                    item.getDropZoneValue.width) ||
-        //        true
-        //    ) {
-        //        //DO SOMETHING
-        //    }
-        //}
-    };
+    const [codeBlocksAsigment, setCodeBlocksAsigment] = useState(
+        new CCodeBlockAsigment(props.onDrop)
+    );
+
     return (
         <View
             style={{
                 display: props.isVisible ? "flex" : "none",
                 ...styles.container,
-            }}></View>
+            }}>
+            {codeBlocksAsigment.render.call(codeBlocksAsigment, {
+                key: Date.now(),
+            })}
+        </View>
     );
 };
 

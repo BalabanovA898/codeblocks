@@ -1,27 +1,51 @@
-import { RenderContent } from "../types/types";
-import { Key } from "react";
-import { StyleSheet, View } from "react-native";
+import { Key, RefObject } from "react";
+import {
+    GestureResponderEvent,
+    PanResponderGestureState,
+    View,
+} from "react-native";
+import { Position, RenderContent } from "../types/types";
+import CCodeBlockWrapper from "./CodeBlockWrapper";
+import DropZone from "./DropZode";
+import CodeBlock from "../components/CodeBlock";
 
-interface ICodeBlock {
-    content_: RenderContent;
-    children: Array<CodeBlock>;
-    next_: CodeBlock | null;
-    render: (props: { key: Key }) => React.JSX.Element;
+interface Props {
+    key: Key;
+    renderArray: Array<RenderContent | null>;
+    children: CCodeBlockWrapper | null;
+    onLayout: (x: number, y: number, w: number, h: number) => void;
 }
 
-class CodeBlock implements ICodeBlock {
-    content_: RenderContent;
-    next_: CodeBlock | null;
-    children: CodeBlock[];
+interface ICodeBlock {
+    content_: RenderContent | null;
+    children: CCodeBlockWrapper | null;
+    next_: CCodeBlock | null;
+    render_: (props: Props) => React.JSX.Element;
+    renderSequence: (props: { key: Key }) => React.JSX.Element;
+    insertCodeBlock: (
+        e: GestureResponderEvent,
+        g: PanResponderGestureState,
+        block: CCodeBlock
+    ) => void;
+}
+
+class CCodeBlock extends DropZone implements ICodeBlock {
+    content_: RenderContent | null;
+    next_: CCodeBlock | null;
+    children: CCodeBlockWrapper | null;
+    render_: (props: Props) => React.JSX.Element;
 
     constructor(
-        content: RenderContent,
-        next: CodeBlock | null,
-        ...children: Array<CodeBlock>
+        offset: Position,
+        content: RenderContent | null,
+        next: CCodeBlock | null,
+        children: CCodeBlockWrapper | null
     ) {
+        super(offset);
         this.content_ = content;
         this.next_ = next;
         this.children = children;
+        this.render_ = CodeBlock;
     }
 
     get content() {
@@ -32,36 +56,39 @@ class CodeBlock implements ICodeBlock {
         return this.next_;
     }
 
-    render(props: { key: Key }) {
-        return (
-            <View
-                key={props.key}
-                style={styles.container}>
-                {this.content.render({ key: Date.now() })}
-                {(() => {
-                    if (this.children.length)
-                        return (
-                            <View style={styles.children}>
-                                {this.children.map((item) =>
-                                    item.render({ key: Date.now() })
-                                )}
-                            </View>
-                        );
-                })()}
-            </View>
-        );
+    renderSequence(props: { key: Key }) {
+        let renderArray = [];
+        let currentNode: CCodeBlock | null = this;
+
+        while (currentNode) {
+            renderArray.push(currentNode.content);
+            currentNode = currentNode.next;
+        }
+        return this.render_({
+            key: props.key,
+            renderArray: renderArray,
+            children: this.children,
+            onLayout: this.setPositions.bind(this),
+        });
+    }
+
+    insertCodeBlock(
+        e: GestureResponderEvent,
+        g: PanResponderGestureState,
+        block: CCodeBlock
+    ) {
+        let isDropInChildren = this.children?.checkDropIn(g);
+        if (this.checkDropIn(g) && !isDropInChildren) {
+            //this.insert(codeBlock);
+            console.log("YES");
+        } else if (isDropInChildren)
+            this.children?.insertCodeBlock(e, g, block);
+        else if (this.next_) this.next_.insertCodeBlock(e, g, block);
+        else {
+            console.log("NO");
+        }
     }
 }
 
-const styles = StyleSheet.create({
-    container: {
-        backgroundColor: "#0000ff",
-        padding: 4,
-    },
-    children: {
-        backgroundColor: "orange",
-        padding: 4,
-    },
-});
-export default CodeBlock;
+export default CCodeBlock;
 

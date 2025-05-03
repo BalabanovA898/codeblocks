@@ -1,4 +1,4 @@
-import { Key } from "react";
+import { Dispatch, Key } from "react";
 import {
     Animated,
     GestureResponderEvent,
@@ -7,6 +7,7 @@ import {
 } from "react-native";
 import CodeBlockAsigment from "../components/CodeBlockAsigment";
 import Draggable from "./Draggable";
+import CCodeBlock from "./CodeBlock";
 
 interface ICodeBlockAsigment {
     render_: (props: Props) => React.JSX.Element;
@@ -19,13 +20,16 @@ interface Props {
 }
 
 class CCodeBlockAsigment extends Draggable implements ICodeBlockAsigment {
-    render_ = CodeBlockAsigment;
-
+    render_: (props: Props) => React.JSX.Element;
     constructor(
-        onDrop: (e: GestureResponderEvent, g: PanResponderGestureState) => void
+        onDrop: (
+            e: GestureResponderEvent,
+            g: PanResponderGestureState,
+            block: CCodeBlock
+        ) => void
     ) {
         super(onDrop);
-        this.panResponder.panHandlers;
+        this.render_ = CodeBlockAsigment;
     }
 
     render(props: { key: Key }) {

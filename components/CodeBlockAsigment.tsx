@@ -5,6 +5,7 @@ import {
     GestureResponderHandlers,
 } from "react-native";
 import { Key } from "react";
+import CCodeBlock from "../classes/CodeBlock";
 
 interface Props {
     key: Key;
@@ -31,6 +32,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#aaaa11",
         width: 200,
         margin: 4,
+        zIndex: 100,
     },
 });
 
