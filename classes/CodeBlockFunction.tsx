@@ -31,10 +31,8 @@ class CodeBlockFunction implements ICodeBlockFunction {
         g: PanResponderGestureState,
         block: CCodeBlock
     ) {
-        console.log("Hello from functionBlock");
-        if (this.codeBlocks.insertCodeBlock(e, g, block)) {
-            this.cfl(this);
-        }
+        this.codeBlocks.insertCodeBlock(e, g, block);
+        this.cfl(this);
     }
 }
 

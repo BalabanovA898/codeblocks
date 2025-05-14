@@ -19,7 +19,7 @@ interface Props {
 
 const BlockList = (props: Props, index: Number) => {
     const [codeBlocksAsigment, setCodeBlocksAsigment] = useState(
-        new CCodeBlockAsigment(props.onDrop)
+        new CCodeBlockAsigment(props.onDrop, true, null)
     );
 
     return (

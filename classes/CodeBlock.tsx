@@ -16,6 +16,7 @@ interface ICodeBlock {
     content_: RenderContent | null;
     children: CCodeBlockWrapper | null;
     next_: CCodeBlock | null;
+    prev_: CCodeBlock | null;
     render_: (props: Props) => React.JSX.Element;
     renderSequence: (props: { key: Key }) => React.JSX.Element;
     insertCodeBlock: (
@@ -27,19 +28,23 @@ interface ICodeBlock {
 
 class CCodeBlock extends DropZone implements ICodeBlock {
     content_: RenderContent | null;
-    next_: CCodeBlock | null;
     children: CCodeBlockWrapper | null;
+    next_: CCodeBlock | null;
+    prev_: CCodeBlock | null;
     render_: (props: Props) => React.JSX.Element;
 
     constructor(
         offset: Position,
         content: RenderContent | null,
-        next: CCodeBlock | null,
-        children: CCodeBlockWrapper | null
+        next: CCodeBlock | null = null,
+        prev: CCodeBlock | null = null,
+        children: CCodeBlockWrapper | null = null
     ) {
         super(offset);
         this.content_ = content;
+        if (this.content !== null) this.content.parent = this;
         this.next_ = next;
+        this.prev_ = prev;
         this.children = children;
         this.render_ = CodeBlock;
     }
@@ -54,6 +59,14 @@ class CCodeBlock extends DropZone implements ICodeBlock {
 
     set next(item: CCodeBlock | null) {
         this.next_ = item;
+    }
+
+    get prev() {
+        return this.prev_;
+    }
+
+    set prev(block: CCodeBlock | null) {
+        this.prev_ = block;
     }
 
     renderSequence(props: { key: Key }) {
@@ -73,9 +86,20 @@ class CCodeBlock extends DropZone implements ICodeBlock {
     }
 
     pushCodeBlockAfterThis(newBLock: CCodeBlock) {
+        console.log("I've been added from CodeBlock");
         let tmp = this.next;
         this.next = newBLock;
-        this.next.next = tmp;
+        if (tmp) tmp.prev = newBLock;
+        newBLock.next = tmp;
+        newBLock.prev = this;
+        console.log(this.next);
+    }
+
+    removeThisCodeBLock() {
+        if (this.prev) {
+            this.prev.next = this.next;
+            if (this.next) this.next.prev = this.prev;
+        }
     }
 
     insertCodeBlock = (

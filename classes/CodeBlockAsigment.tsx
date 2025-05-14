@@ -10,6 +10,8 @@ interface ICodeBlockAssignment {
         g: PanResponderGestureState,
         block: CCodeBlock
     ) => void;
+    parent: CCodeBlock | null;
+    isNew: boolean;
 }
 
 interface Props {
@@ -19,6 +21,8 @@ interface Props {
 
 class CCodeBlockAssignment implements ICodeBlockAssignment {
     render_: (props: Props) => React.JSX.Element;
+    isNew: boolean;
+    parent: CCodeBlock | null;
     onDrop: (
         e: GestureResponderEvent,
         g: PanResponderGestureState,
@@ -30,23 +34,29 @@ class CCodeBlockAssignment implements ICodeBlockAssignment {
             e: GestureResponderEvent,
             g: PanResponderGestureState,
             block: CCodeBlock
-        ) => void
+        ) => void,
+        isNew: boolean,
+        parent: CCodeBlock | null
     ) {
         this.render_ = CodeBlockAssignment;
         this.onDrop = onDrop;
+        this.isNew = isNew;
+        this.parent = parent;
     }
 
     onDropHandler(e: GestureResponderEvent, g: PanResponderGestureState) {
-        this.onDrop(
-            e,
-            g,
-            new CCodeBlock(
-                { x: 0, y: 0 },
-                new CCodeBlockAssignment(this.onDrop),
-                null,
-                null
-            )
-        );
+        if (this.parent) {
+            this.parent.removeThisCodeBLock();
+            this.onDrop(e, g, this.parent);
+        } else
+            this.onDrop(
+                e,
+                g,
+                new CCodeBlock(
+                    { x: 0, y: 0 },
+                    new CCodeBlockAssignment(this.onDrop, false, null)
+                )
+            );
     }
 
     render(props: { key: Key }) {
