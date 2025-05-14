@@ -1,9 +1,5 @@
 import { Key, RefObject } from "react";
-import {
-    GestureResponderEvent,
-    PanResponderGestureState,
-    View,
-} from "react-native";
+import { GestureResponderEvent, PanResponderGestureState } from "react-native";
 import { Position, RenderContent } from "../types/types";
 import CCodeBlockWrapper from "./CodeBlockWrapper";
 import DropZone from "./DropZode";
@@ -26,7 +22,7 @@ interface ICodeBlock {
         e: GestureResponderEvent,
         g: PanResponderGestureState,
         block: CCodeBlock
-    ) => void;
+    ) => boolean;
 }
 
 class CCodeBlock extends DropZone implements ICodeBlock {
@@ -56,6 +52,10 @@ class CCodeBlock extends DropZone implements ICodeBlock {
         return this.next_;
     }
 
+    set next(item: CCodeBlock | null) {
+        this.next_ = item;
+    }
+
     renderSequence(props: { key: Key }) {
         let renderArray = [];
         let currentNode: CCodeBlock | null = this;
@@ -72,22 +72,29 @@ class CCodeBlock extends DropZone implements ICodeBlock {
         });
     }
 
-    insertCodeBlock(
+    pushCodeBlockAfterThis(newBLock: CCodeBlock) {
+        let tmp = this.next;
+        this.next = newBLock;
+        this.next.next = tmp;
+    }
+
+    insertCodeBlock = (
         e: GestureResponderEvent,
         g: PanResponderGestureState,
         block: CCodeBlock
-    ) {
+    ): boolean => {
         let isDropInChildren = this.children?.checkDropIn(g);
         if (this.checkDropIn(g) && !isDropInChildren) {
-            //this.insert(codeBlock);
+            this.pushCodeBlockAfterThis(block);
             console.log("YES");
-        } else if (isDropInChildren)
-            this.children?.insertCodeBlock(e, g, block);
-        else if (this.next_) this.next_.insertCodeBlock(e, g, block);
+            return true;
+        } else if (isDropInChildren && this.children)
+            return this.children.insertCodeBlock(e, g, block);
+        else if (this.next_) return this.next_.insertCodeBlock(e, g, block);
         else {
-            console.log("NO");
+            return false;
         }
-    }
+    };
 }
 
 export default CCodeBlock;

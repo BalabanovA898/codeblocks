@@ -1,26 +1,30 @@
 import { Dispatch, Key } from "react";
-import {
-    Animated,
-    GestureResponderEvent,
-    GestureResponderHandlers,
-    PanResponderGestureState,
-} from "react-native";
-import CodeBlockAsigment from "../components/CodeBlockAsigment";
-import Draggable from "./Draggable";
+import { GestureResponderEvent, PanResponderGestureState } from "react-native";
+import CodeBlockAssignment from "../components/CodeBlockAssignment";
 import CCodeBlock from "./CodeBlock";
 
-interface ICodeBlockAsigment {
+interface ICodeBlockAssignment {
     render_: (props: Props) => React.JSX.Element;
+    onDrop: (
+        e: GestureResponderEvent,
+        g: PanResponderGestureState,
+        block: CCodeBlock
+    ) => void;
 }
 
 interface Props {
     key: Key;
-    panResponderHandlers: GestureResponderHandlers;
-    position: Animated.ValueXY;
+    onDrop: (e: GestureResponderEvent, g: PanResponderGestureState) => void;
 }
 
-class CCodeBlockAsigment extends Draggable implements ICodeBlockAsigment {
+class CCodeBlockAssignment implements ICodeBlockAssignment {
     render_: (props: Props) => React.JSX.Element;
+    onDrop: (
+        e: GestureResponderEvent,
+        g: PanResponderGestureState,
+        block: CCodeBlock
+    ) => void;
+
     constructor(
         onDrop: (
             e: GestureResponderEvent,
@@ -28,18 +32,30 @@ class CCodeBlockAsigment extends Draggable implements ICodeBlockAsigment {
             block: CCodeBlock
         ) => void
     ) {
-        super(onDrop);
-        this.render_ = CodeBlockAsigment;
+        this.render_ = CodeBlockAssignment;
+        this.onDrop = onDrop;
+    }
+
+    onDropHandler(e: GestureResponderEvent, g: PanResponderGestureState) {
+        this.onDrop(
+            e,
+            g,
+            new CCodeBlock(
+                { x: 0, y: 0 },
+                new CCodeBlockAssignment(this.onDrop),
+                null,
+                null
+            )
+        );
     }
 
     render(props: { key: Key }) {
         return this.render_({
             ...props,
-            panResponderHandlers: this.panResponder.panHandlers,
-            position: this.position,
+            onDrop: this.onDropHandler.bind(this),
         });
     }
 }
 
-export default CCodeBlockAsigment;
+export default CCodeBlockAssignment;
 

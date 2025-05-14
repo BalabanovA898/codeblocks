@@ -4,13 +4,19 @@ import CCodeBlock from "./CodeBlock";
 
 interface ICodeBlockFunction {
     codeBlocksWrapper_: CCodeBlockWrapper;
+    cfl: (fn: CodeBlockFunction) => void;
 }
 
 class CodeBlockFunction implements ICodeBlockFunction {
     codeBlocksWrapper_: CCodeBlockWrapper;
+    cfl: (fn: CodeBlockFunction) => void;
 
-    constructor(codeBlocksTree: CCodeBlockWrapper) {
+    constructor(
+        codeBlocksTree: CCodeBlockWrapper,
+        changeFunctionList: (fn: CodeBlockFunction) => void
+    ) {
         this.codeBlocksWrapper_ = codeBlocksTree;
+        this.cfl = changeFunctionList;
     }
 
     set codeBlocks(newCodeBlocks: CCodeBlockWrapper) {
@@ -25,7 +31,10 @@ class CodeBlockFunction implements ICodeBlockFunction {
         g: PanResponderGestureState,
         block: CCodeBlock
     ) {
-        this.codeBlocks.insertCodeBlock(e, g, block);
+        console.log("Hello from functionBlock");
+        if (this.codeBlocks.insertCodeBlock(e, g, block)) {
+            this.cfl(this);
+        }
     }
 }
 

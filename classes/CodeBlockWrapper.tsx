@@ -1,6 +1,10 @@
 import { Key } from "react";
 import CCodeBlock from "./CodeBlock";
-import { GestureResponderEvent, PanResponderGestureState } from "react-native";
+import {
+    GestureResponderEvent,
+    PanResponderGestureState,
+    TouchableWithoutFeedbackBase,
+} from "react-native";
 import CodeBlockWrapper from "../components/CodeBlockWrapper";
 import DropZone from "./DropZode";
 import { Position } from "../types/types";
@@ -17,7 +21,7 @@ interface ICodeBlockWrapper {
         e: GestureResponderEvent,
         g: PanResponderGestureState,
         block: CCodeBlock
-    ) => void;
+    ) => boolean;
 }
 
 interface Props {
@@ -47,6 +51,16 @@ class CCodeBlockWrapper extends DropZone implements ICodeBlockWrapper {
         });
     }
 
+    pushBackCodeBlock(newBlock: CCodeBlock) {
+        if (!this.content) {
+            this.content = newBlock;
+            return;
+        }
+        let currentNode = this.content;
+        while (currentNode.next) currentNode = currentNode.next;
+        currentNode.next = newBlock;
+    }
+
     insertCodeBlock(
         e: GestureResponderEvent,
         g: PanResponderGestureState,
@@ -54,8 +68,12 @@ class CCodeBlockWrapper extends DropZone implements ICodeBlockWrapper {
     ) {
         console.log(this.content.checkDropIn(g));
         if (this.content.checkDropIn(g))
-            this.content.insertCodeBlock(e, g, block);
-        //else this.pushBack(codeBlock);
+            return this.content.insertCodeBlock(e, g, block);
+        else if (this.checkDropIn(g)) {
+            this.pushBackCodeBlock(block);
+            return true;
+        }
+        return false;
     }
 }
 

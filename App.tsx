@@ -1,9 +1,4 @@
-import {
-    GestureResponderEvent,
-    PanResponderGestureState,
-    StyleSheet,
-    View,
-} from "react-native";
+import { View } from "react-native";
 
 import Header from "./components/Header";
 import FunctionNavigator from "./components/FunctionNavigator";
@@ -11,18 +6,11 @@ import CodeblocksZone from "./components/CodeblocksZone";
 import Footer from "./components/Footer";
 import BlockList from "./components/BlockList";
 
-import {
-    createContext,
-    Dispatch,
-    useContext,
-    useEffect,
-    useState,
-} from "react";
+import { useEffect, useState } from "react";
 import CodeBlockFunction from "./classes/CodeBlockFunction";
 import CCodeBlockWrapper from "./classes/CodeBlockWrapper";
 import CCodeBlock from "./classes/CodeBlock";
-import CCodeBlockAsigment from "./classes/CodeBlockAsigment";
-import CodeBlockWrapper from "./components/CodeBlockWrapper";
+import CCodeBlockAssignment from "./classes/CodeBlockAsigment";
 
 export default function App() {
     const [isBlockListVisible, setIsBlockListVisible] =
@@ -32,17 +20,26 @@ export default function App() {
         y: 0,
     });
 
+    const changeFunctionList = (fn: CodeBlockFunction) => {
+        let res = [];
+        for (let item = 0; item < functions.length; ++item)
+            res.push(item != currentFunction ? functions[item] : fn);
+        setFunctions(res);
+        console.log("Hello form cfl");
+    };
+
     const [functions, setFunctions] = useState<CodeBlockFunction[]>([
         new CodeBlockFunction(
             new CCodeBlockWrapper(
                 codeBlocksZoneOffset,
                 new CCodeBlock(
                     codeBlocksZoneOffset,
-                    new CCodeBlockAsigment(() => {}),
+                    new CCodeBlockAssignment(() => {}),
                     null,
                     null
                 )
-            )
+            ),
+            changeFunctionList
         ),
     ]);
     const [currentFunction, setCurrentFunction] = useState<number>(0);
@@ -74,9 +71,7 @@ export default function App() {
                 setBlockListVisible={setIsBlockListVisible}
             />
             <BlockList
-                onDrop={functions[0].codeBlocks.insertCodeBlock.bind(
-                    functions[0].codeBlocks
-                )}
+                onDrop={functions[0].insertNewCodeBlock.bind(functions[0])}
                 isVisible={isBlockListVisible}></BlockList>
             <FunctionNavigator />
             <CodeblocksZone

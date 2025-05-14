@@ -35,6 +35,7 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: "#0000ff",
         padding: 4,
+        width: 300,
     },
     children: {
         backgroundColor: "orange",

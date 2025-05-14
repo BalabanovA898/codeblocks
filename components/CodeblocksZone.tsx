@@ -18,7 +18,7 @@ const CodeblocksZone = ({ blocks, setCBZO }: Props) => {
 
     return (
         <View
-            style={{ height: height - 105, ...styles.container }}
+            style={{ height: height - 180, ...styles.container }} //TODO: Починить адаптивность.
             onLayout={(e) => {
                 console.log(
                     "setCBZO",
