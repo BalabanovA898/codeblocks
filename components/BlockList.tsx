@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useReducer, useState } from "react";
 import {
     StyleSheet,
     View,
     PanResponderGestureState,
     GestureResponderEvent,
 } from "react-native";
-import CCodeBlockAsigment from "../classes/CodeBlockAsigment";
+import CCodeBlockAsigment from "../classes/CodeBlockAssignment";
 import CCodeBlock from "../classes/CodeBlock";
 
 interface Props {
@@ -22,6 +22,7 @@ const BlockList = (props: Props, index: Number) => {
         new CCodeBlockAsigment(props.onDrop, true, null)
     );
 
+    const [, renderer] = useReducer((e) => e - 1, 0);
     return (
         <View
             style={{
@@ -30,6 +31,7 @@ const BlockList = (props: Props, index: Number) => {
             }}>
             {codeBlocksAsigment.render.call(codeBlocksAsigment, {
                 key: Date.now(),
+                rerender: renderer,
             })}
         </View>
     );

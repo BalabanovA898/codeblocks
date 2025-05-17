@@ -10,7 +10,11 @@ import {
 } from "react-native";
 
 interface Props {
-    onDrop: (e: GestureResponderEvent, g: PanResponderGestureState) => void;
+    onDrop: (
+        e: GestureResponderEvent,
+        g: PanResponderGestureState,
+        position: Animated.ValueXY
+    ) => void;
     styles: any; //TODO: ПОТОМ ЗАГУГЛИТЬ КАК ЭТО ФИКСИТЬ.
 }
 
@@ -28,11 +32,7 @@ const Draggable = (props: PropsWithChildren & Props) => {
                 },
             ]),
             onPanResponderRelease: (e, g) => {
-                props.onDrop(e, g);
-                Animated.spring(new Animated.ValueXY(position), {
-                    toValue: { x: 0, y: 0 },
-                    useNativeDriver: false,
-                }).start();
+                props.onDrop(e, g, position);
             },
         })
     ).current;

@@ -3,13 +3,34 @@ import {
     StyleSheet,
     GestureResponderEvent,
     PanResponderGestureState,
+    Animated,
+    TextInput,
+    TextInputChangeEventData,
+    NativeSyntheticEvent,
 } from "react-native";
-import { Key } from "react";
+import {
+    Key,
+    useEffect,
+    useState,
+    useReducer,
+    DispatchWithoutAction,
+} from "react";
 import Draggable from "./Draggable";
+import Value from "../classes/Functional/Value";
+import Select from "./Select";
 
 interface Props {
     key: Key;
-    onDrop: (e: GestureResponderEvent, g: PanResponderGestureState) => void;
+    type: string;
+    name: string;
+    value: string;
+    onDrop: (
+        e: GestureResponderEvent,
+        g: PanResponderGestureState,
+        position: Animated.ValueXY
+    ) => void;
+    onChange: (name: string, value: string, type: string) => void;
+    rerender: DispatchWithoutAction;
 }
 
 const CodeBlockAssignment = (props: Props) => {
@@ -17,7 +38,30 @@ const CodeBlockAssignment = (props: Props) => {
         <Draggable
             onDrop={props.onDrop}
             styles={styles.container}>
-            <Text>a = 11</Text>
+            <Select
+                selectedOption={props.type}
+                onSelect={(item: string) => {
+                    props.onChange(props.name, props.value, item);
+                    props.rerender();
+                }}
+                options={["string", "number", "bool"]}></Select>
+            <TextInput
+                onChange={(
+                    e: NativeSyntheticEvent<TextInputChangeEventData>
+                ) => {
+                    props.onChange(e.nativeEvent.text, props.value, props.type);
+                }}>
+                {props.name || "Имя переменной"}
+            </TextInput>
+            <Text>=</Text>
+            <TextInput
+                onChange={(
+                    e: NativeSyntheticEvent<TextInputChangeEventData>
+                ) => {
+                    props.onChange(props.value, e.nativeEvent.text, props.type);
+                }}>
+                {props.value || "Значание"}
+            </TextInput>
         </Draggable>
     );
 };

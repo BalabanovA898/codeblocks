@@ -1,9 +1,13 @@
 import { Key, RefObject } from "react";
 import { GestureResponderEvent, PanResponderGestureState } from "react-native";
-import { Position, RenderContent } from "../types/types";
+import { Position, RenderContent } from "../shared/types";
 import CCodeBlockWrapper from "./CodeBlockWrapper";
-import DropZone from "./DropZode";
+import DropZone from "./Functional/DropZode";
 import CodeBlock from "../components/CodeBlock";
+import Executable from "../shared/Interfaces/Executable";
+import LexicalEnvironment from "./Functional/LexicalEnvironment";
+import Returnable from "../shared/Interfaces/Returnable";
+import Value from "./Functional/Value";
 
 interface Props {
     key: Key;
@@ -26,7 +30,7 @@ interface ICodeBlock {
     ) => boolean;
 }
 
-class CCodeBlock extends DropZone implements ICodeBlock {
+class CCodeBlock extends DropZone implements ICodeBlock, Returnable {
     content_: RenderContent | null;
     children: CCodeBlockWrapper | null;
     next_: CCodeBlock | null;
@@ -119,6 +123,13 @@ class CCodeBlock extends DropZone implements ICodeBlock {
             return false;
         }
     };
+
+    execute(le: LexicalEnvironment): Value {
+        if (this.content) return this.content.execute(le);
+        throw new Error(
+            "Ошибка при попытке выполинть команду! Ощиюка может быть вызвана пустыми полями."
+        );
+    }
 }
 
 export default CCodeBlock;

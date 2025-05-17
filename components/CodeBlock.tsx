@@ -1,6 +1,6 @@
-import { Key, RefObject } from "react";
+import { Key, RefObject, useReducer } from "react";
 import { View, StyleSheet } from "react-native";
-import { RenderContent } from "../types/types";
+import { RenderContent } from "../shared/types";
 import CCodeBlockWrapper from "../classes/CodeBlockWrapper";
 
 interface Props {
@@ -11,6 +11,7 @@ interface Props {
 }
 
 const CodeBlock = (props: Props) => {
+    const [, forceUpdate] = useReducer((x) => x + 1, 0);
     return (
         <View
             key={props.key}
@@ -24,7 +25,10 @@ const CodeBlock = (props: Props) => {
                 );
             }}>
             {props.renderArray.map((item) => {
-                return item?.render.call(item, { key: Date.now() });
+                return item?.render.call(item, {
+                    key: Date.now(),
+                    rerender: forceUpdate,
+                });
             })}
             {props.children?.render({ key: Date.now() })}
         </View>

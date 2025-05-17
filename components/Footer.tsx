@@ -1,16 +1,19 @@
 import { Pressable, View, Text, StyleSheet } from "react-native";
 
-const Footer = () => {
+interface Props {
+    executeCode: () => void;
+}
+
+const Footer = (props: Props) => {
     return (
         <View style={styles.container}>
             <Pressable style={styles.button}>
-                <Text style={styles.buttonText}>"Footer"</Text>
+                <Text style={styles.buttonText}>Debug</Text>
             </Pressable>
-            <Pressable style={styles.button}>
-                <Text style={styles.buttonText}>"Footer"</Text>
-            </Pressable>
-            <Pressable style={styles.button}>
-                <Text style={styles.buttonText}>"Footer"</Text>
+            <Pressable
+                style={styles.button}
+                onPress={props.executeCode}>
+                <Text style={styles.buttonText}>Start</Text>
             </Pressable>
         </View>
     );

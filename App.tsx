@@ -10,11 +10,16 @@ import { useEffect, useState } from "react";
 import CodeBlockFunction from "./classes/CodeBlockFunction";
 import CCodeBlockWrapper from "./classes/CodeBlockWrapper";
 import CCodeBlock from "./classes/CodeBlock";
-import CCodeBlockAssignment from "./classes/CodeBlockAsigment";
+import LexicalEnvironment from "./classes/Functional/LexicalEnvironment";
+import { TYPES } from "./shared/types";
+import OutputWindow from "./components/OutoutWindow";
+import CCodeBlockAssignment from "./classes/CodeBlockAssignment";
 
 export default function App() {
     const [isBlockListVisible, setIsBlockListVisible] =
         useState<Boolean>(false);
+    const [isOutputWindowVisible, setIsOutputWindowVisible] =
+        useState<boolean>(false);
     const [codeBlocksZoneOffset, setCodeBlocksZoneOffset] = useState({
         x: 0,
         y: 0,
@@ -28,21 +33,26 @@ export default function App() {
         console.log("Hello form cfl");
     };
 
+    let globalLE = new LexicalEnvironment(null);
+
     const [functions, setFunctions] = useState<CodeBlockFunction[]>([
         new CodeBlockFunction(
             new CCodeBlockWrapper(
                 codeBlocksZoneOffset,
                 new CCodeBlock(
                     codeBlocksZoneOffset,
-                    new CCodeBlockAssignment(() => {}),
-                    null,
-                    null
-                )
+                    new CCodeBlockAssignment(() => {}, false, null)
+                ),
+                globalLE
             ),
-            changeFunctionList
+            changeFunctionList,
+            TYPES.VOID,
+            globalLE
         ),
     ]);
     const [currentFunction, setCurrentFunction] = useState<number>(0);
+
+    const [output, setOutput] = useState<string[]>([]);
 
     useEffect(() => {
         console.log(codeBlocksZoneOffset);
@@ -78,7 +88,18 @@ export default function App() {
                 setCBZO={setCodeBlocksZoneOffset}
                 blocks={functions[currentFunction].codeBlocks}
             />
-            <Footer />
+            <Footer
+                executeCode={() => {
+                    globalLE = new LexicalEnvironment(null);
+                    functions[currentFunction].execute.bind(
+                        functions[currentFunction]
+                    )();
+                }}
+            />
+            <OutputWindow
+                isActive={isOutputWindowVisible}
+                setIsActive={setIsOutputWindowVisible}
+                massages={output}></OutputWindow>
         </View>
     );
 }

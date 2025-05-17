@@ -6,8 +6,12 @@ import {
     TouchableWithoutFeedbackBase,
 } from "react-native";
 import CodeBlockWrapper from "../components/CodeBlockWrapper";
-import DropZone from "./DropZode";
-import { Position } from "../types/types";
+import DropZone from "./Functional/DropZode";
+import { Position, TYPES } from "../shared/types";
+import Wrapper from "./Functional/Wrapper";
+import LexicalEnvironment from "./Functional/LexicalEnvironment";
+import Returnable from "../shared/Interfaces/Returnable";
+import Value from "./Functional/Value";
 
 interface ICodeBlockWrapper {
     content: CCodeBlock;
@@ -22,23 +26,29 @@ interface ICodeBlockWrapper {
         g: PanResponderGestureState,
         block: CCodeBlock
     ) => boolean;
+    le: LexicalEnvironment;
 }
 
 interface Props {
     key: Key;
 }
 
-class CCodeBlockWrapper extends DropZone implements ICodeBlockWrapper {
+class CCodeBlockWrapper
+    extends DropZone
+    implements ICodeBlockWrapper, Returnable
+{
     content: CCodeBlock;
     render_: (props: {
         key: Key;
         children: React.JSX.Element;
         onLayout: (x: number, y: number, w: number, h: number) => void;
     }) => React.JSX.Element = CodeBlockWrapper;
+    le: LexicalEnvironment;
 
-    constructor(offset: Position, content: CCodeBlock) {
+    constructor(offset: Position, content: CCodeBlock, le: LexicalEnvironment) {
         super(offset);
         this.content = content;
+        this.le = le;
     }
 
     render(props: Props) {
@@ -74,6 +84,16 @@ class CCodeBlockWrapper extends DropZone implements ICodeBlockWrapper {
             return true;
         }
         return false;
+    }
+    execute() {
+        this.le = new LexicalEnvironment(this.le.prev);
+        let valueToReturn: Value | null = null;
+        let currentNode: CCodeBlock | null = this.content;
+        while (currentNode) {
+            valueToReturn = currentNode.execute(this.le);
+            currentNode = currentNode.next;
+        }
+        return valueToReturn ? valueToReturn : new Value(TYPES.VOID, "");
     }
 }
 

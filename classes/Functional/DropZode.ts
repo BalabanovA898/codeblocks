@@ -1,5 +1,5 @@
 import { PanResponderGestureState, View } from "react-native";
-import { Position } from "../types/types";
+import { Position } from "../../shared/types";
 
 interface IDropZone {
     checkDropIn: (g: PanResponderGestureState) => Boolean;
