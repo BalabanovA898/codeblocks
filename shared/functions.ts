@@ -1,15 +1,18 @@
-import { TYPES } from "./types";
+import TypeBool from "../classes/types/TypeBool";
+import TypeNumber from "../classes/types/TypeNumber";
+import TypeString from "../classes/types/TypeString";
+import { Class, InterpreterTypes, ValidTypes } from "./types";
 
-export const getTypeByString = (type: string): TYPES => {
+export const getTypeByString = (type: string): Class<InterpreterTypes> => {
     switch (type) {
         case "string":
-            return TYPES.STRING;
+            return TypeString;
         case "number":
-            return TYPES.NUMBER;
+            return TypeNumber;
         case "bool":
-            return TYPES.BOOL;
+            return TypeBool;
         default:
-            return TYPES.STRING;
+            return TypeString;
     }
 };
 

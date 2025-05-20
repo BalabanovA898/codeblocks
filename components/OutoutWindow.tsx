@@ -16,8 +16,10 @@ const OutputWindow = (props: Props) => {
                 display: props.isActive ? "flex" : "none",
             }}>
             <ScrollView>
-                {props.massages.map((item, index) => (
-                    <Text>{index}) item</Text>
+                {props.massages.map((item) => (
+                    <Text style={styles.text}>
+                        {">"} {item}
+                    </Text>
                 ))}
             </ScrollView>
         </Pressable>
@@ -32,6 +34,10 @@ const styles = StyleSheet.create({
         backgroundColor: "rgba(0, 0, 0, 0.8)",
         top: 0,
         left: 0,
+    },
+    text: {
+        fontSize: 18,
+        color: "white",
     },
 });
 

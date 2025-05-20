@@ -1,28 +1,29 @@
-import { Key, RefObject } from "react";
+import { Dispatch, DispatchWithoutAction, Key, RefObject } from "react";
 import { GestureResponderEvent, PanResponderGestureState } from "react-native";
-import { Position, RenderContent } from "../shared/types";
+import { Position } from "../shared/types";
 import CCodeBlockWrapper from "./CodeBlockWrapper";
 import DropZone from "./Functional/DropZode";
 import CodeBlock from "../components/CodeBlock";
-import Executable from "../shared/Interfaces/Executable";
 import LexicalEnvironment from "./Functional/LexicalEnvironment";
 import Returnable from "../shared/Interfaces/Returnable";
 import Value from "./Functional/Value";
+import Renderable from "../shared/Interfaces/Renderable";
+import CodeBlockEnvironment from "../shared/Interfaces/CodeBlockEnvironment";
 
 interface Props {
     key: Key;
-    renderArray: Array<RenderContent | null>;
+    renderItem: Renderable | null;
     children: CCodeBlockWrapper | null;
     onLayout: (x: number, y: number, w: number, h: number) => void;
+    rerender: DispatchWithoutAction;
 }
 
 interface ICodeBlock {
-    content_: RenderContent | null;
+    content_: (Renderable & Returnable) | null;
     children: CCodeBlockWrapper | null;
     next_: CCodeBlock | null;
     prev_: CCodeBlock | null;
-    render_: (props: Props) => React.JSX.Element;
-    renderSequence: (props: { key: Key }) => React.JSX.Element;
+    parent: CCodeBlockWrapper | null;
     insertCodeBlock: (
         e: GestureResponderEvent,
         g: PanResponderGestureState,
@@ -30,19 +31,26 @@ interface ICodeBlock {
     ) => boolean;
 }
 
-class CCodeBlock extends DropZone implements ICodeBlock, Returnable {
-    content_: RenderContent | null;
+class CCodeBlock
+    extends DropZone
+    implements ICodeBlock, Returnable, CodeBlockEnvironment
+{
+    content_: (Renderable & Returnable) | null;
     children: CCodeBlockWrapper | null;
     next_: CCodeBlock | null;
     prev_: CCodeBlock | null;
     render_: (props: Props) => React.JSX.Element;
+    le: LexicalEnvironment;
+    parent: CCodeBlockWrapper | null;
 
     constructor(
         offset: Position,
-        content: RenderContent | null,
+        content: (Renderable & Returnable) | null,
         next: CCodeBlock | null = null,
         prev: CCodeBlock | null = null,
-        children: CCodeBlockWrapper | null = null
+        children: CCodeBlockWrapper | null = null,
+        le: LexicalEnvironment | null,
+        parent: CCodeBlockWrapper | null = null
     ) {
         super(offset);
         this.content_ = content;
@@ -51,6 +59,9 @@ class CCodeBlock extends DropZone implements ICodeBlock, Returnable {
         this.prev_ = prev;
         this.children = children;
         this.render_ = CodeBlock;
+        this.le = le ? le : new LexicalEnvironment(null);
+        this.parent = parent;
+        if (this.children) this.children.parent = this;
     }
 
     get content() {
@@ -73,19 +84,24 @@ class CCodeBlock extends DropZone implements ICodeBlock, Returnable {
         this.prev_ = block;
     }
 
-    renderSequence(props: { key: Key }) {
-        let renderArray = [];
-        let currentNode: CCodeBlock | null = this;
+    onLayoutHandler(x: number, y: number, w: number, h: number) {
+        this.setPositions(
+            x,
+            y,
+            w,
+            h,
+            this.parent?.elementX ? this.parent.elementX : 0,
+            this.parent?.elementY ? this.parent.elementY : 0
+        );
+    }
 
-        while (currentNode) {
-            renderArray.push(currentNode.content);
-            currentNode = currentNode.next;
-        }
+    renderSequence(props: { key: Key; rerender: DispatchWithoutAction }) {
         return this.render_({
             key: props.key,
-            renderArray: renderArray,
+            renderItem: this.content,
             children: this.children,
-            onLayout: this.setPositions.bind(this),
+            onLayout: this.onLayoutHandler.bind(this),
+            rerender: props.rerender,
         });
     }
 
@@ -96,6 +112,9 @@ class CCodeBlock extends DropZone implements ICodeBlock, Returnable {
         if (tmp) tmp.prev = newBLock;
         newBLock.next = tmp;
         newBLock.prev = this;
+        this.next.le = this.le;
+        this.next.offset = this.offset;
+        this.next.parent = this.parent;
         console.log(this.next);
     }
 
@@ -104,6 +123,7 @@ class CCodeBlock extends DropZone implements ICodeBlock, Returnable {
             this.prev.next = this.next;
             if (this.next) this.next.prev = this.prev;
         }
+        //TODD: Добавить возможно удаление первого эелемента!
     }
 
     insertCodeBlock = (
@@ -111,7 +131,9 @@ class CCodeBlock extends DropZone implements ICodeBlock, Returnable {
         g: PanResponderGestureState,
         block: CCodeBlock
     ): boolean => {
+        console.log("trying to drop inside:", this);
         let isDropInChildren = this.children?.checkDropIn(g);
+        console.log("children drop result: ", isDropInChildren);
         if (this.checkDropIn(g) && !isDropInChildren) {
             this.pushCodeBlockAfterThis(block);
             console.log("YES");
@@ -119,13 +141,13 @@ class CCodeBlock extends DropZone implements ICodeBlock, Returnable {
         } else if (isDropInChildren && this.children)
             return this.children.insertCodeBlock(e, g, block);
         else if (this.next_) return this.next_.insertCodeBlock(e, g, block);
-        else {
-            return false;
-        }
+        return false;
     };
 
     execute(le: LexicalEnvironment): Value {
-        if (this.content) return this.content.execute(le);
+        let contextReturn;
+        if (this.children) contextReturn = this.children.execute();
+        if (this.content) return this.content.execute(le, contextReturn);
         throw new Error(
             "Ошибка при попытке выполинть команду! Ощиюка может быть вызвана пустыми полями."
         );

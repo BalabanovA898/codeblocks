@@ -6,7 +6,7 @@ import {
 } from "react-native";
 
 import CCodeBlockWrapper from "../classes/CodeBlockWrapper";
-import { Dispatch, useContext } from "react";
+import { Dispatch, useContext, useReducer } from "react";
 
 interface Props {
     blocks: CCodeBlockWrapper;
@@ -16,6 +16,7 @@ interface Props {
 const CodeblocksZone = ({ blocks, setCBZO }: Props) => {
     const { height } = useWindowDimensions();
 
+    const [, forceUpdate] = useReducer((x) => x + 1, 0);
     return (
         <View
             style={{ height: height - 180, ...styles.container }} //TODO: Починить адаптивность.
@@ -30,7 +31,9 @@ const CodeblocksZone = ({ blocks, setCBZO }: Props) => {
                     y: e.nativeEvent.layout.y,
                 });
             }}>
-            <ScrollView>{blocks.render({ key: Date.now() })}</ScrollView>
+            <ScrollView>
+                {blocks.render({ key: Date.now(), rerender: forceUpdate })}
+            </ScrollView>
         </View>
     );
 };

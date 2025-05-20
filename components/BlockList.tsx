@@ -1,4 +1,4 @@
-import { useReducer, useState } from "react";
+import { Dispatch, DispatchWithoutAction, useReducer, useState } from "react";
 import {
     StyleSheet,
     View,
@@ -7,6 +7,8 @@ import {
 } from "react-native";
 import CCodeBlockAsigment from "../classes/CodeBlockAssignment";
 import CCodeBlock from "../classes/CodeBlock";
+import CCodeBlockPrint from "../classes/CodeBlockPrint";
+import CCodeBlockWrapper from "../classes/CodeBlockWrapper";
 
 interface Props {
     isVisible: Boolean;
@@ -15,11 +17,22 @@ interface Props {
         g: PanResponderGestureState,
         block: CCodeBlock
     ) => void;
+    globalOutput: string[];
+    globalSetOutput: Dispatch<string[]>;
 }
 
-const BlockList = (props: Props, index: Number) => {
+const BlockList = (props: Props) => {
     const [codeBlocksAsigment, setCodeBlocksAsigment] = useState(
         new CCodeBlockAsigment(props.onDrop, true, null)
+    );
+    const [codeBlockPrint, setCodeBlockPrint] = useState(
+        new CCodeBlockPrint(
+            null,
+            new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
+            props.onDrop,
+            props.globalOutput,
+            props.globalSetOutput
+        )
     );
 
     const [, renderer] = useReducer((e) => e - 1, 0);
@@ -30,6 +43,10 @@ const BlockList = (props: Props, index: Number) => {
                 ...styles.container,
             }}>
             {codeBlocksAsigment.render.call(codeBlocksAsigment, {
+                key: Date.now(),
+                rerender: renderer,
+            })}
+            {codeBlockPrint.render.call(codeBlockPrint, {
                 key: Date.now(),
                 rerender: renderer,
             })}

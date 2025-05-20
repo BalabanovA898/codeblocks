@@ -24,13 +24,16 @@ const Draggable = (props: PropsWithChildren & Props) => {
         PanResponder.create({
             onStartShouldSetPanResponder: () => true,
             onMoveShouldSetPanResponder: () => true,
-            onPanResponderMove: Animated.event([
-                null,
-                {
-                    dx: position.x,
-                    dy: position.y,
-                },
-            ]),
+            onPanResponderMove: Animated.event(
+                [
+                    null,
+                    {
+                        dx: position.x,
+                        dy: position.y,
+                    },
+                ],
+                { useNativeDriver: false }
+            ),
             onPanResponderRelease: (e, g) => {
                 props.onDrop(e, g, position);
             },

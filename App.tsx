@@ -11,9 +11,9 @@ import CodeBlockFunction from "./classes/CodeBlockFunction";
 import CCodeBlockWrapper from "./classes/CodeBlockWrapper";
 import CCodeBlock from "./classes/CodeBlock";
 import LexicalEnvironment from "./classes/Functional/LexicalEnvironment";
-import { TYPES } from "./shared/types";
 import OutputWindow from "./components/OutoutWindow";
 import CCodeBlockAssignment from "./classes/CodeBlockAssignment";
+import TypeNumber from "./classes/types/TypeNumber";
 
 export default function App() {
     const [isBlockListVisible, setIsBlockListVisible] =
@@ -37,16 +37,9 @@ export default function App() {
 
     const [functions, setFunctions] = useState<CodeBlockFunction[]>([
         new CodeBlockFunction(
-            new CCodeBlockWrapper(
-                codeBlocksZoneOffset,
-                new CCodeBlock(
-                    codeBlocksZoneOffset,
-                    new CCodeBlockAssignment(() => {}, false, null)
-                ),
-                globalLE
-            ),
+            new CCodeBlockWrapper(codeBlocksZoneOffset, null, globalLE),
             changeFunctionList,
-            TYPES.VOID,
+            TypeNumber,
             globalLE
         ),
     ]);
@@ -61,15 +54,6 @@ export default function App() {
             x: codeBlocksZoneOffset.x + functions[0].codeBlocks.offset.x,
             y: codeBlocksZoneOffset.y + functions[0].codeBlocks.offset.y,
         };
-        functions[0].codeBlocks.content.offset = {
-            x:
-                codeBlocksZoneOffset.x +
-                functions[0].codeBlocks.content.offset.x,
-            y:
-                codeBlocksZoneOffset.y +
-                functions[0].codeBlocks.content.offset.y,
-        };
-
         setFunctions({ ...copy });
         console.log(functions);
     }, [codeBlocksZoneOffset]);
@@ -82,7 +66,9 @@ export default function App() {
             />
             <BlockList
                 onDrop={functions[0].insertNewCodeBlock.bind(functions[0])}
-                isVisible={isBlockListVisible}></BlockList>
+                isVisible={isBlockListVisible}
+                globalOutput={output}
+                globalSetOutput={setOutput}></BlockList>
             <FunctionNavigator />
             <CodeblocksZone
                 setCBZO={setCodeBlocksZoneOffset}
@@ -94,6 +80,7 @@ export default function App() {
                     functions[currentFunction].execute.bind(
                         functions[currentFunction]
                     )();
+                    setIsOutputWindowVisible(true);
                 }}
             />
             <OutputWindow

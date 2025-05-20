@@ -7,20 +7,14 @@ import {
 import CodeBlockAssignment from "../components/CodeBlockAssignment";
 import CCodeBlock from "./CodeBlock";
 import Value from "./Functional/Value";
-import Executable from "../shared/Interfaces/Executable";
 import LexicalEnvironment from "./Functional/LexicalEnvironment";
 import Returnable from "../shared/Interfaces/Returnable";
-import { TYPES } from "../shared/types";
+import TypeNumber from "./types/TypeNumber";
 import { getTypeByString } from "../shared/functions";
+import Renderable from "../shared/Interfaces/Renderable";
+import Droppable from "../shared/Interfaces/Droppable";
 
 interface ICodeBlockAssignment {
-    render_: (props: Props) => React.JSX.Element;
-    onDrop: (
-        e: GestureResponderEvent,
-        g: PanResponderGestureState,
-        block: CCodeBlock
-    ) => void;
-    parent: CCodeBlock | null;
     isNew: boolean;
     nameToAssign: string | null;
     typeToAssign: string | null;
@@ -41,7 +35,9 @@ interface Props {
     rerender: DispatchWithoutAction;
 }
 
-class CCodeBlockAssignment implements ICodeBlockAssignment, Returnable {
+class CCodeBlockAssignment
+    implements ICodeBlockAssignment, Renderable, Returnable, Droppable
+{
     render_: (props: Props) => React.JSX.Element;
     isNew: boolean;
     parent: CCodeBlock | null;
@@ -90,7 +86,12 @@ class CCodeBlockAssignment implements ICodeBlockAssignment, Returnable {
                 g,
                 new CCodeBlock(
                     { x: 0, y: 0 },
-                    new CCodeBlockAssignment(this.onDrop, false, null)
+                    new CCodeBlockAssignment(this.onDrop, false, null),
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
                 )
             );
     }
@@ -114,7 +115,7 @@ class CCodeBlockAssignment implements ICodeBlockAssignment, Returnable {
             />
         );
     }
-    execute(le: LexicalEnvironment): Value {
+    execute(le: LexicalEnvironment, contextReturn?: Value): Value {
         if (this.nameToAssign && this.typeToAssign && this.valueToAssign) {
             le.setValue(
                 this.nameToAssign,
@@ -125,7 +126,7 @@ class CCodeBlockAssignment implements ICodeBlockAssignment, Returnable {
             );
             console.log(le);
         }
-        return new Value(TYPES.VOID, "");
+        return new Value(TypeNumber, "-1");
     }
 }
 

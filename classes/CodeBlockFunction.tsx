@@ -1,28 +1,28 @@
 import { GestureResponderEvent, PanResponderGestureState } from "react-native";
 import CCodeBlockWrapper from "./CodeBlockWrapper";
 import CCodeBlock from "./CodeBlock";
-import { TYPES } from "../shared/types";
 import LexicalEnvironment from "./Functional/LexicalEnvironment";
 import Returnable from "../shared/Interfaces/Returnable";
 import Value from "./Functional/Value";
+import { Class, InterpreterTypes } from "../shared/types";
 
 interface ICodeBlockFunction {
     codeBlocksWrapper_: CCodeBlockWrapper;
     cfl: (fn: CodeBlockFunction) => void;
-    returnType: TYPES;
+    returnType: Class<InterpreterTypes>;
     le: LexicalEnvironment;
 }
 
 class CodeBlockFunction implements ICodeBlockFunction, Returnable {
     codeBlocksWrapper_: CCodeBlockWrapper;
     cfl: (fn: CodeBlockFunction) => void;
-    returnType: TYPES;
+    returnType: Class<InterpreterTypes>;
     le: LexicalEnvironment;
 
     constructor(
         codeBlocksTree: CCodeBlockWrapper,
         changeFunctionList: (fn: CodeBlockFunction) => void,
-        returnType: TYPES,
+        returnType: Class<InterpreterTypes>,
         le: LexicalEnvironment
     ) {
         this.codeBlocksWrapper_ = codeBlocksTree;

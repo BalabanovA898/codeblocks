@@ -1,15 +1,15 @@
-import { TYPES } from "../../shared/types";
+import { Class, InterpreterTypes } from "../../shared/types";
 
 interface Value {
-    type: TYPES;
+    type: Class<InterpreterTypes>;
     value: string;
 }
 
 class Value implements Value {
-    type: TYPES;
+    type: Class<InterpreterTypes>;
     value: string;
 
-    constructor(type: TYPES, value: string) {
+    constructor(type: Class<InterpreterTypes>, value: string) {
         this.type = type;
         this.value = value;
     }

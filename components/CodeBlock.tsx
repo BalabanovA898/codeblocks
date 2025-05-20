@@ -1,17 +1,17 @@
-import { Key, RefObject, useReducer } from "react";
+import { DispatchWithoutAction, Key, RefObject, useReducer } from "react";
 import { View, StyleSheet } from "react-native";
-import { RenderContent } from "../shared/types";
 import CCodeBlockWrapper from "../classes/CodeBlockWrapper";
+import Renderable from "../shared/Interfaces/Renderable";
 
 interface Props {
     key: Key;
-    renderArray: Array<RenderContent | null>;
+    renderItem: Renderable | null;
     children: CCodeBlockWrapper | null;
     onLayout: (x: number, y: number, w: number, h: number) => void;
+    rerender: DispatchWithoutAction;
 }
 
 const CodeBlock = (props: Props) => {
-    const [, forceUpdate] = useReducer((x) => x + 1, 0);
     return (
         <View
             key={props.key}
@@ -24,13 +24,18 @@ const CodeBlock = (props: Props) => {
                     e.nativeEvent.layout.height
                 );
             }}>
-            {props.renderArray.map((item) => {
-                return item?.render.call(item, {
+            <View style={styles.childrenBorder}>
+                {props.children?.render({
                     key: Date.now(),
-                    rerender: forceUpdate,
-                });
-            })}
-            {props.children?.render({ key: Date.now() })}
+                    rerender: props.rerender,
+                })}
+            </View>
+            <View style={styles.bodyBorder}>
+                {props.renderItem?.render.call(props.renderItem, {
+                    key: Date.now(),
+                    rerender: props.rerender,
+                })}
+            </View>
         </View>
     );
 };
@@ -44,6 +49,14 @@ const styles = StyleSheet.create({
     children: {
         backgroundColor: "orange",
         padding: 4,
+    },
+    childrenBorder: {
+        borderColor: "white",
+        borderWidth: 2,
+    },
+    bodyBorder: {
+        borderColor: "red",
+        borderWidth: 2,
     },
 });
 
