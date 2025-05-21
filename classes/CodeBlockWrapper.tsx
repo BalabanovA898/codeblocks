@@ -1,5 +1,5 @@
 import { DispatchWithoutAction, Key } from "react";
-import CCodeBlock from "./CodeBlock";
+import CCodeBlock from "./Functional/CodeBlock";
 import {
     GestureResponderEvent,
     PanResponderGestureState,
@@ -7,30 +7,31 @@ import {
     View,
 } from "react-native";
 import CodeBlockWrapper from "../components/CodeBlockWrapper";
-import DropZone from "./Functional/DropZode";
+import DropZone from "./Functional/DropZone";
 import { Position } from "../shared/types";
 import Wrapper from "./Functional/Wrapper";
 import LexicalEnvironment from "./Functional/LexicalEnvironment";
 import Returnable from "../shared/Interfaces/Returnable";
 import Value from "./Functional/Value";
 import TypeNumber from "./types/TypeNumber";
+import ICodeBlock from "../shared/Interfaces/CodeBlock";
 
 interface ICodeBlockWrapper {
-    content: CCodeBlock | null;
+    content: ICodeBlock | null;
     render_: (props: {
         key: Key;
         onLayout: (x: number, y: number, w: number, h: number) => void;
-        firstElement: CCodeBlock | null;
+        firstElement: ICodeBlock | null;
         rerender: DispatchWithoutAction;
     }) => React.JSX.Element;
     render: (props: Props) => React.JSX.Element;
     insertCodeBlock: (
         e: GestureResponderEvent,
         g: PanResponderGestureState,
-        block: CCodeBlock
+        block: ICodeBlock
     ) => boolean;
     le: LexicalEnvironment | null;
-    parent: CCodeBlock | null;
+    parent: ICodeBlock | null;
 }
 
 interface Props {
@@ -42,21 +43,21 @@ class CCodeBlockWrapper
     extends DropZone
     implements ICodeBlockWrapper, Returnable
 {
-    content: CCodeBlock | null;
+    content: ICodeBlock | null;
     render_: (props: {
         key: Key;
         onLayout: (x: number, y: number, w: number, h: number) => void;
-        firstElement: CCodeBlock | null;
+        firstElement: ICodeBlock | null;
         rerender: DispatchWithoutAction;
     }) => React.JSX.Element = CodeBlockWrapper;
     le: LexicalEnvironment | null;
-    parent: CCodeBlock | null;
+    parent: ICodeBlock | null;
 
     constructor(
         offset: Position,
-        content: CCodeBlock | null,
+        content: ICodeBlock | null,
         le: LexicalEnvironment | null,
-        parent: CCodeBlock | null = null
+        parent: ICodeBlock | null = null
     ) {
         super(offset);
         this.content = content;
@@ -65,14 +66,7 @@ class CCodeBlockWrapper
     }
 
     onLayoutHandler(x: number, y: number, w: number, h: number) {
-        this.setPositions(
-            x,
-            y,
-            w,
-            h,
-            this.parent?.elementX ? this.parent.elementX : 0,
-            this.parent?.elementY ? this.parent.elementY : 0
-        );
+        this.setPositions(x, y, w, h, 0, this.parent?.offset.y || 0);
     }
 
     render(props: Props) {
@@ -84,31 +78,25 @@ class CCodeBlockWrapper
         });
     }
 
-    pushBackCodeBlock(newBlock: CCodeBlock) {
-        if (!this.content) {
-            this.content = newBlock;
-            return;
-        }
+    pushBackCodeBlock(newBlock: ICodeBlock) {
+        if (!this.content) return;
         let currentNode = this.content;
         while (currentNode.next) currentNode = currentNode.next;
         currentNode.next = newBlock;
         newBlock.parent = this;
+        newBlock.offset = { x: currentNode.offset.x, y: currentNode.offset.y };
     }
 
     insertCodeBlock(
         e: GestureResponderEvent,
         g: PanResponderGestureState,
-        block: CCodeBlock
+        block: ICodeBlock
     ) {
         console.log("trying to add in wrapper: ", this);
         if (this.content == null && this.checkDropIn(g)) {
             console.log("THIS WILL BE PLACED INSIDE THIS");
             this.content = block;
-            this.content.le = new LexicalEnvironment(this.le);
-            if (this.content.children)
-                this.content.children.le = new LexicalEnvironment(
-                    this.content.le
-                );
+            this.content.parent = this;
             this.content.offset = this.offset;
             return true;
         } else if (this.content !== null) {
@@ -124,12 +112,12 @@ class CCodeBlockWrapper
     execute() {
         if (!this.le) {
             throw new Error(
-                "Блок не располагает доступом к лксическому окружению. Произошла ошибка интерпритации."
+                "Блок не располагает доступом к лeксическому окружению. Произошла ошибка интерпритации."
             );
         }
         this.le = new LexicalEnvironment(this.le.prev);
         let valueToReturn: Value | null = null;
-        let currentNode: CCodeBlock | null = this.content;
+        let currentNode = this.content;
         while (currentNode) {
             valueToReturn = currentNode.execute(this.le);
             currentNode = currentNode.next;

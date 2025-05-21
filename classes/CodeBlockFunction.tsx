@@ -1,16 +1,22 @@
 import { GestureResponderEvent, PanResponderGestureState } from "react-native";
 import CCodeBlockWrapper from "./CodeBlockWrapper";
-import CCodeBlock from "./CodeBlock";
+import CCodeBlock from "./Functional/CodeBlock";
 import LexicalEnvironment from "./Functional/LexicalEnvironment";
 import Returnable from "../shared/Interfaces/Returnable";
 import Value from "./Functional/Value";
 import { Class, InterpreterTypes } from "../shared/types";
+import ICodeBlock from "../shared/Interfaces/CodeBlock";
+import { Dispatch } from "react";
+import TypeNumber from "./types/TypeNumber";
 
 interface ICodeBlockFunction {
     codeBlocksWrapper_: CCodeBlockWrapper;
     cfl: (fn: CodeBlockFunction) => void;
     returnType: Class<InterpreterTypes>;
     le: LexicalEnvironment;
+    output: string[];
+    setOutput: Dispatch<string[]>;
+    name: string;
 }
 
 class CodeBlockFunction implements ICodeBlockFunction, Returnable {
@@ -18,17 +24,26 @@ class CodeBlockFunction implements ICodeBlockFunction, Returnable {
     cfl: (fn: CodeBlockFunction) => void;
     returnType: Class<InterpreterTypes>;
     le: LexicalEnvironment;
+    output: string[];
+    setOutput: Dispatch<string[]>;
+    name: string;
 
     constructor(
         codeBlocksTree: CCodeBlockWrapper,
         changeFunctionList: (fn: CodeBlockFunction) => void,
         returnType: Class<InterpreterTypes>,
-        le: LexicalEnvironment
+        le: LexicalEnvironment,
+        output: string[],
+        setOutput: Dispatch<string[]>,
+        name: string
     ) {
         this.codeBlocksWrapper_ = codeBlocksTree;
         this.cfl = changeFunctionList;
         this.returnType = returnType;
         this.le = le;
+        this.output = output;
+        this.setOutput = setOutput;
+        this.name = name;
     }
 
     set codeBlocks(newCodeBlocks: CCodeBlockWrapper) {
@@ -41,7 +56,7 @@ class CodeBlockFunction implements ICodeBlockFunction, Returnable {
     insertNewCodeBlock(
         e: GestureResponderEvent,
         g: PanResponderGestureState,
-        block: CCodeBlock
+        block: ICodeBlock
     ) {
         this.codeBlocks.insertCodeBlock(e, g, block);
         this.cfl(this);
@@ -49,7 +64,15 @@ class CodeBlockFunction implements ICodeBlockFunction, Returnable {
 
     execute(): Value {
         this.le = new LexicalEnvironment(this.le.prev);
-        return this.codeBlocks.execute();
+        try {
+            return this.codeBlocks.execute();
+        } catch (e: any) {
+            this.setOutput([
+                ...this.output,
+                `Произошла  ошибка в фукнцие ${this.name}. Текст ошибки: ${e.message}`,
+            ]);
+            throw new Error(`Ошибка в функцие ${this.name}`);
+        }
     }
 }
 

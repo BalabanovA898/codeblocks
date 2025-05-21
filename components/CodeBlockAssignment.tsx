@@ -7,6 +7,7 @@ import {
     TextInput,
     TextInputChangeEventData,
     NativeSyntheticEvent,
+    View,
 } from "react-native";
 import {
     Key,
@@ -31,6 +32,7 @@ interface Props {
     ) => void;
     onChange: (name: string, value: string, type: string) => void;
     rerender: DispatchWithoutAction;
+    onLayout: (x: number, y: number, w: number, h: number) => void;
 }
 
 const CodeBlockAssignment = (props: Props) => {
@@ -38,30 +40,48 @@ const CodeBlockAssignment = (props: Props) => {
         <Draggable
             onDrop={props.onDrop}
             styles={styles.container}>
-            <Select
-                selectedOption={props.type}
-                onSelect={(item: string) => {
-                    props.onChange(props.name, props.value, item);
-                    props.rerender();
-                }}
-                options={["string", "number", "bool"]}></Select>
-            <TextInput
-                onChange={(
-                    e: NativeSyntheticEvent<TextInputChangeEventData>
-                ) => {
-                    props.onChange(e.nativeEvent.text, props.value, props.type);
+            <View
+                onLayout={(e) => {
+                    props.onLayout(
+                        e.nativeEvent.layout.x,
+                        e.nativeEvent.layout.y,
+                        e.nativeEvent.layout.width,
+                        e.nativeEvent.layout.height
+                    );
                 }}>
-                {props.name || "Имя переменной"}
-            </TextInput>
-            <Text>=</Text>
-            <TextInput
-                onChange={(
-                    e: NativeSyntheticEvent<TextInputChangeEventData>
-                ) => {
-                    props.onChange(props.value, e.nativeEvent.text, props.type);
-                }}>
-                {props.value || "Значание"}
-            </TextInput>
+                <Select
+                    selectedOption={props.type}
+                    onSelect={(item: string) => {
+                        props.onChange(props.name, props.value, item);
+                        props.rerender();
+                    }}
+                    options={["string", "number", "bool"]}></Select>
+                <TextInput
+                    onChange={(
+                        e: NativeSyntheticEvent<TextInputChangeEventData>
+                    ) => {
+                        props.onChange(
+                            e.nativeEvent.text,
+                            props.value,
+                            props.type
+                        );
+                    }}>
+                    {props.name || "Имя переменной"}
+                </TextInput>
+                <Text>=</Text>
+                <TextInput
+                    onChange={(
+                        e: NativeSyntheticEvent<TextInputChangeEventData>
+                    ) => {
+                        props.onChange(
+                            props.value,
+                            e.nativeEvent.text,
+                            props.type
+                        );
+                    }}>
+                    {props.value || "Значание"}
+                </TextInput>
+            </View>
         </Draggable>
     );
 };

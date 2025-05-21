@@ -29,6 +29,7 @@ class DropZone implements IDropZone {
         offsetX: number,
         offsetY: number
     ) {
+        console.log("SetPositions", x, y, w, h, offsetX, offsetY);
         this.elementX = x + this.offset.x + offsetX;
         this.elementY = y + this.offset.y + offsetY;
         this.elementWidth = w;
@@ -36,21 +37,21 @@ class DropZone implements IDropZone {
     }
 
     checkDropIn(g: PanResponderGestureState) {
+        console.log(
+            "try to drop: ",
+            this.elementX,
+            this.elementY,
+            this.elementWidth,
+            this.elementHeight,
+            g.moveX,
+            g.moveY
+        );
         if (
             this.elementX !== undefined &&
             this.elementY !== undefined &&
             this.elementHeight !== undefined &&
             this.elementWidth !== undefined
         ) {
-            console.log(
-                "try to drop: ",
-                this.elementX,
-                this.elementY,
-                this.elementX + this.elementWidth,
-                this.elementY + this.elementHeight,
-                g.moveX,
-                g.moveY
-            );
             if (
                 g.moveX > this.elementX &&
                 g.moveY > this.elementY &&

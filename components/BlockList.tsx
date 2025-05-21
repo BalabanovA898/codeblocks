@@ -6,16 +6,17 @@ import {
     GestureResponderEvent,
 } from "react-native";
 import CCodeBlockAsigment from "../classes/CodeBlockAssignment";
-import CCodeBlock from "../classes/CodeBlock";
+import CCodeBlock from "../classes/Functional/CodeBlock";
 import CCodeBlockPrint from "../classes/CodeBlockPrint";
 import CCodeBlockWrapper from "../classes/CodeBlockWrapper";
+import ICodeBlock from "../shared/Interfaces/CodeBlock";
 
 interface Props {
     isVisible: Boolean;
     onDrop: (
         e: GestureResponderEvent,
         g: PanResponderGestureState,
-        block: CCodeBlock
+        block: ICodeBlock
     ) => void;
     globalOutput: string[];
     globalSetOutput: Dispatch<string[]>;
@@ -23,11 +24,11 @@ interface Props {
 
 const BlockList = (props: Props) => {
     const [codeBlocksAsigment, setCodeBlocksAsigment] = useState(
-        new CCodeBlockAsigment(props.onDrop, true, null)
+        new CCodeBlockAsigment({ x: 0, y: 0 }, props.onDrop)
     );
     const [codeBlockPrint, setCodeBlockPrint] = useState(
         new CCodeBlockPrint(
-            null,
+            { x: 0, y: 0 },
             new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
             props.onDrop,
             props.globalOutput,

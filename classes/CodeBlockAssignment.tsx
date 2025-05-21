@@ -5,7 +5,7 @@ import {
     Animated,
 } from "react-native";
 import CodeBlockAssignment from "../components/CodeBlockAssignment";
-import CCodeBlock from "./CodeBlock";
+import CCodeBlock from "./Functional/CodeBlock";
 import Value from "./Functional/Value";
 import LexicalEnvironment from "./Functional/LexicalEnvironment";
 import Returnable from "../shared/Interfaces/Returnable";
@@ -13,56 +13,50 @@ import TypeNumber from "./types/TypeNumber";
 import { getTypeByString } from "../shared/functions";
 import Renderable from "../shared/Interfaces/Renderable";
 import Droppable from "../shared/Interfaces/Droppable";
+import { Position } from "../shared/types";
+import CCodeBlockWrapper from "./CodeBlockWrapper";
+import ICodeBlock from "../shared/Interfaces/CodeBlock";
 
 interface ICodeBlockAssignment {
-    isNew: boolean;
     nameToAssign: string | null;
     typeToAssign: string | null;
     valueToAssign: string | null;
 }
 
-interface Props {
-    key: Key;
-    type: string;
-    name: string;
-    value: string;
-    onDrop: (
-        e: GestureResponderEvent,
-        g: PanResponderGestureState,
-        position: Animated.ValueXY
-    ) => void;
-    onChange: (name: string, value: string, type: string) => void;
-    rerender: DispatchWithoutAction;
-}
-
 class CCodeBlockAssignment
-    implements ICodeBlockAssignment, Renderable, Returnable, Droppable
+    extends CCodeBlock
+    implements
+        ICodeBlock,
+        ICodeBlockAssignment,
+        Renderable,
+        Returnable,
+        Droppable
 {
-    render_: (props: Props) => React.JSX.Element;
-    isNew: boolean;
-    parent: CCodeBlock | null;
+    render_: (props: any) => React.JSX.Element;
     onDrop: (
         e: GestureResponderEvent,
         g: PanResponderGestureState,
-        block: CCodeBlock
+        block: ICodeBlock
     ) => void;
     nameToAssign: string | null;
     valueToAssign: string | null;
     typeToAssign: string | null;
 
     constructor(
+        offset: Position,
         onDrop: (
             e: GestureResponderEvent,
             g: PanResponderGestureState,
-            block: CCodeBlock
+            block: ICodeBlock
         ) => void,
-        isNew: boolean,
-        parent: CCodeBlock | null
+        next: CCodeBlock | null = null,
+        prev: CCodeBlock | null = null,
+        parent: CCodeBlockWrapper | null = null,
+        le: LexicalEnvironment | null = null
     ) {
+        super(offset, next, prev, parent);
         this.render_ = CodeBlockAssignment;
         this.onDrop = onDrop;
-        this.isNew = isNew;
-        this.parent = parent;
         this.nameToAssign = null;
         this.valueToAssign = null;
         this.typeToAssign = null;
@@ -73,27 +67,31 @@ class CCodeBlockAssignment
         g: PanResponderGestureState,
         position: Animated.ValueXY
     ) {
-        Animated.spring(new Animated.ValueXY(position), {
-            toValue: { x: 0, y: 0 },
-            useNativeDriver: false,
-        }).start();
         if (this.parent) {
-            this.parent.removeThisCodeBLock.call(this.parent);
-            this.onDrop(e, g, this.parent);
+            this.removeThisCodeBLock();
+            this.onDrop(e, g, this);
         } else
             this.onDrop(
                 e,
                 g,
-                new CCodeBlock(
-                    { x: 0, y: 0 },
-                    new CCodeBlockAssignment(this.onDrop, false, null),
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                )
+                new CCodeBlockAssignment({ x: 0, y: 0 }, this.onDrop, null)
             );
+    }
+
+    override insertCodeBlock(
+        e: GestureResponderEvent,
+        g: PanResponderGestureState,
+        block: ICodeBlock
+    ): boolean {
+        console.log("1231231231");
+        if (this.checkDropIn.call(this, g)) {
+            this.pushCodeBlockAfterThis(block);
+            return true;
+        }
+        if (this.next) {
+            return this.next.insertCodeBlock(e, g, block);
+        }
+        return false;
     }
 
     setAssignmentState(name: string, value: string, type: string) {
@@ -102,7 +100,18 @@ class CCodeBlockAssignment
         this.typeToAssign = type;
     }
 
-    render(props: { key: Key; rerender: DispatchWithoutAction }) {
+    onLayoutHandler(x: number, y: number, w: number, h: number): void {
+        this.setPositions(
+            x,
+            y,
+            w,
+            h,
+            0,
+            (this.prev?.offset.y || 0) + (this.prev?.elementY || 0)
+        );
+    }
+
+    override render(props: { key: Key; rerender: DispatchWithoutAction }) {
         return (
             <CodeBlockAssignment
                 key={props.key}
@@ -112,6 +121,7 @@ class CCodeBlockAssignment
                 type={this.typeToAssign || ""}
                 name={this.nameToAssign || ""}
                 value={this.valueToAssign || ""}
+                onLayout={this.onLayoutHandler.bind(this)}
             />
         );
     }

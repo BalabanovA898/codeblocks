@@ -9,7 +9,7 @@ import BlockList from "./components/BlockList";
 import { useEffect, useState } from "react";
 import CodeBlockFunction from "./classes/CodeBlockFunction";
 import CCodeBlockWrapper from "./classes/CodeBlockWrapper";
-import CCodeBlock from "./classes/CodeBlock";
+import CCodeBlock from "./classes/Functional/CodeBlock";
 import LexicalEnvironment from "./classes/Functional/LexicalEnvironment";
 import OutputWindow from "./components/OutoutWindow";
 import CCodeBlockAssignment from "./classes/CodeBlockAssignment";
@@ -34,25 +34,28 @@ export default function App() {
     };
 
     let globalLE = new LexicalEnvironment(null);
+    const [output, setOutput] = useState<string[]>([]);
 
     const [functions, setFunctions] = useState<CodeBlockFunction[]>([
         new CodeBlockFunction(
             new CCodeBlockWrapper(codeBlocksZoneOffset, null, globalLE),
             changeFunctionList,
             TypeNumber,
-            globalLE
+            globalLE,
+            output,
+            setOutput,
+            "main"
         ),
     ]);
     const [currentFunction, setCurrentFunction] = useState<number>(0);
-
-    const [output, setOutput] = useState<string[]>([]);
+    const [countOfFunctions, setCountOfFunctions] = useState<number>(1);
 
     useEffect(() => {
         console.log(codeBlocksZoneOffset);
         let copy = functions;
         functions[0].codeBlocks.offset = {
-            x: codeBlocksZoneOffset.x + functions[0].codeBlocks.offset.x,
-            y: codeBlocksZoneOffset.y + functions[0].codeBlocks.offset.y,
+            x: codeBlocksZoneOffset.x,
+            y: codeBlocksZoneOffset.y,
         };
         setFunctions({ ...copy });
         console.log(functions);
@@ -69,7 +72,11 @@ export default function App() {
                 isVisible={isBlockListVisible}
                 globalOutput={output}
                 globalSetOutput={setOutput}></BlockList>
-            <FunctionNavigator />
+            <FunctionNavigator
+                functions={functions}
+                setCurrentFunction={setCurrentFunction}
+                countOfFunctions={countOfFunctions}
+            />
             <CodeblocksZone
                 setCBZO={setCodeBlocksZoneOffset}
                 blocks={functions[currentFunction].codeBlocks}

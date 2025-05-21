@@ -1,22 +1,23 @@
-import { DispatchWithoutAction, Key } from "react";
+import { DispatchWithoutAction, Key, useReducer } from "react";
 import { StyleSheet, View } from "react-native";
-import CCodeBlock from "../classes/CodeBlock";
+import CCodeBlock from "../classes/Functional/CodeBlock";
+import ICodeBlock from "../shared/Interfaces/CodeBlock";
 
 interface Props {
     key: Key;
     onLayout: (x: number, y: number, w: number, h: number) => void;
-    firstElement: CCodeBlock | null;
-    rerender: DispatchWithoutAction;
+    firstElement: ICodeBlock | null;
 }
 
 const CodeBlockWrapper = (props: Props) => {
     let renderArray = [];
     let currentNode = props.firstElement;
+    const [, rerender] = useReducer((e) => e - 1, 0);
     while (currentNode) {
         renderArray.push(
-            currentNode.renderSequence({
+            currentNode.render({
                 key: Date.now() + renderArray.length,
-                rerender: props.rerender,
+                rerender: rerender,
             })
         );
         currentNode = currentNode.next;

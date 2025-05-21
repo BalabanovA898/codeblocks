@@ -1,7 +1,7 @@
-import CCodeBlock from "../../classes/CodeBlock";
+import CCodeBlockWrapper from "../../classes/CodeBlockWrapper";
 
 export default interface Renderable {
-    parent: CCodeBlock | null;
+    parent: CCodeBlockWrapper | null;
     render(props: any): JSX.Element;
 }
 

@@ -3,7 +3,7 @@ import {
     PanResponderGestureState,
     Animated,
 } from "react-native";
-import CCodeBlock from "../../classes/CodeBlock";
+import CCodeBlock from "../../classes/Functional/CodeBlock";
 
 export default interface Droppable {
     onDrop: (
