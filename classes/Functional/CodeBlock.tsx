@@ -43,7 +43,6 @@ abstract class CCodeBlock extends DropZone implements ICodeBlock {
         if (tmp) tmp.prev = newBLock;
         newBLock.next = tmp;
         newBLock.prev = this;
-        this.next.offset = this.offset;
         this.next.parent = this.parent;
         console.log(this.next);
     }
@@ -74,7 +73,7 @@ abstract class CCodeBlock extends DropZone implements ICodeBlock {
             this.prev.next = this.next;
             if (this.next) this.next.prev = this.prev;
         }
-        if (!this.prev && this.parent) this.parent.content = null;
+        if (!this.prev && this.parent) this.parent.content = this.next;
     }
 }
 

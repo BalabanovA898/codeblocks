@@ -10,6 +10,8 @@ import CCodeBlock from "../classes/Functional/CodeBlock";
 import CCodeBlockPrint from "../classes/CodeBlockPrint";
 import CCodeBlockWrapper from "../classes/CodeBlockWrapper";
 import ICodeBlock from "../shared/Interfaces/CodeBlock";
+import CCodeBlockValue from "../classes/CodeBlockValue";
+import CCodeBlockGetVariableValue from "../classes/CodeBlockGetVariable";
 
 interface Props {
     isVisible: Boolean;
@@ -24,7 +26,11 @@ interface Props {
 
 const BlockList = (props: Props) => {
     const [codeBlocksAsigment, setCodeBlocksAsigment] = useState(
-        new CCodeBlockAsigment({ x: 0, y: 0 }, props.onDrop)
+        new CCodeBlockAsigment(
+            { x: 0, y: 0 },
+            new CCodeBlockWrapper({ x: 0, y: 0 }, null),
+            props.onDrop
+        )
     );
     const [codeBlockPrint, setCodeBlockPrint] = useState(
         new CCodeBlockPrint(
@@ -35,7 +41,13 @@ const BlockList = (props: Props) => {
             props.globalSetOutput
         )
     );
+    const [codeBlockValue, setCodeBlockValue] = useState(
+        new CCodeBlockValue({ x: 0, y: 0 }, props.onDrop)
+    );
 
+    const [codeBlockGetVariableValue, setCodeBlockGetVariableValue] = useState(
+        new CCodeBlockGetVariableValue({ x: 0, y: 0 }, props.onDrop)
+    );
     const [, renderer] = useReducer((e) => e - 1, 0);
     return (
         <View
@@ -48,6 +60,14 @@ const BlockList = (props: Props) => {
                 rerender: renderer,
             })}
             {codeBlockPrint.render.call(codeBlockPrint, {
+                key: Date.now(),
+                rerender: renderer,
+            })}
+            {codeBlockValue.render.call(codeBlockValue, {
+                key: Date.now(),
+                rerender: renderer,
+            })}
+            {codeBlockGetVariableValue.render.call(codeBlockGetVariableValue, {
                 key: Date.now(),
                 rerender: renderer,
             })}

@@ -13,7 +13,6 @@ interface ICodeBlockFunction {
     codeBlocksWrapper_: CCodeBlockWrapper;
     cfl: (fn: CodeBlockFunction) => void;
     returnType: Class<InterpreterTypes>;
-    le: LexicalEnvironment;
     output: string[];
     setOutput: Dispatch<string[]>;
     name: string;
@@ -23,7 +22,6 @@ class CodeBlockFunction implements ICodeBlockFunction, Returnable {
     codeBlocksWrapper_: CCodeBlockWrapper;
     cfl: (fn: CodeBlockFunction) => void;
     returnType: Class<InterpreterTypes>;
-    le: LexicalEnvironment;
     output: string[];
     setOutput: Dispatch<string[]>;
     name: string;
@@ -32,7 +30,6 @@ class CodeBlockFunction implements ICodeBlockFunction, Returnable {
         codeBlocksTree: CCodeBlockWrapper,
         changeFunctionList: (fn: CodeBlockFunction) => void,
         returnType: Class<InterpreterTypes>,
-        le: LexicalEnvironment,
         output: string[],
         setOutput: Dispatch<string[]>,
         name: string
@@ -40,7 +37,6 @@ class CodeBlockFunction implements ICodeBlockFunction, Returnable {
         this.codeBlocksWrapper_ = codeBlocksTree;
         this.cfl = changeFunctionList;
         this.returnType = returnType;
-        this.le = le;
         this.output = output;
         this.setOutput = setOutput;
         this.name = name;
@@ -62,16 +58,17 @@ class CodeBlockFunction implements ICodeBlockFunction, Returnable {
         this.cfl(this);
     }
 
-    execute(): Value {
-        this.le = new LexicalEnvironment(this.le.prev);
+    execute(le: LexicalEnvironment): Value {
         try {
-            return this.codeBlocks.execute();
+            return this.codeBlocks.execute(new LexicalEnvironment(le));
         } catch (e: any) {
             this.setOutput([
                 ...this.output,
                 `Произошла  ошибка в фукнцие ${this.name}. Текст ошибки: ${e.message}`,
             ]);
-            throw new Error(`Ошибка в функцие ${this.name}`);
+            throw new Error(
+                `Произошла  ошибка в фукнцие ${this.name}. Текст ошибки: ${e.message}`
+            );
         }
     }
 }

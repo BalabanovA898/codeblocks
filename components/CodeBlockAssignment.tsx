@@ -9,33 +9,25 @@ import {
     NativeSyntheticEvent,
     View,
 } from "react-native";
-import {
-    Key,
-    useEffect,
-    useState,
-    useReducer,
-    DispatchWithoutAction,
-} from "react";
+import { Key, DispatchWithoutAction, PropsWithChildren } from "react";
 import Draggable from "./Draggable";
-import Value from "../classes/Functional/Value";
-import Select from "./Select";
+import CCodeBlockWrapper from "../classes/CodeBlockWrapper";
 
 interface Props {
     key: Key;
-    type: string;
     name: string;
-    value: string;
     onDrop: (
         e: GestureResponderEvent,
         g: PanResponderGestureState,
         position: Animated.ValueXY
     ) => void;
-    onChange: (name: string, value: string, type: string) => void;
+    onChange: (name: string) => void;
     rerender: DispatchWithoutAction;
     onLayout: (x: number, y: number, w: number, h: number) => void;
+    wrapper: CCodeBlockWrapper;
 }
 
-const CodeBlockAssignment = (props: Props) => {
+const CodeBlockAssignment = (props: Props & PropsWithChildren) => {
     return (
         <Draggable
             onDrop={props.onDrop}
@@ -49,38 +41,20 @@ const CodeBlockAssignment = (props: Props) => {
                         e.nativeEvent.layout.height
                     );
                 }}>
-                <Select
-                    selectedOption={props.type}
-                    onSelect={(item: string) => {
-                        props.onChange(props.name, props.value, item);
-                        props.rerender();
-                    }}
-                    options={["string", "number", "bool"]}></Select>
                 <TextInput
                     onChange={(
                         e: NativeSyntheticEvent<TextInputChangeEventData>
                     ) => {
-                        props.onChange(
-                            e.nativeEvent.text,
-                            props.value,
-                            props.type
-                        );
-                    }}>
+                        props.onChange(e.nativeEvent.text);
+                    }}
+                    onEndEditing={() => props.rerender()}>
                     {props.name || "Имя переменной"}
                 </TextInput>
                 <Text>=</Text>
-                <TextInput
-                    onChange={(
-                        e: NativeSyntheticEvent<TextInputChangeEventData>
-                    ) => {
-                        props.onChange(
-                            props.value,
-                            e.nativeEvent.text,
-                            props.type
-                        );
-                    }}>
-                    {props.value || "Значание"}
-                </TextInput>
+                {props.wrapper.render({
+                    key: Date.now(),
+                    rerender: props.rerender,
+                })}
             </View>
         </Draggable>
     );
