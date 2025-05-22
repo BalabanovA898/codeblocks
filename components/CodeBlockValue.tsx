@@ -26,6 +26,7 @@ interface Props {
 const CodeBlockValue = (props: Props) => {
     return (
         <Draggable
+            key={Date.now()}
             onDrop={props.onDrop}
             styles={styles.container}>
             <View
