@@ -13,6 +13,7 @@ import ICodeBlock from "../shared/Interfaces/CodeBlock";
 import CCodeBlockValue from "../classes/CodeBlockValue";
 import CCodeBlockGetVariableValue from "../classes/CodeBlockGetVariable";
 import CCodeBlockLogic from "../classes/CodeBlockLogic";
+import CCodeBlockMath from "../classes/CodeBlockMath";
 
 interface Props {
     isVisible: Boolean;
@@ -57,7 +58,14 @@ const BlockList = (props: Props) => {
             props.onDrop
         )
     );
-
+    const [codeBlockMath, setCodeBlockMath] = useState(
+        new CCodeBlockMath(
+            { x: 0, y: 0 },
+            new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
+            new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
+            props.onDrop
+        )
+    );
     const [, renderer] = useReducer((e) => e - 1, 0);
     return (
         <View
@@ -82,6 +90,10 @@ const BlockList = (props: Props) => {
                 rerender: renderer,
             })}
             {codeBlockLogic.render.call(codeBlockLogic, {
+                key: Date.now(),
+                rerender: renderer,
+            })}
+            {codeBlockMath.render.call(codeBlockMath, {
                 key: Date.now(),
                 rerender: renderer,
             })}
