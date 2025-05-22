@@ -38,10 +38,9 @@ export default function App() {
 
     const [functions, setFunctions] = useState<CodeBlockFunction[]>([
         new CodeBlockFunction(
-            new CCodeBlockWrapper(codeBlocksZoneOffset, null, globalLE),
+            new CCodeBlockWrapper(codeBlocksZoneOffset, null),
             changeFunctionList,
             TypeNumber,
-            globalLE,
             output,
             setOutput,
             "main"
@@ -83,10 +82,15 @@ export default function App() {
             />
             <Footer
                 executeCode={() => {
-                    globalLE = new LexicalEnvironment(null);
-                    functions[currentFunction].execute.bind(
-                        functions[currentFunction]
-                    )();
+                    setOutput([]);
+                    try {
+                        globalLE = new LexicalEnvironment(null);
+                        functions[currentFunction].execute.bind(
+                            functions[currentFunction]
+                        )(globalLE);
+                    } catch (e: any) {
+                        setOutput([...output, e.message]);
+                    }
                     setIsOutputWindowVisible(true);
                 }}
             />

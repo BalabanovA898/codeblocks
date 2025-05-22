@@ -30,7 +30,6 @@ interface ICodeBlockWrapper {
         g: PanResponderGestureState,
         block: ICodeBlock
     ) => boolean;
-    le: LexicalEnvironment | null;
     parent: ICodeBlock | null;
 }
 
@@ -50,18 +49,15 @@ class CCodeBlockWrapper
         firstElement: ICodeBlock | null;
         rerender: DispatchWithoutAction;
     }) => React.JSX.Element = CodeBlockWrapper;
-    le: LexicalEnvironment | null;
     parent: ICodeBlock | null;
 
     constructor(
         offset: Position,
         content: ICodeBlock | null,
-        le: LexicalEnvironment | null,
         parent: ICodeBlock | null = null
     ) {
         super(offset);
         this.content = content;
-        this.le = le;
         this.parent = parent;
     }
 
@@ -109,17 +105,11 @@ class CCodeBlockWrapper
         }
         return false;
     }
-    execute() {
-        if (!this.le) {
-            throw new Error(
-                "Блок не располагает доступом к лeксическому окружению. Произошла ошибка интерпритации."
-            );
-        }
-        this.le = new LexicalEnvironment(this.le.prev);
+    execute(le: LexicalEnvironment) {
         let valueToReturn: Value | null = null;
         let currentNode = this.content;
         while (currentNode) {
-            valueToReturn = currentNode.execute(this.le);
+            valueToReturn = currentNode.execute(le);
             currentNode = currentNode.next;
         }
         return valueToReturn ? valueToReturn : new Value(TypeNumber, "");

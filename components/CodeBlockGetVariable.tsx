@@ -3,26 +3,25 @@ import {
     GestureResponderEvent,
     PanResponderGestureState,
     StyleSheet,
-    Text,
+    TextInput,
     View,
 } from "react-native";
+import { DispatchWithoutAction, useState } from "react";
 import Draggable from "./Draggable";
-import { Children, DispatchWithoutAction, Key, PropsWithChildren } from "react";
-import CCodeBlockWrapper from "../classes/CodeBlockWrapper";
 
 interface Props {
-    key: Key;
+    value: string;
+    setValue: (value: string) => void;
+    rerender: DispatchWithoutAction;
     onDrop: (
         e: GestureResponderEvent,
         g: PanResponderGestureState,
         position: Animated.ValueXY
     ) => void;
     onLayout: (x: number, y: number, w: number, h: number) => void;
-    wrapper: CCodeBlockWrapper;
-    rerender: DispatchWithoutAction;
 }
 
-const CodeBlockPrint = (props: Props & PropsWithChildren) => {
+const CodeBlockGetVariableValue = (props: Props) => {
     return (
         <Draggable
             onDrop={props.onDrop}
@@ -36,11 +35,13 @@ const CodeBlockPrint = (props: Props & PropsWithChildren) => {
                         e.nativeEvent.layout.height
                     );
                 }}>
-                <Text>Log</Text>
-                {props.wrapper.render({
-                    key: Date.now(),
-                    rerender: props.rerender,
-                })}
+                <TextInput
+                    onChange={(e) => {
+                        props.setValue(e.nativeEvent.text);
+                    }}
+                    onEndEditing={() => props.rerender()}>
+                    {props.value || "Значение"}
+                </TextInput>
             </View>
         </Draggable>
     );
@@ -48,15 +49,11 @@ const CodeBlockPrint = (props: Props & PropsWithChildren) => {
 
 const styles = StyleSheet.create({
     container: {
-        width: 200,
+        backgroundColor: "purple",
         minHeight: 100,
-        backgroundColor: "blue",
-        color: "white",
-    },
-    textColor: {
-        color: "white",
+        minWidth: 100,
     },
 });
 
-export default CodeBlockPrint;
+export default CodeBlockGetVariableValue;
 

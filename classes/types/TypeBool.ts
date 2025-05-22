@@ -18,20 +18,20 @@ class TypeBool {
     }
 
     public static compareLess(a: Value, b: Value): boolean {
-        const numberA = TypeBool.convertFrom(a.value);
-        const numberB = TypeBool.convertFrom(b.value);
+        const numberA = TypeBool.convertFromOtherType(a.value);
+        const numberB = TypeBool.convertFromOtherType(b.value);
         return numberA < numberB;
     }
 
     public static compareEqual(a: Value, b: Value): boolean {
-        const numberA = TypeBool.convertFrom(a.value);
-        const numberB = TypeBool.convertFrom(b.value);
+        const numberA = TypeBool.convertFromOtherType(a.value);
+        const numberB = TypeBool.convertFromOtherType(b.value);
         return numberA === numberB;
     }
 
     public static compareBigger(a: Value, b: Value): boolean {
-        const numberA = TypeBool.convertFrom(a.value);
-        const numberB = TypeBool.convertFrom(b.value);
+        const numberA = TypeBool.convertFromOtherType(a.value);
+        const numberB = TypeBool.convertFromOtherType(b.value);
         return numberA > numberB;
     }
 }

@@ -10,17 +10,17 @@ import Value from "./Functional/Value";
 import LexicalEnvironment from "./Functional/LexicalEnvironment";
 import Returnable from "../shared/Interfaces/Returnable";
 import TypeNumber from "./types/TypeNumber";
-import { getTypeByString } from "../shared/functions";
+import { convertFrom, getTypeByString } from "../shared/functions";
 import Renderable from "../shared/Interfaces/Renderable";
 import Droppable from "../shared/Interfaces/Droppable";
 import { Position } from "../shared/types";
 import CCodeBlockWrapper from "./CodeBlockWrapper";
 import ICodeBlock from "../shared/Interfaces/CodeBlock";
+import TypeVoid from "./types/TypeVoid";
 
 interface ICodeBlockAssignment {
     nameToAssign: string | null;
-    typeToAssign: string | null;
-    valueToAssign: string | null;
+    wrapper: CCodeBlockWrapper;
 }
 
 class CCodeBlockAssignment
@@ -39,11 +39,11 @@ class CCodeBlockAssignment
         block: ICodeBlock
     ) => void;
     nameToAssign: string | null;
-    valueToAssign: string | null;
-    typeToAssign: string | null;
+    wrapper: CCodeBlockWrapper;
 
     constructor(
         offset: Position,
+        wrapper: CCodeBlockWrapper,
         onDrop: (
             e: GestureResponderEvent,
             g: PanResponderGestureState,
@@ -51,15 +51,13 @@ class CCodeBlockAssignment
         ) => void,
         next: CCodeBlock | null = null,
         prev: CCodeBlock | null = null,
-        parent: CCodeBlockWrapper | null = null,
-        le: LexicalEnvironment | null = null
+        parent: CCodeBlockWrapper | null = null
     ) {
         super(offset, next, prev, parent);
         this.render_ = CodeBlockAssignment;
         this.onDrop = onDrop;
         this.nameToAssign = null;
-        this.valueToAssign = null;
-        this.typeToAssign = null;
+        this.wrapper = wrapper;
     }
 
     onDropHandler(
@@ -70,12 +68,19 @@ class CCodeBlockAssignment
         if (this.parent) {
             this.removeThisCodeBLock();
             this.onDrop(e, g, this);
-        } else
+        } else {
+            let blockWrapper = new CCodeBlockWrapper(this.offset, null, null);
             this.onDrop(
                 e,
                 g,
-                new CCodeBlockAssignment({ x: 0, y: 0 }, this.onDrop, null)
+                new CCodeBlockAssignment(
+                    { x: 0, y: 0 },
+                    blockWrapper,
+                    this.onDrop,
+                    null
+                )
             );
+        }
     }
 
     override insertCodeBlock(
@@ -85,6 +90,10 @@ class CCodeBlockAssignment
     ): boolean {
         console.log("1231231231");
         if (this.checkDropIn.call(this, g)) {
+            if (this.wrapper.checkDropIn(g)) {
+                this.wrapper.content = null;
+                return this.wrapper.insertCodeBlock(e, g, block);
+            }
             this.pushCodeBlockAfterThis(block);
             return true;
         }
@@ -94,21 +103,21 @@ class CCodeBlockAssignment
         return false;
     }
 
-    setAssignmentState(name: string, value: string, type: string) {
+    setAssignmentState(name: string) {
         this.nameToAssign = name;
-        this.valueToAssign = value;
-        this.typeToAssign = type;
     }
 
     onLayoutHandler(x: number, y: number, w: number, h: number): void {
-        this.setPositions(
-            x,
-            y,
-            w,
-            h,
-            0,
-            (this.prev?.offset.y || 0) + (this.prev?.elementY || 0)
-        );
+        this.setPositions(x, y, w, h, 0, 0);
+        this.wrapper.offset = {
+            x: this.elementX || 0 + this.offset.x,
+            y: this.offset.y,
+        };
+        if (this.next)
+            this.next.offset = {
+                x: this.offset.x,
+                y: this.offset.y + (this.elementHeight || 0),
+            };
     }
 
     override render(props: { key: Key; rerender: DispatchWithoutAction }) {
@@ -118,25 +127,36 @@ class CCodeBlockAssignment
                 rerender={props.rerender}
                 onDrop={this.onDropHandler.bind(this)}
                 onChange={this.setAssignmentState.bind(this)}
-                type={this.typeToAssign || ""}
                 name={this.nameToAssign || ""}
-                value={this.valueToAssign || ""}
                 onLayout={this.onLayoutHandler.bind(this)}
-            />
+                wrapper={this.wrapper}></CodeBlockAssignment>
         );
     }
     execute(le: LexicalEnvironment, contextReturn?: Value): Value {
-        if (this.nameToAssign && this.typeToAssign && this.valueToAssign) {
-            le.setValue(
-                this.nameToAssign,
-                new Value(
-                    getTypeByString(this.typeToAssign),
-                    this.valueToAssign
-                )
+        if (!this.nameToAssign)
+            throw new Error(
+                "Ошибка при создании переменной. Не назначено имя переменной"
             );
-            console.log(le);
-        }
-        return new Value(TypeNumber, "-1");
+        if (
+            !/^ *[a-zA-Z][a-zA-Z0-9]* *( *, *[a-zA-Z][a-zA-Z0-9]* *)*\b/.test(
+                this.nameToAssign
+            )
+        )
+            throw new Error(
+                "Неправильное наименование переменных. Переменная должна начинаться с буквы, далее сожержать только буквы латинского алфавита и цифры. Допускается передача нескольих имен переменных через запятую."
+            );
+
+        let valueToAssign = this.wrapper.execute(new LexicalEnvironment(le));
+
+        if (valueToAssign.type === TypeVoid)
+            throw new Error("Ошибка присваивания. Невозиожно присвоить Void.");
+
+        this.nameToAssign.split(",").forEach((item) => {
+            le.setValue(item.trim(), valueToAssign);
+        });
+
+        console.log(le);
+        return new Value(TypeVoid, "");
     }
 }
 

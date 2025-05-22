@@ -17,6 +17,8 @@ import CCodeBlockWrapper from "./CodeBlockWrapper";
 import { Dispatch, DispatchWithoutAction, Key, useReducer } from "react";
 import { Position } from "../shared/types";
 import ICodeBlock from "../shared/Interfaces/CodeBlock";
+import TypeString from "./types/TypeString";
+import TypeVoid from "./types/TypeVoid";
 
 interface ICodeBlockPrint {
     wrapper: CCodeBlockWrapper;
@@ -49,15 +51,11 @@ class CCodeBlockPrint
         gso: Dispatch<string[]>,
         next: CCodeBlock | null = null,
         prev: CCodeBlock | null = null,
-        parent: CCodeBlockWrapper | null = null,
-        le: LexicalEnvironment | null = null
+        parent: CCodeBlockWrapper | null = null
     ) {
         super(offset, next, prev, parent);
         this.onDrop = onDrop;
         this.wrapper = wrapper;
-        this.wrapper.le = new LexicalEnvironment(
-            this.parent ? this.parent.le : null
-        );
         this.globalOutput = go;
         this.globalSetOutput = gso;
     }
@@ -108,8 +106,16 @@ class CCodeBlockPrint
     }
 
     onLayoutHandler(x: number, y: number, w: number, h: number): void {
-        this.setPositions(x, y, w, h, 0, this.prev?.elementY || 0);
-        this.wrapper.offset = { x: this.elementX, y: this.elementY };
+        this.setPositions(x, y, w, h, 0, 0);
+        this.wrapper.offset = {
+            x: this.elementX || 0 + this.offset.x,
+            y: this.offset.y,
+        };
+        if (this.next)
+            this.next.offset = {
+                x: this.offset.x,
+                y: this.offset.y + (this.elementHeight || 0),
+            };
     }
 
     render(props: any): JSX.Element {
@@ -123,11 +129,16 @@ class CCodeBlockPrint
         );
     }
     execute(le: LexicalEnvironment): Value {
-        this.wrapper.le = new LexicalEnvironment(le);
-        let output = this.wrapper.execute();
-        this.globalSetOutput([...this.globalOutput, output.value]);
+        let output = this.wrapper.execute(new LexicalEnvironment(le));
+        if (output.type === TypeVoid) {
+            throw new Error("Значение для печати имеет тип void.");
+        }
+        this.globalSetOutput([
+            ...this.globalOutput,
+            TypeString.convertFromOtherType(output.value),
+        ]);
         console.log(this.globalOutput);
-        return new Value(TypeNumber, "-1");
+        return new Value(TypeVoid, "");
     }
 }
 
