@@ -3,30 +3,32 @@ import {
     GestureResponderEvent,
     PanResponderGestureState,
     StyleSheet,
-    TextInput,
+    Text,
     View,
 } from "react-native";
-import Select from "./Select";
-import { DispatchWithoutAction, useState } from "react";
 import Draggable from "./Draggable";
+import { Children, DispatchWithoutAction, Key, PropsWithChildren } from "react";
+import CCodeBlockWrapper from "../classes/CodeBlockWrapper";
+import Select from "./Select";
 
 interface Props {
-    type: string;
-    value: string;
-    setValue: (type: string, value: string) => void;
-    rerender: DispatchWithoutAction;
+    key: Key;
     onDrop: (
         e: GestureResponderEvent,
         g: PanResponderGestureState,
         position: Animated.ValueXY
     ) => void;
     onLayout: (x: number, y: number, w: number, h: number) => void;
+    wrapperLeft: CCodeBlockWrapper;
+    wrapperRight: CCodeBlockWrapper;
+    operator: string;
+    setValue: (operator: string) => void;
+    rerender: DispatchWithoutAction;
 }
 
-const CodeBlockValue = (props: Props) => {
+const CodeBlockMath = (props: Props & PropsWithChildren) => {
     return (
         <Draggable
-            key={Date.now()}
             onDrop={props.onDrop}
             styles={styles.container}>
             <View
@@ -38,20 +40,21 @@ const CodeBlockValue = (props: Props) => {
                         e.nativeEvent.layout.height
                     );
                 }}>
+                {props.wrapperLeft.render({
+                    key: Date.now(),
+                    rerender: props.rerender,
+                })}
                 <Select
-                    selectedOption={props.type}
+                    options={["+", "-", "/", "*", "pow", "mod"]}
                     onSelect={(e) => {
-                        props.setValue(props.value, e);
+                        props.setValue(e);
                         props.rerender();
                     }}
-                    options={["string", "bool", "number"]}></Select>
-                <TextInput
-                    onChange={(e) => {
-                        props.setValue(e.nativeEvent.text, props.type);
-                    }}
-                    onEndEditing={() => props.rerender()}>
-                    {props.value || "Значение"}
-                </TextInput>
+                    selectedOption={props.operator}></Select>
+                {props.wrapperRight.render({
+                    key: Date.now(),
+                    rerender: props.rerender,
+                })}
             </View>
         </Draggable>
     );
@@ -59,11 +62,15 @@ const CodeBlockValue = (props: Props) => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: "green",
+        width: 200,
         minHeight: 100,
-        minWidth: 100,
+        backgroundColor: "yellow",
+        color: "white",
+    },
+    textColor: {
+        color: "white",
     },
 });
 
-export default CodeBlockValue;
+export default CodeBlockMath;
 
