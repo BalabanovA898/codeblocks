@@ -95,7 +95,6 @@ class CCodeBlockPrint
         if (this.checkDropIn(g)) {
             console.log("Insert inside the the print code block");
             if (this.wrapper.checkDropIn(g)) {
-                this.wrapper.content = null;
                 return this.wrapper.insertCodeBlock(e, g, block);
             }
             this.pushCodeBlockAfterThis(block);
@@ -135,7 +134,7 @@ class CCodeBlockPrint
         }
         this.globalSetOutput([
             ...this.globalOutput,
-            TypeString.convertFromOtherType(output.value),
+            new TypeString().convertFromOtherType(output.value),
         ]);
         console.log(this.globalOutput);
         return new Value(TypeVoid, "");
