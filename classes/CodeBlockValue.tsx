@@ -112,10 +112,8 @@ export default class CCodeBlockValue
             throw new Error("Ошибка значения. Необходимо указать тип");
         if (this.valueToAssign === null)
             throw new Error("Ошибка значения. Значение не может быть пустым");
-        return new Value(
-            getTypeByString(this.typeToAssign),
-            convertFrom(this.valueToAssign, getTypeByString(this.typeToAssign))
-        );
+        let type = getTypeByString(this.typeToAssign);
+        return new Value(type, new type().convertFrom(this.valueToAssign));
     }
 }
 

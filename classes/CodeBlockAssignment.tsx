@@ -91,7 +91,6 @@ class CCodeBlockAssignment
         console.log("1231231231");
         if (this.checkDropIn.call(this, g)) {
             if (this.wrapper.checkDropIn(g)) {
-                this.wrapper.content = null;
                 return this.wrapper.insertCodeBlock(e, g, block);
             }
             this.pushCodeBlockAfterThis(block);
