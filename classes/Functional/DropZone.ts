@@ -29,7 +29,6 @@ class DropZone implements IDropZone {
         offsetX: number,
         offsetY: number
     ) {
-        console.log("SetPositions", x, y, w, h, offsetX, offsetY);
         this.elementX = x + this.offset.x + offsetX;
         this.elementY = y + this.offset.y + offsetY;
         this.elementWidth = w;

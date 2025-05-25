@@ -14,7 +14,6 @@ import CodeBlockValue from "../components/CodeBlockValue";
 import LexicalEnvironment from "./Functional/LexicalEnvironment";
 import Value from "./Functional/Value";
 import TypeVoid from "./types/TypeVoid";
-import { convertFrom, getTypeByString } from "../shared/functions";
 import CodeBlockGetVariableValue from "../components/CodeBlockGetVariable";
 
 interface ICodeBlockValue {
@@ -73,7 +72,7 @@ export default class CCodeBlockGetVariableValue
         g: PanResponderGestureState,
         block: ICodeBlock
     ): boolean {
-        console.log("1231231231");
+        console.log("Добавление в GetVariable");
         if (this.checkDropIn.call(this, g)) {
             this.pushCodeBlockAfterThis(block);
             return true;
@@ -88,8 +87,8 @@ export default class CCodeBlockGetVariableValue
         this.setPositions(x, y, w, h, 0, 0);
         if (this.next)
             this.next.offset = {
-                x: this.offset.x,
-                y: this.offset.y + (this.elementHeight || 0),
+                x: this.offset.x + 4,
+                y: this.offset.y + (this.elementHeight || 0) + 4,
             };
     }
 

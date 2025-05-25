@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { SafeAreaView, View } from "react-native";
 
 import Header from "./components/Header";
 import FunctionNavigator from "./components/FunctionNavigator";
@@ -30,7 +30,6 @@ export default function App() {
         for (let item = 0; item < functions.length; ++item)
             res.push(item != currentFunction ? functions[item] : fn);
         setFunctions(res);
-        console.log("Hello form cfl");
     };
 
     let globalLE = new LexicalEnvironment(null);
@@ -50,18 +49,16 @@ export default function App() {
     const [countOfFunctions, setCountOfFunctions] = useState<number>(1);
 
     useEffect(() => {
-        console.log(codeBlocksZoneOffset);
         let copy = functions;
         functions[0].codeBlocks.offset = {
             x: codeBlocksZoneOffset.x,
             y: codeBlocksZoneOffset.y,
         };
         setFunctions({ ...copy });
-        console.log(functions);
     }, [codeBlocksZoneOffset]);
 
     return (
-        <View>
+        <SafeAreaView>
             <Header
                 isBlockListVisible={isBlockListVisible}
                 setBlockListVisible={setIsBlockListVisible}
@@ -98,7 +95,7 @@ export default function App() {
                 isActive={isOutputWindowVisible}
                 setIsActive={setIsOutputWindowVisible}
                 massages={output}></OutputWindow>
-        </View>
+        </SafeAreaView>
     );
 }
 

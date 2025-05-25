@@ -1,6 +1,7 @@
 import { View, StyleSheet, Text, ScrollView, Pressable } from "react-native";
 import CodeBlockFunction from "../classes/CodeBlockFunction";
 import { Dispatch } from "react";
+import { uuidv4 } from "../shared/functions";
 
 interface Props {
     functions: CodeBlockFunction[];
@@ -12,7 +13,9 @@ const FunctionNavigator = (props: Props) => {
     let ar = [];
     for (let i = 0; i < props.countOfFunctions; ++i) {
         ar.push(
-            <View style={styles.function}>
+            <View
+                style={styles.function}
+                key={uuidv4()}>
                 <Pressable
                     onPress={() => {
                         props.setCurrentFunction(i);
@@ -22,7 +25,7 @@ const FunctionNavigator = (props: Props) => {
             </View>
         );
     }
-    console.log(ar);
+
     return (
         <ScrollView
             style={styles.container}

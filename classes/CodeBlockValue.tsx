@@ -14,7 +14,7 @@ import CodeBlockValue from "../components/CodeBlockValue";
 import LexicalEnvironment from "./Functional/LexicalEnvironment";
 import Value from "./Functional/Value";
 import TypeVoid from "./types/TypeVoid";
-import { convertFrom, getTypeByString } from "../shared/functions";
+import { getTypeByString } from "../shared/functions";
 
 interface ICodeBlockValue {
     valueToAssign: string | null;
@@ -70,7 +70,7 @@ export default class CCodeBlockValue
         g: PanResponderGestureState,
         block: ICodeBlock
     ): boolean {
-        console.log("1231231231");
+        console.log("Добавление в Value");
         if (this.checkDropIn.call(this, g)) {
             this.pushCodeBlockAfterThis(block);
             return true;

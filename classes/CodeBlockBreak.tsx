@@ -20,45 +20,31 @@ import ICodeBlock from "../shared/Interfaces/CodeBlock";
 import TypeString from "./types/TypeString";
 import TypeVoid from "./types/TypeVoid";
 import { uuidv4 } from "../shared/functions";
+import CodeBlockBreak from "../components/CodeBlockBreak";
 
-interface ICodeBlockPrint {
-    wrapper: CCodeBlockWrapper;
-    globalSetOutput: Dispatch<string[]>;
-    globalOutput: string[];
-}
-
-class CCodeBlockPrint
+class CCodeBlockBreak
     extends CCodeBlock
-    implements Returnable, Renderable, Droppable, ICodeBlockPrint
+    implements Returnable, Renderable, Droppable
 {
     onDrop: (
         e: GestureResponderEvent,
         g: PanResponderGestureState,
         block: CCodeBlock
     ) => void;
-    wrapper: CCodeBlockWrapper;
-    globalOutput: string[];
-    globalSetOutput: Dispatch<string[]>;
 
     constructor(
         offset: Position,
-        wrapper: CCodeBlockWrapper,
         onDrop: (
             e: GestureResponderEvent,
             g: PanResponderGestureState,
             block: CCodeBlock
         ) => void,
-        go: string[],
-        gso: Dispatch<string[]>,
         next: CCodeBlock | null = null,
         prev: CCodeBlock | null = null,
         parent: CCodeBlockWrapper | null = null
     ) {
         super(offset, next, prev, parent);
         this.onDrop = onDrop;
-        this.wrapper = wrapper;
-        this.globalOutput = go;
-        this.globalSetOutput = gso;
     }
     onDropHandler(
         e: GestureResponderEvent,
@@ -73,18 +59,7 @@ class CCodeBlockPrint
             this.removeThisCodeBLock.call(this);
             this.onDrop(e, g, this);
         } else {
-            let blockWrapper = new CCodeBlockWrapper(this.offset, null, null);
-            this.onDrop(
-                e,
-                g,
-                new CCodeBlockPrint(
-                    { x: 0, y: 0 },
-                    blockWrapper,
-                    this.onDrop,
-                    this.globalOutput,
-                    this.globalSetOutput
-                )
-            );
+            this.onDrop(e, g, new CCodeBlockBreak({ x: 0, y: 0 }, this.onDrop));
         }
     }
 
@@ -93,11 +68,8 @@ class CCodeBlockPrint
         g: PanResponderGestureState,
         block: ICodeBlock
     ): boolean {
-        console.log("Добавление в Print");
+        console.log("Добавление в Break");
         if (this.checkDropIn(g)) {
-            if (this.wrapper.checkDropIn(g)) {
-                return this.wrapper.insertCodeBlock(e, g, block);
-            }
             this.pushCodeBlockAfterThis(block);
             return true;
         }
@@ -107,10 +79,6 @@ class CCodeBlockPrint
 
     onLayoutHandler(x: number, y: number, w: number, h: number): void {
         this.setPositions(x, y, w, h, 0, 0);
-        this.wrapper.offset = {
-            x: this.elementX || 0 + this.offset.x,
-            y: this.offset.y,
-        };
         if (this.next)
             this.next.offset = {
                 x: this.offset.x,
@@ -120,27 +88,17 @@ class CCodeBlockPrint
 
     render(props: any): JSX.Element {
         return (
-            <CodeBlockPrint
+            <CodeBlockBreak
                 key={uuidv4()}
                 onDrop={this.onDropHandler.bind(this)}
                 onLayout={this.onLayoutHandler.bind(this)}
-                wrapper={this.wrapper}
-                rerender={props.rerender}></CodeBlockPrint>
+                rerender={props.rerender}></CodeBlockBreak>
         );
     }
     execute(le: LexicalEnvironment): Value {
-        let output = this.wrapper.execute(new LexicalEnvironment(le));
-        if (output.type === TypeVoid) {
-            throw new Error("Значение для печати имеет тип void.");
-        }
-        this.globalSetOutput([
-            ...this.globalOutput,
-            new TypeString().convertFromOtherType(output.value),
-        ]);
-
-        return new Value(TypeVoid, "");
+        return new Value(TypeNumber, "1");
     }
 }
 
-export default CCodeBlockPrint;
+export default CCodeBlockBreak;
 

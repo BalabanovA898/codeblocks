@@ -18,9 +18,11 @@ import CodeBlockLogic from "../components/CodeBlockLogic";
 import TypeNumber from "./types/TypeNumber";
 import TypeBool from "./types/TypeBool";
 import CodeBlockMath from "../components/CodeBlockMath";
+import CodeBlockIfStatement from "../components/CodeBlockIfStatement";
 import { uuidv4 } from "../shared/functions";
+import CodeBlockWhile from "../components/CodeBlockWhile";
 
-export default class CCodeBlockMath
+export default class CCodeBlockWhile
     extends CCodeBlock
     implements Returnable, Renderable, Droppable, ICodeBlock
 {
@@ -29,8 +31,8 @@ export default class CCodeBlockMath
         g: PanResponderGestureState,
         block: CCodeBlock
     ) => void;
-    wrapperLeft: CCodeBlockWrapper;
-    wrapperRight: CCodeBlockWrapper;
+    wrapperWhile: CCodeBlockWrapper;
+    wrapperDo: CCodeBlockWrapper;
     operator: string | null = null;
 
     constructor(
@@ -48,8 +50,8 @@ export default class CCodeBlockMath
     ) {
         super(offset, next, prev, parent);
         this.onDrop = onDrop;
-        this.wrapperLeft = wrapperA;
-        this.wrapperRight = wrapperB;
+        this.wrapperWhile = wrapperA;
+        this.wrapperDo = wrapperB;
     }
 
     onDropHandler(
@@ -70,7 +72,7 @@ export default class CCodeBlockMath
             this.onDrop(
                 e,
                 g,
-                new CCodeBlockMath(
+                new CCodeBlockWhile(
                     { x: 0, y: 0 },
                     blockWrapperA,
                     blockWrapperB,
@@ -85,14 +87,12 @@ export default class CCodeBlockMath
         g: PanResponderGestureState,
         block: ICodeBlock
     ): boolean {
-        console.log("Добавлоение в Math");
+        console.log("Добавление в IfStatement");
         if (this.checkDropIn(g)) {
-            if (this.wrapperLeft.checkDropIn(g)) {
-                return this.wrapperLeft.insertCodeBlock(e, g, block);
-            }
-            if (this.wrapperRight.checkDropIn(g)) {
-                return this.wrapperRight.insertCodeBlock(e, g, block);
-            }
+            if (this.wrapperWhile.checkDropIn(g))
+                return this.wrapperWhile.insertCodeBlock(e, g, block);
+            if (this.wrapperDo.checkDropIn(g))
+                return this.wrapperDo.insertCodeBlock(e, g, block);
             this.pushCodeBlockAfterThis(block);
             return true;
         }
@@ -102,11 +102,11 @@ export default class CCodeBlockMath
 
     onLayoutHandler(x: number, y: number, w: number, h: number): void {
         this.setPositions(x, y, w, h, 0, 0);
-        this.wrapperLeft.offset = {
+        this.wrapperWhile.offset = {
             x: this.elementX || 0 + this.offset.x,
             y: this.offset.y,
         };
-        this.wrapperRight.offset = {
+        this.wrapperDo.offset = {
             x: this.elementX || 0 + this.offset.x,
             y: this.offset.y,
         };
@@ -123,57 +123,33 @@ export default class CCodeBlockMath
 
     render(props: any): JSX.Element {
         return (
-            <CodeBlockMath
+            <CodeBlockWhile
                 key={uuidv4()}
                 onDrop={this.onDropHandler.bind(this)}
                 onLayout={this.onLayoutHandler.bind(this)}
-                wrapperLeft={this.wrapperLeft}
-                wrapperRight={this.wrapperRight}
-                operator={this.operator || ""}
-                setValue={this.setOperator.bind(this)}
-                rerender={props.rerender}></CodeBlockMath>
+                wrapperWhile={this.wrapperWhile}
+                wrapperDo={this.wrapperDo}
+                rerender={props.rerender}></CodeBlockWhile>
         );
     }
 
     execute(le: LexicalEnvironment): Value {
-        let leftOperand = this.wrapperLeft.execute(new LexicalEnvironment(le));
-        let rightOperand = this.wrapperRight.execute(
-            new LexicalEnvironment(le)
-        );
-        if (leftOperand.type === TypeVoid || rightOperand.type === TypeVoid)
+        let statement = this.wrapperWhile.execute(new LexicalEnvironment(le));
+        if (statement.type === TypeVoid)
             throw new Error(
-                "Ошибка в математическом вырожении. Операнд не может быть типа Void."
+                "Ошибка цикла с услвовием. Тип Void не может использоваться в качестве условия."
             );
-        if (!this.operator)
-            throw new Error(
-                "Ошибка в математическом выражении. Необходимо выбрать логическую операцию."
-            );
-
-        let a = Number(
-            new TypeNumber().convertFromOtherType(leftOperand.value)
-        );
-        let b = Number(
-            new TypeNumber().convertFromOtherType(rightOperand.value)
-        );
-
-        switch (this.operator) {
-            case "+":
-                return new Value(TypeNumber, a + b);
-            case "-":
-                return new Value(TypeNumber, a - b);
-            case "/":
-                return new Value(TypeNumber, a / b);
-            case "*":
-                return new Value(TypeNumber, a * b);
-            case "pow":
-                return new Value(TypeNumber, Math.pow(a, b));
-            case "mod":
-                return new Value(TypeNumber, a % b);
-            default:
+        let iteration = new Value(TypeVoid, "");
+        while (new TypeBool().convertFromOtherType(statement.value)) {
+            iteration = this.wrapperDo.execute(new LexicalEnvironment(le));
+            if (iteration.type !== TypeVoid) break;
+            statement = this.wrapperWhile.execute(new LexicalEnvironment(le));
+            if (statement.type === TypeVoid)
                 throw new Error(
-                    "Ошибка в математическом выражении. Произошла непредвиденная ошиюбка инрепритации."
+                    "Ошибка цикла с услвовием. Тип Void не может использоваться в качестве условия."
                 );
         }
+        return iteration;
     }
 }
 

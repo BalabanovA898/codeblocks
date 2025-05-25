@@ -3,29 +3,26 @@ import {
     GestureResponderEvent,
     PanResponderGestureState,
     StyleSheet,
-    TextInput,
+    Text,
     View,
 } from "react-native";
-import { DispatchWithoutAction, useState } from "react";
 import Draggable from "./Draggable";
-import { uuidv4 } from "../shared/functions";
+import { Children, DispatchWithoutAction, Key, PropsWithChildren } from "react";
 
 interface Props {
-    value: string;
-    setValue: (value: string) => void;
-    rerender: DispatchWithoutAction;
+    key: Key;
     onDrop: (
         e: GestureResponderEvent,
         g: PanResponderGestureState,
         position: Animated.ValueXY
     ) => void;
     onLayout: (x: number, y: number, w: number, h: number) => void;
+    rerender: DispatchWithoutAction;
 }
 
-const CodeBlockGetVariableValue = (props: Props) => {
+const CodeBlockBreak = (props: Props & PropsWithChildren) => {
     return (
         <Draggable
-            key={uuidv4()}
             onDrop={props.onDrop}
             styles={styles.container}>
             <View
@@ -37,11 +34,7 @@ const CodeBlockGetVariableValue = (props: Props) => {
                         e.nativeEvent.layout.height
                     );
                 }}>
-                <TextInput
-                    onChange={(e) => {
-                        props.setValue(e.nativeEvent.text);
-                    }}
-                    onEndEditing={() => props.rerender()}></TextInput>
+                <Text style={styles.textColor}>Break</Text>
             </View>
         </Draggable>
     );
@@ -49,11 +42,14 @@ const CodeBlockGetVariableValue = (props: Props) => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: "purple",
+        width: 200,
         minHeight: 100,
-        minWidth: 100,
+        backgroundColor: "black",
+    },
+    textColor: {
+        color: "white",
     },
 });
 
-export default CodeBlockGetVariableValue;
+export default CodeBlockBreak;
 

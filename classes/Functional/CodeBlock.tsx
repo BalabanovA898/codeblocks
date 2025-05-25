@@ -37,14 +37,12 @@ abstract class CCodeBlock extends DropZone implements ICodeBlock {
     }
 
     pushCodeBlockAfterThis(newBLock: ICodeBlock) {
-        console.log("I've been added from CodeBlock");
         let tmp = this.next;
         this.next = newBLock;
         if (tmp) tmp.prev = newBLock;
         newBLock.next = tmp;
         newBLock.prev = this;
         this.next.parent = this.parent;
-        console.log(this.next);
     }
 
     render(props: any) {
@@ -58,7 +56,6 @@ abstract class CCodeBlock extends DropZone implements ICodeBlock {
         g: PanResponderGestureState,
         block: ICodeBlock
     ): boolean {
-        console.log("Called wrong method!");
         //if (this.checkDropIn(g)) {
         //    this.pushCodeBlockAfterThis(block);
         //    return true;
@@ -67,8 +64,6 @@ abstract class CCodeBlock extends DropZone implements ICodeBlock {
     }
 
     removeThisCodeBLock() {
-        console.log("block remove");
-        console.log(this);
         if (this.prev) {
             this.prev.next = this.next;
             if (this.next) this.next.prev = this.prev;

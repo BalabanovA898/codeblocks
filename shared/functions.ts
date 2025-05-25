@@ -16,15 +16,14 @@ export const getTypeByString = (type: string): Class<InterpreterTypes> => {
             return TypeVoid;
     }
 };
-
-export const convertFrom = <T extends Class<InterpreterTypes>>(
-    from: string,
-    to: T
-) => {
-    if (new to() instanceof TypeNumber) return TypeNumber.convertFrom(from);
-    if (new to() instanceof TypeString) return TypeString.convertFrom(from);
-    if (new to() instanceof TypeBool) return TypeBool.convertFrom(from);
-    if (new to() instanceof TypeVoid) return TypeVoid.convertFrom(from);
-    throw new Error(`Ошибка при конвертации типов из ${from} в ${typeof to}`);
-};
+export function uuidv4() {
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+        /[xy]/g,
+        function (c) {
+            const r = (Math.random() * 16) | 0,
+                v = c == "x" ? r : (r & 0x3) | 0x8;
+            return v.toString(16);
+        }
+    );
+}
 
