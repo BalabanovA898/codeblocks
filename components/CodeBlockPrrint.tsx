@@ -9,6 +9,7 @@ import {
 import Draggable from "./Draggable";
 import { Children, DispatchWithoutAction, Key, PropsWithChildren } from "react";
 import CCodeBlockWrapper from "../classes/CodeBlockWrapper";
+import { uuidv4 } from "../shared/functions";
 
 interface Props {
     key: Key;
@@ -38,7 +39,7 @@ const CodeBlockPrint = (props: Props & PropsWithChildren) => {
                 }}>
                 <Text>Log</Text>
                 {props.wrapper.render({
-                    key: Date.now(),
+                    key: uuidv4(),
                     rerender: props.rerender,
                 })}
             </View>

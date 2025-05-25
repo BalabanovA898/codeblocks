@@ -8,6 +8,7 @@ import {
     StyleProp,
     StyleSheetProperties,
 } from "react-native";
+import { uuidv4 } from "../shared/functions";
 
 interface Props {
     onDrop: (
@@ -47,7 +48,7 @@ const Draggable = (props: PropsWithChildren & Props) => {
                     ...props.styles,
                 },
             ]}
-            key={Date.now()}
+            key={uuidv4()}
             {...panResponder.panHandlers}>
             {props.children}
         </Animated.View>

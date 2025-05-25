@@ -12,6 +12,7 @@ import {
 import { Key, DispatchWithoutAction, PropsWithChildren } from "react";
 import Draggable from "./Draggable";
 import CCodeBlockWrapper from "../classes/CodeBlockWrapper";
+import { uuidv4 } from "../shared/functions";
 
 interface Props {
     key: Key;
@@ -52,7 +53,7 @@ const CodeBlockAssignment = (props: Props & PropsWithChildren) => {
                 </TextInput>
                 <Text>=</Text>
                 {props.wrapper.render({
-                    key: Date.now(),
+                    key: uuidv4(),
                     rerender: props.rerender,
                 })}
             </View>

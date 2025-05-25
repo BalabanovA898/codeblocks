@@ -10,6 +10,7 @@ import Draggable from "./Draggable";
 import { Children, DispatchWithoutAction, Key, PropsWithChildren } from "react";
 import CCodeBlockWrapper from "../classes/CodeBlockWrapper";
 import Select from "./Select";
+import { uuidv4 } from "../shared/functions";
 
 interface Props {
     key: Key;
@@ -41,7 +42,7 @@ const CodeBlockLogic = (props: Props & PropsWithChildren) => {
                     );
                 }}>
                 {props.wrapperLeft.render({
-                    key: Date.now(),
+                    key: uuidv4(),
                     rerender: props.rerender,
                 })}
                 <Select
@@ -52,7 +53,7 @@ const CodeBlockLogic = (props: Props & PropsWithChildren) => {
                     }}
                     selectedOption={props.operator}></Select>
                 {props.wrapperRight.render({
-                    key: Date.now(),
+                    key: uuidv4(),
                     rerender: props.rerender,
                 })}
             </View>

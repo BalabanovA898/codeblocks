@@ -20,14 +20,13 @@ interface Props {
         position: Animated.ValueXY
     ) => void;
     onLayout: (x: number, y: number, w: number, h: number) => void;
-    wrapperLeft: CCodeBlockWrapper;
-    wrapperRight: CCodeBlockWrapper;
-    operator: string;
-    setValue: (operator: string) => void;
+    wrapperIf: CCodeBlockWrapper;
+    wrapperThen: CCodeBlockWrapper;
+    wrapperElse: CCodeBlockWrapper;
     rerender: DispatchWithoutAction;
 }
 
-const CodeBlockMath = (props: Props & PropsWithChildren) => {
+const CodeBlockIfStatement = (props: Props & PropsWithChildren) => {
     return (
         <Draggable
             onDrop={props.onDrop}
@@ -41,18 +40,18 @@ const CodeBlockMath = (props: Props & PropsWithChildren) => {
                         e.nativeEvent.layout.height
                     );
                 }}>
-                {props.wrapperLeft.render({
+                <Text>If</Text>
+                {props.wrapperIf.render({
                     key: uuidv4(),
                     rerender: props.rerender,
                 })}
-                <Select
-                    options={["+", "-", "/", "*", "pow", "mod"]}
-                    onSelect={(e) => {
-                        props.setValue(e);
-                        props.rerender();
-                    }}
-                    selectedOption={props.operator}></Select>
-                {props.wrapperRight.render({
+                <Text>Then</Text>
+                {props.wrapperThen.render({
+                    key: uuidv4(),
+                    rerender: props.rerender,
+                })}
+                <Text>Else</Text>
+                {props.wrapperElse.render({
                     key: uuidv4(),
                     rerender: props.rerender,
                 })}
@@ -65,13 +64,12 @@ const styles = StyleSheet.create({
     container: {
         width: 200,
         minHeight: 100,
-        backgroundColor: "yellow",
-        color: "white",
+        backgroundColor: "white",
     },
     textColor: {
-        color: "white",
+        color: "black",
     },
 });
 
-export default CodeBlockMath;
+export default CodeBlockIfStatement;
 

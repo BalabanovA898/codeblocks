@@ -2,6 +2,7 @@ import { DispatchWithoutAction, Key, useReducer } from "react";
 import { StyleSheet, View } from "react-native";
 import CCodeBlock from "../classes/Functional/CodeBlock";
 import ICodeBlock from "../shared/Interfaces/CodeBlock";
+import { uuidv4 } from "../shared/functions";
 
 interface Props {
     key: Key;
@@ -16,7 +17,7 @@ const CodeBlockWrapper = (props: Props) => {
     while (currentNode) {
         renderArray.push(
             currentNode.render({
-                key: Date.now() + renderArray.length,
+                key: uuidv4() + renderArray.length,
                 rerender: rerender,
             })
         );

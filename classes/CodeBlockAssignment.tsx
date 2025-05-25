@@ -10,7 +10,6 @@ import Value from "./Functional/Value";
 import LexicalEnvironment from "./Functional/LexicalEnvironment";
 import Returnable from "../shared/Interfaces/Returnable";
 import TypeNumber from "./types/TypeNumber";
-import { convertFrom, getTypeByString } from "../shared/functions";
 import Renderable from "../shared/Interfaces/Renderable";
 import Droppable from "../shared/Interfaces/Droppable";
 import { Position } from "../shared/types";
@@ -88,7 +87,7 @@ class CCodeBlockAssignment
         g: PanResponderGestureState,
         block: ICodeBlock
     ): boolean {
-        console.log("1231231231");
+        console.log("Доабавление в Assignment");
         if (this.checkDropIn.call(this, g)) {
             if (this.wrapper.checkDropIn(g)) {
                 return this.wrapper.insertCodeBlock(e, g, block);
@@ -109,8 +108,8 @@ class CCodeBlockAssignment
     onLayoutHandler(x: number, y: number, w: number, h: number): void {
         this.setPositions(x, y, w, h, 0, 0);
         this.wrapper.offset = {
-            x: this.elementX || 0 + this.offset.x,
-            y: this.offset.y,
+            x: this.elementX || 0 + this.offset.x + 4,
+            y: this.offset.y + 4, //TODO: Make this gap as global var.
         };
         if (this.next)
             this.next.offset = {
@@ -154,7 +153,6 @@ class CCodeBlockAssignment
             le.setValue(item.trim(), valueToAssign);
         });
 
-        console.log(le);
         return new Value(TypeVoid, "");
     }
 }

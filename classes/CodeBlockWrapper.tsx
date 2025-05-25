@@ -15,6 +15,8 @@ import Returnable from "../shared/Interfaces/Returnable";
 import Value from "./Functional/Value";
 import TypeNumber from "./types/TypeNumber";
 import ICodeBlock from "../shared/Interfaces/CodeBlock";
+import { uuidv4 } from "../shared/functions";
+import TypeVoid from "./types/TypeVoid";
 
 interface ICodeBlockWrapper {
     content: ICodeBlock | null;
@@ -63,12 +65,17 @@ class CCodeBlockWrapper
 
     onLayoutHandler(x: number, y: number, w: number, h: number) {
         this.setPositions(x, y, w, h, 0, this.parent?.offset.y || 0);
+        if (this.content)
+            this.content.offset = {
+                x: this.offset.x + x,
+                y: this.offset.y + y,
+            };
     }
 
     render(props: Props) {
         return this.render_({
             onLayout: this.onLayoutHandler.bind(this),
-            key: Date.now(),
+            key: uuidv4(),
             firstElement: this.content,
             rerender: props.rerender,
         });
@@ -80,7 +87,6 @@ class CCodeBlockWrapper
         while (currentNode.next) currentNode = currentNode.next;
         currentNode.next = newBlock;
         newBlock.parent = this;
-        newBlock.offset = { x: currentNode.offset.x, y: currentNode.offset.y };
     }
 
     insertCodeBlock(
@@ -88,12 +94,10 @@ class CCodeBlockWrapper
         g: PanResponderGestureState,
         block: ICodeBlock
     ) {
-        console.log("trying to add in wrapper: ", this);
+        console.log("Доабвление в Wrapper");
         if (this.content == null && this.checkDropIn(g)) {
-            console.log("THIS WILL BE PLACED INSIDE THIS");
             this.content = block;
             this.content.parent = this;
-            this.content.offset = this.offset;
             return true;
         } else if (this.content !== null) {
             if (this.checkDropIn(g))
@@ -106,13 +110,14 @@ class CCodeBlockWrapper
         return false;
     }
     execute(le: LexicalEnvironment) {
-        let valueToReturn: Value | null = null;
+        let valueToReturn: Value = new Value(TypeVoid, "");
         let currentNode = this.content;
         while (currentNode) {
             valueToReturn = currentNode.execute(le);
             currentNode = currentNode.next;
+            if (valueToReturn.type !== TypeVoid) break;
         }
-        return valueToReturn ? valueToReturn : new Value(TypeNumber, "");
+        return valueToReturn;
     }
 }
 

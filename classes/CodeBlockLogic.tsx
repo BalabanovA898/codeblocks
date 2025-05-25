@@ -17,6 +17,7 @@ import TypeVoid from "./types/TypeVoid";
 import CodeBlockLogic from "../components/CodeBlockLogic";
 import TypeNumber from "./types/TypeNumber";
 import TypeBool from "./types/TypeBool";
+import { uuidv4 } from "../shared/functions";
 
 export default class CCodeBlockLogic
     extends CCodeBlock
@@ -83,8 +84,8 @@ export default class CCodeBlockLogic
         g: PanResponderGestureState,
         block: ICodeBlock
     ): boolean {
+        console.log("Добавление в Logic");
         if (this.checkDropIn(g)) {
-            console.log("Insert inside the the print code block");
             if (this.wrapperLeft.checkDropIn(g)) {
                 return this.wrapperLeft.insertCodeBlock(e, g, block);
             }
@@ -122,7 +123,7 @@ export default class CCodeBlockLogic
     render(props: any): JSX.Element {
         return (
             <CodeBlockLogic
-                key={Date.now()}
+                key={uuidv4()}
                 onDrop={this.onDropHandler.bind(this)}
                 onLayout={this.onLayoutHandler.bind(this)}
                 wrapperLeft={this.wrapperLeft}

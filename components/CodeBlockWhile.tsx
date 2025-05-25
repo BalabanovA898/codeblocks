@@ -3,31 +3,31 @@ import {
     GestureResponderEvent,
     PanResponderGestureState,
     StyleSheet,
-    TextInput,
+    Text,
     View,
 } from "react-native";
-import Select from "./Select";
-import { DispatchWithoutAction, useState } from "react";
 import Draggable from "./Draggable";
+import { Children, DispatchWithoutAction, Key, PropsWithChildren } from "react";
+import CCodeBlockWrapper from "../classes/CodeBlockWrapper";
+import Select from "./Select";
 import { uuidv4 } from "../shared/functions";
 
 interface Props {
-    type: string;
-    value: string;
-    setValue: (type: string, value: string) => void;
-    rerender: DispatchWithoutAction;
+    key: Key;
     onDrop: (
         e: GestureResponderEvent,
         g: PanResponderGestureState,
         position: Animated.ValueXY
     ) => void;
     onLayout: (x: number, y: number, w: number, h: number) => void;
+    wrapperWhile: CCodeBlockWrapper;
+    wrapperDo: CCodeBlockWrapper;
+    rerender: DispatchWithoutAction;
 }
 
-const CodeBlockValue = (props: Props) => {
+const CodeBlockWhile = (props: Props & PropsWithChildren) => {
     return (
         <Draggable
-            key={uuidv4()}
             onDrop={props.onDrop}
             styles={styles.container}>
             <View
@@ -39,20 +39,16 @@ const CodeBlockValue = (props: Props) => {
                         e.nativeEvent.layout.height
                     );
                 }}>
-                <Select
-                    selectedOption={props.type}
-                    onSelect={(e) => {
-                        props.setValue(props.value, e);
-                        props.rerender();
-                    }}
-                    options={["string", "bool", "number"]}></Select>
-                <TextInput
-                    onChange={(e) => {
-                        props.setValue(e.nativeEvent.text, props.type);
-                    }}
-                    onEndEditing={() => props.rerender()}>
-                    {props.value || "Значение"}
-                </TextInput>
+                <Text>While</Text>
+                {props.wrapperWhile.render({
+                    key: uuidv4(),
+                    rerender: props.rerender,
+                })}
+                <Text>Do</Text>
+                {props.wrapperDo.render({
+                    key: uuidv4(),
+                    rerender: props.rerender,
+                })}
             </View>
         </Draggable>
     );
@@ -60,11 +56,14 @@ const CodeBlockValue = (props: Props) => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: "green",
+        width: 200,
         minHeight: 100,
-        minWidth: 100,
+        backgroundColor: "pink",
+    },
+    textColor: {
+        color: "black",
     },
 });
 
-export default CodeBlockValue;
+export default CodeBlockWhile;
 

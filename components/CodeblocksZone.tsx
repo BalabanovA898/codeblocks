@@ -7,6 +7,7 @@ import {
 
 import CCodeBlockWrapper from "../classes/CodeBlockWrapper";
 import { Dispatch, useContext, useReducer } from "react";
+import { uuidv4 } from "../shared/functions";
 
 interface Props {
     blocks: CCodeBlockWrapper;
@@ -21,18 +22,13 @@ const CodeblocksZone = ({ blocks, setCBZO }: Props) => {
         <View
             style={{ height: height - 180, ...styles.container }} //TODO: Починить адаптивность.
             onLayout={(e) => {
-                console.log(
-                    "setCBZO",
-                    e.nativeEvent.layout.x,
-                    e.nativeEvent.layout.y
-                );
                 setCBZO({
                     x: e.nativeEvent.layout.x,
                     y: e.nativeEvent.layout.y,
                 });
             }}>
             <ScrollView>
-                {blocks.render({ key: Date.now(), rerender: forceUpdate })}
+                {blocks.render({ key: uuidv4(), rerender: forceUpdate })}
             </ScrollView>
         </View>
     );
