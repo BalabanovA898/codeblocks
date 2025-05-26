@@ -5,6 +5,7 @@ import {
     PanResponderGestureState,
     GestureResponderEvent,
     ScrollView,
+    Dimensions,
 } from "react-native";
 import CCodeBlockAsigment from "../classes/CodeBlockAssignment";
 import CCodeBlock from "../classes/Functional/CodeBlock";
@@ -34,32 +35,32 @@ interface Props {
 
 const BlockList = (props: Props) => {
     const newBlocks: Renderable[] = [
-        new CCodeBlockAsigment(
-            { x: 0, y: 0 },
-            new CCodeBlockWrapper({ x: 0, y: 0 }, null),
-            props.onDrop
-        ),
-        new CCodeBlockPrint(
-            { x: 0, y: 0 },
-            new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
-            props.onDrop,
-            props.globalOutput,
-            props.globalSetOutput
-        ),
-        new CCodeBlockValue({ x: 0, y: 0 }, props.onDrop),
-        new CCodeBlockGetVariableValue({ x: 0, y: 0 }, props.onDrop),
-        new CCodeBlockLogic(
-            { x: 0, y: 0 },
-            new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
-            new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
-            props.onDrop
-        ),
-        new CCodeBlockMath(
-            { x: 0, y: 0 },
-            new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
-            new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
-            props.onDrop
-        ),
+        //new CCodeBlockAsigment(
+        //    { x: 0, y: 0 },
+        //    new CCodeBlockWrapper({ x: 0, y: 0 }, null),
+        //    props.onDrop
+        //),
+        //new CCodeBlockPrint(
+        //    { x: 0, y: 0 },
+        //    new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
+        //    props.onDrop,
+        //    props.globalOutput,
+        //    props.globalSetOutput
+        //),
+        //new CCodeBlockValue({ x: 0, y: 0 }, props.onDrop),
+        //new CCodeBlockGetVariableValue({ x: 0, y: 0 }, props.onDrop),
+        //new CCodeBlockLogic(
+        //    { x: 0, y: 0 },
+        //    new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
+        //    new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
+        //    props.onDrop
+        //),
+        //new CCodeBlockMath(
+        //    { x: 0, y: 0 },
+        //    new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
+        //    new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
+        //    props.onDrop
+        //),
         new CCodeBlockIfStatement(
             { x: 0, y: 0 },
             new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
@@ -93,11 +94,11 @@ const styles = StyleSheet.create({
     container: {
         position: "absolute",
         right: 0,
-        top: 115,
+        top: Dimensions.get("window").height / 10,
         padding: 10,
-        zIndex: 2,
         overflow: "visible",
-        backgroundColor: "rgba(255, 255, 255, 1)",
+        backgroundColor: "rgba(255, 255, 255, 0.5)",
+        zIndex: 2,
     },
 });
 

@@ -10,6 +10,7 @@ import Draggable from "./Draggable";
 import { Children, DispatchWithoutAction, Key, PropsWithChildren } from "react";
 import CCodeBlockWrapper from "../classes/CodeBlockWrapper";
 import { uuidv4 } from "../shared/functions";
+import { globalStyles } from "../shared/globalStyles";
 
 interface Props {
     key: Key;
@@ -36,8 +37,9 @@ const CodeBlockPrint = (props: Props & PropsWithChildren) => {
                         e.nativeEvent.layout.width,
                         e.nativeEvent.layout.height
                     );
-                }}>
-                <Text>Log</Text>
+                }}
+                style={styles.print}>
+                <Text style={styles.text}>Print</Text>
                 {props.wrapper.render({
                     key: uuidv4(),
                     rerender: props.rerender,
@@ -49,13 +51,19 @@ const CodeBlockPrint = (props: Props & PropsWithChildren) => {
 
 const styles = StyleSheet.create({
     container: {
-        width: 200,
-        minHeight: 100,
-        backgroundColor: "blue",
-        color: "white",
+        width: 0,
+        backgroundColor: "#1A00FF",
     },
-    textColor: {
-        color: "white",
+    print: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-start",
+    },
+    text: {
+        fontSize: globalStyles.fontSize,
+        fontFamily: globalStyles.fontFamily,
+        color: globalStyles.backgroundColor,
+        marginRight: 10,
     },
 });
 

@@ -6,20 +6,24 @@ import {
     ImageBackground,
     Dimensions,
     Animated,
+    SafeAreaView,
 } from "react-native";
 import { globalStyles } from "../shared/globalStyles";
-import { useRef } from "react";
+import { Dispatch, useRef } from "react";
 const MENU = require("../assets/menu.png");
 const ADD_BLOCK = require("../assets/addBlock.png");
 
 interface Props {
     isBlockListVisible: Boolean;
     setBlockListVisible: React.Dispatch<React.SetStateAction<Boolean>>;
+    isMenuOpen: boolean;
+    setIsMenuOpen: Dispatch<boolean>;
     fileName?: string;
 }
 
 const Header = (props: Props) => {
     let addBlockRotateValue = useRef(new Animated.Value(0)).current;
+    let MenuScaleValue = useRef(new Animated.Value(1)).current;
 
     const spin = addBlockRotateValue.interpolate({
         inputRange: [0, 1],
@@ -27,36 +31,53 @@ const Header = (props: Props) => {
     });
 
     return (
-        <View style={styles.container}>
-            <Pressable style={styles.button}>
-                <ImageBackground
-                    source={MENU}
-                    style={styles.image}></ImageBackground>
-            </Pressable>
-            <Pressable style={styles.button}>
-                <Text style={styles.buttonText}>
-                    {props.fileName || "Новый файл"}
-                </Text>
-            </Pressable>
-            <Pressable
-                style={styles.button}
-                onPress={(e) => {
-                    Animated.spring(addBlockRotateValue, {
-                        toValue: props.isBlockListVisible ? 0 : 1,
-                        useNativeDriver: true,
-                    }).start();
-
-                    props.setBlockListVisible(!props.isBlockListVisible);
+        <>
+            <SafeAreaView />
+            <View
+                style={{
+                    ...styles.container,
                 }}>
-                <Animated.Image
-                    source={ADD_BLOCK}
-                    style={{
-                        width: Dimensions.get("window").height / 10 / 3,
-                        height: Dimensions.get("window").height / 10 / 3,
-                        transform: [{ rotateZ: spin }],
-                    }}></Animated.Image>
-            </Pressable>
-        </View>
+                <Pressable
+                    style={styles.button}
+                    onPress={() => {
+                        Animated.spring(MenuScaleValue, {
+                            toValue: props.isMenuOpen ? 1 : 1.25,
+                            useNativeDriver: true,
+                        }).start();
+                        props.setIsMenuOpen(!props.isMenuOpen);
+                    }}>
+                    <Animated.Image
+                        source={MENU}
+                        style={{
+                            ...styles.image,
+                            transform: [{ scaleY: MenuScaleValue }],
+                        }}></Animated.Image>
+                </Pressable>
+                <Pressable style={styles.button}>
+                    <Text style={styles.buttonText}>
+                        {props.fileName || "Новый файл"}
+                    </Text>
+                </Pressable>
+                <Pressable
+                    style={styles.button}
+                    onPress={(e) => {
+                        Animated.spring(addBlockRotateValue, {
+                            toValue: props.isBlockListVisible ? 0 : 1,
+                            useNativeDriver: true,
+                        }).start();
+
+                        props.setBlockListVisible(!props.isBlockListVisible);
+                    }}>
+                    <Animated.Image
+                        source={ADD_BLOCK}
+                        style={{
+                            width: Dimensions.get("window").height / 10 / 3,
+                            height: Dimensions.get("window").height / 10 / 3,
+                            transform: [{ rotateZ: spin }],
+                        }}></Animated.Image>
+                </Pressable>
+            </View>
+        </>
     );
 };
 

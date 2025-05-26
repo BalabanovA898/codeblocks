@@ -51,7 +51,7 @@ const CodeBlockMath = (props: Props & PropsWithChildren) => {
                         props.setValue(e);
                         props.rerender();
                     }}
-                    selectedOption={props.operator}></Select>
+                    selectedOption={props.operator || "Мат. оператор"}></Select>
                 {props.wrapperRight.render({
                     key: uuidv4(),
                     rerender: props.rerender,

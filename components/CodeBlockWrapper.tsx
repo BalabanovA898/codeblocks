@@ -3,6 +3,7 @@ import { StyleSheet, View } from "react-native";
 import CCodeBlock from "../classes/Functional/CodeBlock";
 import ICodeBlock from "../shared/Interfaces/CodeBlock";
 import { uuidv4 } from "../shared/functions";
+import Draggable from "./Draggable";
 
 interface Props {
     key: Key;
@@ -35,17 +36,23 @@ const CodeBlockWrapper = (props: Props) => {
                     e.nativeEvent.layout.height
                 );
             }}>
-            {renderArray}
+            {renderArray.length ? (
+                renderArray
+            ) : (
+                <Draggable
+                    onDrop={() => {}}
+                    styles={{
+                        backgroundColor: "white",
+                        width: 200,
+                        height: 40,
+                    }}></Draggable>
+            )}
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        backgroundColor: "tomato",
-        minHeight: 40,
-        minWidth: 100,
-    },
+    container: {},
 });
 
 export default CodeBlockWrapper;

@@ -1,7 +1,15 @@
-import { View, StyleSheet, Text, ScrollView, Pressable } from "react-native";
+import {
+    View,
+    StyleSheet,
+    Text,
+    ScrollView,
+    Pressable,
+    Dimensions,
+} from "react-native";
 import CodeBlockFunction from "../classes/CodeBlockFunction";
 import { Dispatch } from "react";
 import { uuidv4 } from "../shared/functions";
+import { globalStyles } from "../shared/globalStyles";
 
 interface Props {
     functions: CodeBlockFunction[];
@@ -13,37 +21,41 @@ const FunctionNavigator = (props: Props) => {
     let ar = [];
     for (let i = 0; i < props.countOfFunctions; ++i) {
         ar.push(
-            <View
-                style={styles.function}
-                key={uuidv4()}>
-                <Pressable
-                    onPress={() => {
-                        props.setCurrentFunction(i);
-                    }}>
-                    <Text>{props.functions[i].name}</Text>
-                </Pressable>
-            </View>
+            <Pressable
+                key={uuidv4()}
+                onPress={() => {
+                    props.setCurrentFunction(i);
+                }}>
+                <View style={styles.function}>
+                    <Text style={styles.text}>{props.functions[i].name}</Text>
+                </View>
+            </Pressable>
         );
     }
 
     return (
-        <ScrollView
-            style={styles.container}
-            horizontal={true}>
-            {ar}
-        </ScrollView>
+        <View style={styles.container}>
+            <ScrollView horizontal={true}>{ar}</ScrollView>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: "#ff0000",
-        height: 30,
-        padding: 2.5,
+        backgroundColor: "#090917",
+        height: Dimensions.get("window").height / 20,
+        padding: 3,
     },
     function: {
-        backgroundColor: "#ffffff",
+        backgroundColor: "#2C2C43",
         margin: 3,
+        width: Dimensions.get("window").width / 5,
+        borderRadius: 2.5,
+    },
+    text: {
+        fontSize: Dimensions.get("window").height / 33,
+        textAlign: "center",
+        color: globalStyles.fontColor,
     },
 });
 export default FunctionNavigator;
