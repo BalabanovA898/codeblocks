@@ -13,6 +13,7 @@ import { Key, DispatchWithoutAction, PropsWithChildren } from "react";
 import Draggable from "./Draggable";
 import CCodeBlockWrapper from "../classes/CodeBlockWrapper";
 import { uuidv4 } from "../shared/functions";
+import { globalStyles } from "../shared/globalStyles";
 
 interface Props {
     key: Key;
@@ -42,16 +43,19 @@ const CodeBlockAssignment = (props: Props & PropsWithChildren) => {
                         e.nativeEvent.layout.height
                     );
                 }}>
-                <TextInput
-                    onChange={(
-                        e: NativeSyntheticEvent<TextInputChangeEventData>
-                    ) => {
-                        props.onChange(e.nativeEvent.text);
-                    }}
-                    onEndEditing={() => props.rerender()}>
-                    {props.name || "Имя переменной"}
-                </TextInput>
-                <Text>=</Text>
+                <View style={styles.assignmentBlock}>
+                    <TextInput
+                        onChange={(
+                            e: NativeSyntheticEvent<TextInputChangeEventData>
+                        ) => {
+                            props.onChange(e.nativeEvent.text);
+                        }}
+                        onEndEditing={() => props.rerender()}
+                        style={{ ...styles.text, ...styles.input }}>
+                        {props.name || "Имя"}
+                    </TextInput>
+                    <Text style={styles.text}>=</Text>
+                </View>
                 {props.wrapper.render({
                     key: uuidv4(),
                     rerender: props.rerender,
@@ -63,10 +67,29 @@ const CodeBlockAssignment = (props: Props & PropsWithChildren) => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: "#aaaa11",
-        width: 200,
-        margin: 4,
-        zIndex: 100,
+        backgroundColor: "#FFEA00",
+        width: 0,
+    },
+    input: {
+        borderColor: globalStyles.backgroundColor,
+        borderWidth: 2,
+        padding: 0,
+        paddingHorizontal: 5,
+        borderRadius: 15,
+        maxWidth: 100,
+        maxHeight: 50,
+        marginVertical: 0,
+        marginHorizontal: 7,
+    },
+    text: {
+        fontSize: globalStyles.fontSize,
+        fontFamily: globalStyles.fontFamily,
+        color: globalStyles.backgroundColor,
+    },
+    assignmentBlock: {
+        flexDirection: "row",
+        justifyContent: "center",
+        paddingHorizontal: 30,
     },
 });
 

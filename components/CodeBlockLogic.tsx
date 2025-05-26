@@ -51,7 +51,9 @@ const CodeBlockLogic = (props: Props & PropsWithChildren) => {
                         props.setValue(e);
                         props.rerender();
                     }}
-                    selectedOption={props.operator}></Select>
+                    selectedOption={
+                        props.operator || "Логический оператор"
+                    }></Select>
                 {props.wrapperRight.render({
                     key: uuidv4(),
                     rerender: props.rerender,
@@ -63,9 +65,8 @@ const CodeBlockLogic = (props: Props & PropsWithChildren) => {
 
 const styles = StyleSheet.create({
     container: {
-        width: 200,
-        minHeight: 100,
-        backgroundColor: "aquamarine",
+        width: 0,
+        backgroundColor: "#00FF1E",
         color: "white",
     },
     textColor: {

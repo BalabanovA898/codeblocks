@@ -11,6 +11,7 @@ import { Children, DispatchWithoutAction, Key, PropsWithChildren } from "react";
 import CCodeBlockWrapper from "../classes/CodeBlockWrapper";
 import Select from "./Select";
 import { uuidv4 } from "../shared/functions";
+import { globalStyles } from "../shared/globalStyles";
 
 interface Props {
     key: Key;
@@ -40,17 +41,17 @@ const CodeBlockIfStatement = (props: Props & PropsWithChildren) => {
                         e.nativeEvent.layout.height
                     );
                 }}>
-                <Text>If</Text>
+                <Text style={styles.text}>If</Text>
                 {props.wrapperIf.render({
                     key: uuidv4(),
                     rerender: props.rerender,
                 })}
-                <Text>Then</Text>
+                <Text style={styles.text}>Then</Text>
                 {props.wrapperThen.render({
                     key: uuidv4(),
                     rerender: props.rerender,
                 })}
-                <Text>Else</Text>
+                <Text style={styles.text}>Else</Text>
                 {props.wrapperElse.render({
                     key: uuidv4(),
                     rerender: props.rerender,
@@ -62,12 +63,13 @@ const CodeBlockIfStatement = (props: Props & PropsWithChildren) => {
 
 const styles = StyleSheet.create({
     container: {
-        width: 200,
-        minHeight: 100,
-        backgroundColor: "white",
+        width: 0,
+        backgroundColor: "#00E5FF",
     },
-    textColor: {
-        color: "black",
+    text: {
+        fontSize: globalStyles.fontSize,
+        fontFamily: globalStyles.fontFamily,
+        color: globalStyles.backgroundColor,
     },
 });
 

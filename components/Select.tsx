@@ -1,5 +1,6 @@
 import { Dispatch, useState, useReducer } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { globalStyles } from "../shared/globalStyles";
 
 interface Props {
     options: string[];
@@ -10,28 +11,40 @@ interface Props {
 const Select = (props: Props) => {
     const [active, setActive] = useState<boolean>(false);
     return active ? (
-        <ScrollView>
+        <ScrollView style={styles.select}>
             {props.options.map((item) => (
                 <Pressable
                     onPress={() => {
                         props.onSelect(item);
                         setActive(false);
-                    }}>
-                    <Text>{item}</Text>
+                    }}
+                    style={styles.option}>
+                    <Text style={styles.text}>{`○${item}`}</Text>
                 </Pressable>
             ))}
         </ScrollView>
     ) : (
-        <View>
+        <View style={styles.select}>
             <Pressable
                 onPress={() => {
                     setActive(true);
-                }}>
-                <Text>{props.selectedOption}</Text>
+                }}
+                style={styles.option}>
+                <Text style={styles.text}>▾{props.selectedOption}</Text>
             </Pressable>
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    select: {},
+    option: {},
+    text: {
+        fontSize: globalStyles.fontSize,
+        fontFamily: globalStyles.fontFamily,
+        color: globalStyles.backgroundColor,
+    },
+});
 
 export default Select;
 

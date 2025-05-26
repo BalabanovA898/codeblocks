@@ -11,6 +11,7 @@ import { Children, DispatchWithoutAction, Key, PropsWithChildren } from "react";
 import CCodeBlockWrapper from "../classes/CodeBlockWrapper";
 import Select from "./Select";
 import { uuidv4 } from "../shared/functions";
+import { globalStyles } from "../shared/globalStyles";
 
 interface Props {
     key: Key;
@@ -39,12 +40,12 @@ const CodeBlockWhile = (props: Props & PropsWithChildren) => {
                         e.nativeEvent.layout.height
                     );
                 }}>
-                <Text>While</Text>
+                <Text style={styles.text}>While</Text>
                 {props.wrapperWhile.render({
                     key: uuidv4(),
                     rerender: props.rerender,
                 })}
-                <Text>Do</Text>
+                <Text style={styles.text}>Do</Text>
                 {props.wrapperDo.render({
                     key: uuidv4(),
                     rerender: props.rerender,
@@ -56,12 +57,13 @@ const CodeBlockWhile = (props: Props & PropsWithChildren) => {
 
 const styles = StyleSheet.create({
     container: {
-        width: 200,
-        minHeight: 100,
-        backgroundColor: "pink",
+        width: 0,
+        backgroundColor: "#FF00D0",
     },
-    textColor: {
-        color: "black",
+    text: {
+        fontSize: globalStyles.fontSize,
+        fontFamily: globalStyles.fontFamily,
+        color: globalStyles.backgroundColor,
     },
 });
 

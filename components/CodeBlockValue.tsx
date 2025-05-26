@@ -10,6 +10,7 @@ import Select from "./Select";
 import { DispatchWithoutAction, useState } from "react";
 import Draggable from "./Draggable";
 import { uuidv4 } from "../shared/functions";
+import { globalStyles } from "../shared/globalStyles";
 
 interface Props {
     type: string;
@@ -38,9 +39,10 @@ const CodeBlockValue = (props: Props) => {
                         e.nativeEvent.layout.width,
                         e.nativeEvent.layout.height
                     );
-                }}>
+                }}
+                style={styles.value}>
                 <Select
-                    selectedOption={props.type}
+                    selectedOption={props.type || "Тип"}
                     onSelect={(e) => {
                         props.setValue(props.value, e);
                         props.rerender();
@@ -50,7 +52,8 @@ const CodeBlockValue = (props: Props) => {
                     onChange={(e) => {
                         props.setValue(e.nativeEvent.text, props.type);
                     }}
-                    onEndEditing={() => props.rerender()}>
+                    onEndEditing={() => props.rerender()}
+                    style={styles.text}>
                     {props.value || "Значение"}
                 </TextInput>
             </View>
@@ -60,9 +63,21 @@ const CodeBlockValue = (props: Props) => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: "green",
-        minHeight: 100,
-        minWidth: 100,
+        backgroundColor: "#FF7700",
+        width: 0,
+    },
+    value: {
+        flexDirection: "row",
+        justifyContent: "center",
+        padding: 0,
+    },
+    text: {
+        fontFamily: globalStyles.fontFamily,
+        fontSize: globalStyles.fontSize,
+        color: globalStyles.backgroundColor,
+        maxWidth: 150,
+        maxHeight: 50,
+        marginLeft: 7,
     },
 });
 

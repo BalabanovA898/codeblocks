@@ -9,6 +9,7 @@ import {
 import { DispatchWithoutAction, useState } from "react";
 import Draggable from "./Draggable";
 import { uuidv4 } from "../shared/functions";
+import { globalStyles } from "../shared/globalStyles";
 
 interface Props {
     value: string;
@@ -41,7 +42,10 @@ const CodeBlockGetVariableValue = (props: Props) => {
                     onChange={(e) => {
                         props.setValue(e.nativeEvent.text);
                     }}
-                    onEndEditing={() => props.rerender()}></TextInput>
+                    style={{ ...styles.input, ...styles.text }}
+                    onEndEditing={() => props.rerender()}>
+                    {props.value || "Переменная"}
+                </TextInput>
             </View>
         </Draggable>
     );
@@ -49,9 +53,24 @@ const CodeBlockGetVariableValue = (props: Props) => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: "purple",
-        minHeight: 100,
-        minWidth: 100,
+        backgroundColor: "#AE00FF",
+        width: 0,
+    },
+    input: {
+        borderColor: globalStyles.backgroundColor,
+        borderWidth: 2,
+        padding: 0,
+        paddingHorizontal: 5,
+        borderRadius: 15,
+        maxWidth: 170,
+        maxHeight: 50,
+        marginVertical: 0,
+        marginHorizontal: 7,
+    },
+    text: {
+        fontSize: globalStyles.fontSize,
+        fontFamily: globalStyles.fontFamily,
+        color: globalStyles.backgroundColor,
     },
 });
 

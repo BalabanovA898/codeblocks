@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import Draggable from "./Draggable";
 import { Children, DispatchWithoutAction, Key, PropsWithChildren } from "react";
+import { globalStyles } from "../shared/globalStyles";
 
 interface Props {
     key: Key;
@@ -34,7 +35,7 @@ const CodeBlockBreak = (props: Props & PropsWithChildren) => {
                         e.nativeEvent.layout.height
                     );
                 }}>
-                <Text style={styles.textColor}>Break</Text>
+                <Text style={styles.text}>Break</Text>
             </View>
         </Draggable>
     );
@@ -42,12 +43,13 @@ const CodeBlockBreak = (props: Props & PropsWithChildren) => {
 
 const styles = StyleSheet.create({
     container: {
-        width: 200,
-        minHeight: 100,
+        width: 0,
         backgroundColor: "black",
     },
-    textColor: {
-        color: "white",
+    text: {
+        fontSize: globalStyles.fontSize,
+        fontFamily: globalStyles.fontFamily,
+        color: globalStyles.fontColor,
     },
 });
 

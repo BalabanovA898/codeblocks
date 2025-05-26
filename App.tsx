@@ -9,17 +9,18 @@ import BlockList from "./components/BlockList";
 import { useEffect, useState } from "react";
 import CodeBlockFunction from "./classes/CodeBlockFunction";
 import CCodeBlockWrapper from "./classes/CodeBlockWrapper";
-import CCodeBlock from "./classes/Functional/CodeBlock";
 import LexicalEnvironment from "./classes/Functional/LexicalEnvironment";
 import OutputWindow from "./components/OutoutWindow";
-import CCodeBlockAssignment from "./classes/CodeBlockAssignment";
 import TypeNumber from "./classes/types/TypeNumber";
+import Menu from "./components/Menu";
 
 export default function App() {
     const [isBlockListVisible, setIsBlockListVisible] =
         useState<Boolean>(false);
     const [isOutputWindowVisible, setIsOutputWindowVisible] =
         useState<boolean>(false);
+    const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+
     const [codeBlocksZoneOffset, setCodeBlocksZoneOffset] = useState({
         x: 0,
         y: 0,
@@ -48,6 +49,8 @@ export default function App() {
     const [currentFunction, setCurrentFunction] = useState<number>(0);
     const [countOfFunctions, setCountOfFunctions] = useState<number>(1);
 
+    const [fileName, setFileName] = useState<string>("");
+
     useEffect(() => {
         let copy = functions;
         functions[0].codeBlocks.offset = {
@@ -58,16 +61,20 @@ export default function App() {
     }, [codeBlocksZoneOffset]);
 
     return (
-        <SafeAreaView>
+        <SafeAreaView style={{ flex: 1 }}>
             <Header
                 isBlockListVisible={isBlockListVisible}
                 setBlockListVisible={setIsBlockListVisible}
+                isMenuOpen={isMenuOpen}
+                setIsMenuOpen={setIsMenuOpen}
+                fileName={fileName}
             />
             <BlockList
                 onDrop={functions[0].insertNewCodeBlock.bind(functions[0])}
                 isVisible={isBlockListVisible}
                 globalOutput={output}
                 globalSetOutput={setOutput}></BlockList>
+            <Menu isOpen={isMenuOpen}></Menu>
             <FunctionNavigator
                 functions={functions}
                 setCurrentFunction={setCurrentFunction}
