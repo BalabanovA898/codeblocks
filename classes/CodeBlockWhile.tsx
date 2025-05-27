@@ -64,7 +64,7 @@ export default class CCodeBlockWhile
             useNativeDriver: false,
         }).start();
         if (this.parent) {
-            this.removeThisCodeBLock.call(this);
+            this.removeThisCodeBLock();
             this.onDrop(e, g, this);
         } else {
             let blockWrapperA = new CCodeBlockWrapper(this.offset, null, null);
@@ -89,6 +89,7 @@ export default class CCodeBlockWhile
     ): boolean {
         console.log("Добавление в IfStatement");
         if (this.checkDropIn(g)) {
+            if (block.id === this.id) return true;
             if (this.wrapperWhile.checkDropIn(g))
                 return this.wrapperWhile.insertCodeBlock(e, g, block);
             if (this.wrapperDo.checkDropIn(g))

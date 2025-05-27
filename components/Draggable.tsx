@@ -25,7 +25,7 @@ const Draggable = (props: PropsWithChildren & Props) => {
     const panResponder = useRef(
         PanResponder.create({
             onStartShouldSetPanResponder: () => true,
-            onMoveShouldSetPanResponder: () => true,
+            onMoveShouldSetPanResponder: () => false,
             onPanResponderMove: Animated.event(
                 [
                     null,
@@ -136,7 +136,6 @@ const styles = StyleSheet.create({
         flexDirection: "column",
         justifyContent: "center",
         alignContent: "center",
-        minWidth: 230,
         marginTop: 15,
         opacity: globalStyles.blockOpacity,
     },

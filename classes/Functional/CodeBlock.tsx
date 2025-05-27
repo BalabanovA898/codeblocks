@@ -7,11 +7,13 @@ import CodeBlockEnvironment from "../../shared/Interfaces/CodeBlockEnvironment";
 import ICodeBlock from "../../shared/Interfaces/CodeBlock";
 import Value from "./Value";
 import TypeNumber from "../types/TypeNumber";
+import { uuidv4 } from "../../shared/functions";
 
 abstract class CCodeBlock extends DropZone implements ICodeBlock {
     next: ICodeBlock | null;
     prev: ICodeBlock | null;
     parent: CCodeBlockWrapper | null;
+    id: string;
 
     constructor(
         offset: Position,
@@ -23,6 +25,7 @@ abstract class CCodeBlock extends DropZone implements ICodeBlock {
         this.next = next;
         this.prev = prev;
         this.parent = parent;
+        this.id = uuidv4();
     }
 
     onLayoutHandler(x: number, y: number, w: number, h: number) {
@@ -37,12 +40,21 @@ abstract class CCodeBlock extends DropZone implements ICodeBlock {
     }
 
     pushCodeBlockAfterThis(newBLock: ICodeBlock) {
+        if (this.next && newBLock.id === this.next.id) return;
+        if (this.prev && newBLock.id === this.prev.id) {
+            const tmpPrevPrev = this.prev.prev;
+            this.prev.next = this.next;
+            this.next = this.prev;
+            this.prev = tmpPrevPrev;
+            this.prev.prev = this;
+        }
         let tmp = this.next;
+        newBLock.next = this.next;
+        newBLock.prev = this;
+        newBLock.parent = this.parent;
         this.next = newBLock;
         if (tmp) tmp.prev = newBLock;
-        newBLock.next = tmp;
-        newBLock.prev = this;
-        this.next.parent = this.parent;
+        console.log(newBLock);
     }
 
     render(props: any) {
@@ -64,10 +76,9 @@ abstract class CCodeBlock extends DropZone implements ICodeBlock {
     }
 
     removeThisCodeBLock() {
-        if (this.prev) {
-            this.prev.next = this.next;
-            if (this.next) this.next.prev = this.prev;
-        }
+        console.log(this);
+        if (this.prev) this.prev.next = this.next;
+        if (this.next) this.next.prev = this.prev;
         if (!this.prev && this.parent) this.parent.content = this.next;
     }
 }

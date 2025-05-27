@@ -56,7 +56,7 @@ class CCodeBlockBreak
             useNativeDriver: false,
         }).start();
         if (this.parent) {
-            this.removeThisCodeBLock.call(this);
+            this.removeThisCodeBLock();
             this.onDrop(e, g, this);
         } else {
             this.onDrop(e, g, new CCodeBlockBreak({ x: 0, y: 0 }, this.onDrop));
@@ -70,6 +70,7 @@ class CCodeBlockBreak
     ): boolean {
         console.log("Добавление в Break");
         if (this.checkDropIn(g)) {
+            if (block.id === this.id) return true;
             this.pushCodeBlockAfterThis(block);
             return true;
         }

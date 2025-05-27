@@ -72,6 +72,7 @@ export default class CCodeBlockValue
     ): boolean {
         console.log("Добавление в Value");
         if (this.checkDropIn.call(this, g)) {
+            if (block.id === this.id) return true;
             this.pushCodeBlockAfterThis(block);
             return true;
         }

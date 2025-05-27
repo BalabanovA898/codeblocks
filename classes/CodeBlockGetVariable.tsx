@@ -74,6 +74,7 @@ export default class CCodeBlockGetVariableValue
     ): boolean {
         console.log("Добавление в GetVariable");
         if (this.checkDropIn.call(this, g)) {
+            if (block.id === this.id) return true;
             this.pushCodeBlockAfterThis(block);
             return true;
         }

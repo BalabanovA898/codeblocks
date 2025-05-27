@@ -35,32 +35,32 @@ interface Props {
 
 const BlockList = (props: Props) => {
     const newBlocks: Renderable[] = [
-        //new CCodeBlockAsigment(
-        //    { x: 0, y: 0 },
-        //    new CCodeBlockWrapper({ x: 0, y: 0 }, null),
-        //    props.onDrop
-        //),
-        //new CCodeBlockPrint(
-        //    { x: 0, y: 0 },
-        //    new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
-        //    props.onDrop,
-        //    props.globalOutput,
-        //    props.globalSetOutput
-        //),
-        //new CCodeBlockValue({ x: 0, y: 0 }, props.onDrop),
-        //new CCodeBlockGetVariableValue({ x: 0, y: 0 }, props.onDrop),
-        //new CCodeBlockLogic(
-        //    { x: 0, y: 0 },
-        //    new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
-        //    new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
-        //    props.onDrop
-        //),
-        //new CCodeBlockMath(
-        //    { x: 0, y: 0 },
-        //    new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
-        //    new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
-        //    props.onDrop
-        //),
+        new CCodeBlockAsigment(
+            { x: 0, y: 0 },
+            new CCodeBlockWrapper({ x: 0, y: 0 }, null),
+            props.onDrop
+        ),
+        new CCodeBlockPrint(
+            { x: 0, y: 0 },
+            new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
+            props.onDrop,
+            props.globalOutput,
+            props.globalSetOutput
+        ),
+        new CCodeBlockValue({ x: 0, y: 0 }, props.onDrop),
+        new CCodeBlockGetVariableValue({ x: 0, y: 0 }, props.onDrop),
+        new CCodeBlockLogic(
+            { x: 0, y: 0 },
+            new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
+            new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
+            props.onDrop
+        ),
+        new CCodeBlockMath(
+            { x: 0, y: 0 },
+            new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
+            new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
+            props.onDrop
+        ),
         new CCodeBlockIfStatement(
             { x: 0, y: 0 },
             new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),

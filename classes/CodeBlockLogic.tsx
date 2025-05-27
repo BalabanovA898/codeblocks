@@ -61,7 +61,7 @@ export default class CCodeBlockLogic
             useNativeDriver: false,
         }).start();
         if (this.parent) {
-            this.removeThisCodeBLock.call(this);
+            this.removeThisCodeBLock();
             this.onDrop(e, g, this);
         } else {
             let blockWrapperA = new CCodeBlockWrapper(this.offset, null, null);
@@ -86,6 +86,7 @@ export default class CCodeBlockLogic
     ): boolean {
         console.log("Добавление в Logic");
         if (this.checkDropIn(g)) {
+            if (block.id === this.id) return true;
             if (this.wrapperLeft.checkDropIn(g)) {
                 return this.wrapperLeft.insertCodeBlock(e, g, block);
             }
