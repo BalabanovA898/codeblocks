@@ -22,6 +22,7 @@ import CCodeBlockWhile from "../classes/CodeBlockWhile";
 import Renderable from "../shared/Interfaces/Renderable";
 import CCodeBlockBreak from "../classes/CodeBlockBreak";
 import SelectBlock from "./SelectBlock";
+import CCodeBlockLogicNot from "../classes/CodeBlockLogicNot";
 
 interface Props {
     isVisible: Boolean;
@@ -77,6 +78,11 @@ const BlockList = (props: Props) => {
         new CCodeBlockMath(
             { x: 0, y: 0 },
             new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
+            new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
+            props.onDrop
+        ),
+        new CCodeBlockLogicNot(
+            { x: 0, y: 0 },
             new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
             props.onDrop
         ),
