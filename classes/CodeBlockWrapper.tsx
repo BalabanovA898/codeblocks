@@ -87,6 +87,7 @@ class CCodeBlockWrapper
         while (currentNode.next) currentNode = currentNode.next;
         currentNode.next = newBlock;
         newBlock.parent = this;
+        newBlock.prev = currentNode;
     }
 
     insertCodeBlock(
@@ -95,17 +96,18 @@ class CCodeBlockWrapper
         block: ICodeBlock
     ) {
         console.log("Доабвление в Wrapper");
-        if (this.content == null && this.checkDropIn(g)) {
-            this.content = block;
-            this.content.parent = this;
-            return true;
-        } else if (this.content !== null) {
-            if (this.checkDropIn(g))
+        if (this.checkDropIn(g)) {
+            if (this.content == null) {
+                this.content = block;
+                this.content.parent = this;
+                return true;
+            } else if (this.content !== null) {
                 if (this.content.insertCodeBlock(e, g, block)) return true;
                 else {
                     this.pushBackCodeBlock(block);
                     return true;
                 }
+            }
         }
         return false;
     }

@@ -70,7 +70,7 @@ class CCodeBlockPrint
             useNativeDriver: false,
         }).start();
         if (this.parent) {
-            this.removeThisCodeBLock.call(this);
+            this.removeThisCodeBLock();
             this.onDrop(e, g, this);
         } else {
             let blockWrapper = new CCodeBlockWrapper(this.offset, null, null);
@@ -95,6 +95,7 @@ class CCodeBlockPrint
     ): boolean {
         console.log("Добавление в Print");
         if (this.checkDropIn(g)) {
+            if (block.id === this.id) return true;
             if (this.wrapper.checkDropIn(g)) {
                 return this.wrapper.insertCodeBlock(e, g, block);
             }

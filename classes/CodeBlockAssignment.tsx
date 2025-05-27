@@ -65,7 +65,7 @@ class CCodeBlockAssignment
         position: Animated.ValueXY
     ) {
         if (this.parent) {
-            this.removeThisCodeBLock();
+            this.removeThisCodeBLock.call(this);
             this.onDrop(e, g, this);
         } else {
             let blockWrapper = new CCodeBlockWrapper(this.offset, null, null);
@@ -89,6 +89,7 @@ class CCodeBlockAssignment
     ): boolean {
         console.log("Доабавление в Assignment");
         if (this.checkDropIn.call(this, g)) {
+            if (block.id === this.id) return true;
             if (this.wrapper.checkDropIn(g)) {
                 return this.wrapper.insertCodeBlock(e, g, block);
             }
