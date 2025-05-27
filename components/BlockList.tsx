@@ -23,6 +23,7 @@ import Renderable from "../shared/Interfaces/Renderable";
 import CCodeBlockBreak from "../classes/CodeBlockBreak";
 import SelectBlock from "./SelectBlock";
 import CCodeBlockLogicNot from "../classes/CodeBlockLogicNot";
+import CCodeBlockArrayInit from "../classes/CodeBlockArrayInit";
 
 interface Props {
     isVisible: Boolean;
@@ -66,6 +67,7 @@ const BlockList = (props: Props) => {
             props.globalSetOutput
         ),
         new CCodeBlockValue({ x: 0, y: 0 }, props.onDrop),
+        new CCodeBlockArrayInit({ x: 0, y: 0 }, props.onDrop),
         new CCodeBlockGetVariableValue({ x: 0, y: 0 }, props.onDrop),
     ];
     const operators = [

@@ -25,6 +25,10 @@ class LexicalEnvironment implements LexicalEnvironment {
     private setValueRecursive(name: string, value: Value): boolean {
         if (!this.prev) return false;
         if (this.values.has(name)) {
+            if (value.type !== this.values.get(name)?.type)
+                throw new Error(
+                    "Ошибка лексического окружения. Попытка присвоить переменной не тот тип."
+                );
             this.values.set(name, value);
             return true;
         }

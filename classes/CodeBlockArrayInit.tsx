@@ -14,17 +14,16 @@ import CodeBlockValue from "../components/CodeBlockValue";
 import LexicalEnvironment from "./Functional/LexicalEnvironment";
 import Value from "./Functional/Value";
 import TypeVoid from "./types/TypeVoid";
-import CodeBlockGetVariableValue from "../components/CodeBlockGetVariable";
+import { getTypeByString } from "../shared/functions";
+import CodeBlockArrayInit from "../components/CodeBlockArrayInit";
 
-interface ICodeBlockValue {
-    valueToGet: string | null;
-}
-
-export default class CCodeBlockGetVariableValue
+export default class CCodeBlockArrayInit
     extends CCodeBlock
-    implements ICodeBlockValue, Renderable, Returnable, Droppable, ICodeBlock
+    implements Renderable, Returnable, Droppable, ICodeBlock
 {
-    valueToGet: string | null = null;
+    nameToAssign: string | null = null;
+    typeToAssign: string | null = null;
+    numberOfElement: string | null = null;
 
     onDrop: (
         e: GestureResponderEvent,
@@ -59,11 +58,7 @@ export default class CCodeBlockGetVariableValue
             this.onDrop(
                 e,
                 g,
-                new CCodeBlockGetVariableValue(
-                    { x: 0, y: 0 },
-                    this.onDrop,
-                    null
-                )
+                new CCodeBlockArrayInit({ x: 0, y: 0 }, this.onDrop, null)
             );
     }
 
@@ -72,7 +67,7 @@ export default class CCodeBlockGetVariableValue
         g: PanResponderGestureState,
         block: ICodeBlock
     ): boolean {
-        console.log("Добавление в GetVariable");
+        console.log("Добавление в ArrayInit");
         if (this.checkDropIn.call(this, g)) {
             if (block.id === this.id) return true;
             this.pushCodeBlockAfterThis(block);
@@ -88,48 +83,62 @@ export default class CCodeBlockGetVariableValue
         this.setPositions(x, y, w, h, 0, 0);
         if (this.next)
             this.next.offset = {
-                x: this.offset.x + 4,
-                y: this.offset.y + (this.elementHeight || 0) + 4,
+                x: this.offset.x,
+                y: this.offset.y + (this.elementHeight || 0),
             };
     }
 
-    setAssignmentState(value: string) {
-        this.valueToGet = value;
+    setAssignmentState(name: string, type: string, numberOfElement: string) {
+        this.nameToAssign = name;
+        this.typeToAssign = type;
+        this.numberOfElement = numberOfElement;
     }
 
     render(props: any) {
         return (
-            <CodeBlockGetVariableValue
-                value={this.valueToGet || ""}
+            <CodeBlockArrayInit
+                type={this.typeToAssign || ""}
+                name={this.nameToAssign || ""}
+                numberOfElement={this.numberOfElement || ""}
                 setValue={this.setAssignmentState.bind(this)}
                 rerender={props.rerender}
                 onDrop={this.onDropHandler.bind(this)}
-                onLayout={this.onLayoutHandler.bind(
-                    this
-                )}></CodeBlockGetVariableValue>
+                onLayout={this.onLayoutHandler.bind(this)}></CodeBlockArrayInit>
         );
     }
 
     execute(le: LexicalEnvironment): Value {
-        if (!this.valueToGet)
+        if (!this.nameToAssign)
             throw new Error(
-                "Ошибка получения значение переменной. Необзодимо указать имя переменной."
+                "Ошибка блока инициализации массива. Имя не может быть пустым."
+            );
+        if (!this.numberOfElement)
+            throw new Error(
+                "Ошибка блока инициализации массива. Необходимо указать количество элементов."
+            );
+        if (!this.typeToAssign)
+            throw new Error(
+                "Ошибка блока инициализации массива. Необхожимо указать тип массива."
             );
         if (
-            !/(([a-zA-Z][a-zA-Z0-9]*\[((0)|([1-9]\d*))\])|([a-zA-Z][a-zA-Z0-9]*))/.test(
-                this.valueToGet
+            !/^ *[a-zA-Z][a-zA-Z0-9]* *( *, *[a-zA-Z][a-zA-Z0-9]* *)*\b/.test(
+                this.nameToAssign
             )
         )
             throw new Error(
-                "Неправильное наименование переменнjq. Переменная должна начинаться с буквы, далее сожержать только буквы латинского алфавита и цифры. Для присвоения значения элементу массива неоходимо указать индекс в квадратных скобках без пробелов после имени переменной."
+                "Неправильное наименование переменных. Переменная должна начинаться с буквы, далее сожержать только буквы латинского алфавита и цифры. Допускается передача нескольих имен переменных через запятую."
             );
-
-        let res = le.getValue(this.valueToGet);
-        if (!res)
+        if (!/[1-9]\d*/.test(this.numberOfElement))
             throw new Error(
-                `Ошибка получения значения переменной. Нет переменной с именем ${this.valueToGet}`
+                "Ошибка блока инициализации массива. Количество элементов должно быть натуральным числом."
             );
-        return res;
+        for (let i = 0; i < Number(this.numberOfElement); ++i) {
+            le.setValue(
+                `${this.nameToAssign}[${i}]`,
+                new Value(getTypeByString(this.typeToAssign), "0")
+            );
+        }
+        return new Value(TypeVoid, "");
     }
 }
 
