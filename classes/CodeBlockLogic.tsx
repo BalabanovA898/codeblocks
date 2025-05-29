@@ -134,25 +134,31 @@ export default class CCodeBlockLogic
             case "=":
                 return new Value(
                     TypeBool,
-                    new leftOperand.type().compareEqual(
-                        leftOperand,
-                        rightOperand
+                    new TypeBool().convertFromOtherType(
+                        new leftOperand.type().compareEqual(
+                            leftOperand,
+                            rightOperand
+                        )
                     )
                 );
             case "<":
                 return new Value(
                     TypeBool,
-                    new leftOperand.type().compareLess(
-                        leftOperand,
-                        rightOperand
+                    new TypeBool().convertFromOtherType(
+                        new leftOperand.type().compareLess(
+                            leftOperand,
+                            rightOperand
+                        )
                     )
                 );
             case ">":
                 return new Value(
                     TypeBool,
-                    new leftOperand.type().compareBigger(
-                        leftOperand,
-                        rightOperand
+                    new TypeBool().convertFromOtherType(
+                        new leftOperand.type().compareBigger(
+                            leftOperand,
+                            rightOperand
+                        )
                     )
                 );
             case "&&":
