@@ -8,13 +8,12 @@ import { Class, InterpreterTypes } from "../shared/types";
 import ICodeBlock from "../shared/Interfaces/CodeBlock";
 import { Dispatch } from "react";
 import TypeNumber from "./types/TypeNumber";
+import { output } from "../shared/globals";
 
 interface ICodeBlockFunction {
     codeBlocksWrapper_: CCodeBlockWrapper;
     cfl: (fn: CodeBlockFunction) => void;
     returnType: Class<InterpreterTypes>;
-    output: string[];
-    setOutput: Dispatch<string[]>;
     name: string;
 }
 
@@ -22,23 +21,17 @@ class CodeBlockFunction implements ICodeBlockFunction, Returnable {
     codeBlocksWrapper_: CCodeBlockWrapper;
     cfl: (fn: CodeBlockFunction) => void;
     returnType: Class<InterpreterTypes>;
-    output: string[];
-    setOutput: Dispatch<string[]>;
     name: string;
 
     constructor(
         codeBlocksTree: CCodeBlockWrapper,
         changeFunctionList: (fn: CodeBlockFunction) => void,
         returnType: Class<InterpreterTypes>,
-        output: string[],
-        setOutput: Dispatch<string[]>,
         name: string
     ) {
         this.codeBlocksWrapper_ = codeBlocksTree;
         this.cfl = changeFunctionList;
         this.returnType = returnType;
-        this.output = output;
-        this.setOutput = setOutput;
         this.name = name;
     }
 
@@ -62,10 +55,9 @@ class CodeBlockFunction implements ICodeBlockFunction, Returnable {
         try {
             return this.codeBlocks.execute(new LexicalEnvironment(le));
         } catch (e: any) {
-            this.setOutput([
-                ...this.output,
-                `Произошла  ошибка в фукнцие ${this.name}. Текст ошибки: ${e.message}`,
-            ]);
+            output.push(
+                `Произошла  ошибка в фукнцие ${this.name}. Текст ошибки: ${e.message}`
+            );
             throw new Error(
                 `Произошла  ошибка в фукнцие ${this.name}. Текст ошибки: ${e.message}`
             );

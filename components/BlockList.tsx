@@ -40,9 +40,6 @@ interface Props {
         g: PanResponderGestureState,
         block: ICodeBlock
     ) => void;
-    globalOutput: string[];
-    globalSetOutput: Dispatch<string[]>;
-    setIsDemolishAreaActive: Dispatch<boolean>;
 }
 
 const BlockList = (props: Props) => {
@@ -98,8 +95,6 @@ const BlockList = (props: Props) => {
         new CCodeBlockPrint(
             new CCodeBlockWrapper(null, null),
             onDropHandler,
-            props.globalOutput,
-            props.globalSetOutput,
             onPickUp
         ),
         new CCodeBlockValue(onDropHandler, onPickUp),

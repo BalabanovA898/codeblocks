@@ -19,9 +19,7 @@ interface Props {
 const CodeblocksZone = ({ blocks }: Props) => {
     const [, forceUpdate] = useReducer((x) => x + 1, 0);
     return (
-        <View
-            style={{ ...styles.container }} //TODO: Починить адаптивность.
-        >
+        <View style={{ ...styles.container }}>
             <ImageBackground
                 source={BACKGROUND}
                 style={styles.backgroundImage}>
