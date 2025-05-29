@@ -4,6 +4,7 @@ import CCodeBlock from "../classes/Functional/CodeBlock";
 import ICodeBlock from "../shared/Interfaces/CodeBlock";
 import { uuidv4 } from "../shared/functions";
 import Draggable from "./Draggable";
+import { processColorsInProps } from "react-native-reanimated/lib/typescript/Colors";
 
 interface Props {
     key: Key;
@@ -29,7 +30,12 @@ const CodeBlockWrapper = (props: Props) => {
 
     return (
         <View
-            style={styles.container}
+            style={{
+                ...styles.container,
+                width: renderArray.length
+                    ? props.firstElement?.elementWidth
+                    : 250,
+            }}
             key={props.key}
             ref={(view) => (element = view)}
             onLayout={(e) => {

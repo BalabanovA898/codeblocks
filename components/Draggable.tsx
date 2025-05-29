@@ -8,7 +8,6 @@ import {
     StyleSheet,
 } from "react-native";
 import { uuidv4 } from "../shared/functions";
-import { transform } from "@babel/core";
 import { globalStyles } from "../shared/globalStyles";
 
 interface Props {
