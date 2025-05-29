@@ -42,7 +42,6 @@ class CCodeBlockAssignment
     onPickUp?: () => void;
 
     constructor(
-        offset: Position,
         wrapper: CCodeBlockWrapper,
         onDrop: (
             e: GestureResponderEvent,
@@ -54,7 +53,7 @@ class CCodeBlockAssignment
         prev: CCodeBlock | null = null,
         parent: CCodeBlockWrapper | null = null
     ) {
-        super(offset, next, prev, parent);
+        super(next, prev, parent);
         this.render_ = CodeBlockAssignment;
         this.onDrop = onDrop;
         this.nameToAssign = null;
@@ -71,15 +70,11 @@ class CCodeBlockAssignment
             this.removeThisCodeBLock.call(this);
             this.onDrop(e, g, this);
         } else {
-            let blockWrapper = new CCodeBlockWrapper(this.offset, null, null);
+            let blockWrapper = new CCodeBlockWrapper(null, null);
             this.onDrop(
                 e,
                 g,
-                new CCodeBlockAssignment(
-                    { x: 0, y: 0 },
-                    blockWrapper,
-                    this.onDrop
-                )
+                new CCodeBlockAssignment(blockWrapper, this.onDrop)
             );
         }
     }

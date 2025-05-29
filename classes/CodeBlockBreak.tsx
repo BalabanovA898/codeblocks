@@ -34,7 +34,6 @@ class CCodeBlockBreak
     ) => void;
 
     constructor(
-        offset: Position,
         onDrop: (
             e: GestureResponderEvent,
             g: PanResponderGestureState,
@@ -45,7 +44,7 @@ class CCodeBlockBreak
         prev: CCodeBlock | null = null,
         parent: CCodeBlockWrapper | null = null
     ) {
-        super(offset, next, prev, parent);
+        super(next, prev, parent);
         this.onDrop = onDrop;
         this.onPickUp = onPickUp;
     }
@@ -62,7 +61,7 @@ class CCodeBlockBreak
             this.removeThisCodeBLock();
             this.onDrop(e, g, this);
         } else {
-            this.onDrop(e, g, new CCodeBlockBreak({ x: 0, y: 0 }, this.onDrop));
+            this.onDrop(e, g, new CCodeBlockBreak(this.onDrop));
         }
     }
 

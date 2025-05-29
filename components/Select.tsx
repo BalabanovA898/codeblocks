@@ -1,6 +1,7 @@
 import { Dispatch, useState, useReducer } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { globalStyles } from "../shared/globalStyles";
+import { uuidv4 } from "../shared/functions";
 
 interface Props {
     options: string[];
@@ -18,7 +19,8 @@ const Select = (props: Props) => {
                         props.onSelect(item);
                         setActive(false);
                     }}
-                    style={styles.option}>
+                    style={styles.option}
+                    key={uuidv4()}>
                     <Text style={styles.text}>{`○${item}`}</Text>
                 </Pressable>
             ))}

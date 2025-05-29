@@ -37,7 +37,6 @@ export default class CCodeBlockIfStatement
     operator: string | null = null;
 
     constructor(
-        offset: Position,
         wrapperA: CCodeBlockWrapper,
         wrapperB: CCodeBlockWrapper,
         wrapperC: CCodeBlockWrapper,
@@ -51,7 +50,7 @@ export default class CCodeBlockIfStatement
         prev: CCodeBlock | null = null,
         parent: CCodeBlockWrapper | null = null
     ) {
-        super(offset, next, prev, parent);
+        super(next, prev, parent);
         this.onDrop = onDrop;
         this.onPickUp = onPickUp;
         this.wrapperIf = wrapperA;
@@ -73,14 +72,13 @@ export default class CCodeBlockIfStatement
 
             this.onDrop(e, g, this);
         } else {
-            let blockWrapperA = new CCodeBlockWrapper(this.offset, null, null);
-            let blockWrapperB = new CCodeBlockWrapper(this.offset, null, null);
-            let blockWrapperC = new CCodeBlockWrapper(this.offset, null, null);
+            let blockWrapperA = new CCodeBlockWrapper(null, null);
+            let blockWrapperB = new CCodeBlockWrapper(null, null);
+            let blockWrapperC = new CCodeBlockWrapper(null, null);
             this.onDrop(
                 e,
                 g,
                 new CCodeBlockIfStatement(
-                    { x: 0, y: 0 },
                     blockWrapperA,
                     blockWrapperB,
                     blockWrapperC,

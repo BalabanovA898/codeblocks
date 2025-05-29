@@ -36,7 +36,6 @@ export default class CCodeBlockValue
     ) => void;
 
     constructor(
-        offset: Position,
         onDrop: (
             e: GestureResponderEvent,
             g: PanResponderGestureState,
@@ -47,7 +46,7 @@ export default class CCodeBlockValue
         prev: ICodeBlock | null = null,
         parent: CCodeBlockWrapper | null = null
     ) {
-        super(offset, next, prev, parent);
+        super(next, prev, parent);
         this.onDrop = onDrop;
         this.onPickUp = onPickUp;
     }
@@ -60,8 +59,7 @@ export default class CCodeBlockValue
         if (this.parent) {
             this.removeThisCodeBLock();
             this.onDrop(e, g, this);
-        } else
-            this.onDrop(e, g, new CCodeBlockValue({ x: 0, y: 0 }, this.onDrop));
+        } else this.onDrop(e, g, new CCodeBlockValue(this.onDrop));
     }
 
     override insertCodeBlock(

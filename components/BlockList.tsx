@@ -75,59 +75,52 @@ const BlockList = (props: Props) => {
 
     const flowControl: Renderable[] = [
         new CCodeBlockIfStatement(
-            { x: 0, y: 0 },
-            new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
-            new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
-            new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
+            new CCodeBlockWrapper(null, null),
+            new CCodeBlockWrapper(null, null),
+            new CCodeBlockWrapper(null, null),
             onDropHandler,
             onPickUp
         ),
         new CCodeBlockWhile(
-            { x: 0, y: 0 },
-            new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
-            new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
+            new CCodeBlockWrapper(null, null),
+            new CCodeBlockWrapper(null, null),
             onDropHandler,
             onPickUp
         ),
-        new CCodeBlockBreak({ x: 0, y: 0 }, onDropHandler, onPickUp),
+        new CCodeBlockBreak(onDropHandler, onPickUp),
     ];
     const utility = [
         new CCodeBlockAsigment(
-            { x: 0, y: 0 },
-            new CCodeBlockWrapper({ x: 0, y: 0 }, null),
+            new CCodeBlockWrapper(null),
             onDropHandler,
             onPickUp
         ),
         new CCodeBlockPrint(
-            { x: 0, y: 0 },
-            new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
+            new CCodeBlockWrapper(null, null),
             onDropHandler,
             props.globalOutput,
             props.globalSetOutput,
             onPickUp
         ),
-        new CCodeBlockValue({ x: 0, y: 0 }, onDropHandler, onPickUp),
-        new CCodeBlockArrayInit({ x: 0, y: 0 }, onDropHandler, onPickUp),
-        new CCodeBlockGetVariableValue({ x: 0, y: 0 }, onDropHandler, onPickUp),
+        new CCodeBlockValue(onDropHandler, onPickUp),
+        new CCodeBlockArrayInit(onDropHandler, onPickUp),
+        new CCodeBlockGetVariableValue(onDropHandler, onPickUp),
     ];
     const operators = [
         new CCodeBlockLogic(
-            { x: 0, y: 0 },
-            new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
-            new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
+            new CCodeBlockWrapper(null, null),
+            new CCodeBlockWrapper(null, null),
             onDropHandler,
             onPickUp
         ),
         new CCodeBlockMath(
-            { x: 0, y: 0 },
-            new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
-            new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
+            new CCodeBlockWrapper(null, null),
+            new CCodeBlockWrapper(null, null),
             onDropHandler,
             onPickUp
         ),
         new CCodeBlockLogicNot(
-            { x: 0, y: 0 },
-            new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
+            new CCodeBlockWrapper(null, null),
             onDropHandler,
             onPickUp
         ),

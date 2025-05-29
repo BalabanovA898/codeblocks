@@ -35,7 +35,6 @@ export default class CCodeBlockMath
     onPickUp?: () => void;
 
     constructor(
-        offset: Position,
         wrapperA: CCodeBlockWrapper,
         wrapperB: CCodeBlockWrapper,
         onDrop: (
@@ -48,7 +47,7 @@ export default class CCodeBlockMath
         prev: CCodeBlock | null = null,
         parent: CCodeBlockWrapper | null = null
     ) {
-        super(offset, next, prev, parent);
+        super(next, prev, parent);
         this.onDrop = onDrop;
         this.wrapperLeft = wrapperA;
         this.wrapperRight = wrapperB;
@@ -68,17 +67,12 @@ export default class CCodeBlockMath
             this.removeThisCodeBLock();
             this.onDrop(e, g, this);
         } else {
-            let blockWrapperA = new CCodeBlockWrapper(this.offset, null, null);
-            let blockWrapperB = new CCodeBlockWrapper(this.offset, null, null);
+            let blockWrapperA = new CCodeBlockWrapper(null, null);
+            let blockWrapperB = new CCodeBlockWrapper(null, null);
             this.onDrop(
                 e,
                 g,
-                new CCodeBlockMath(
-                    { x: 0, y: 0 },
-                    blockWrapperA,
-                    blockWrapperB,
-                    this.onDrop
-                )
+                new CCodeBlockMath(blockWrapperA, blockWrapperB, this.onDrop)
             );
         }
     }

@@ -16,12 +16,11 @@ abstract class CCodeBlock extends DropZone implements ICodeBlock {
     id: string;
 
     constructor(
-        offset: Position,
         next: ICodeBlock | null = null,
         prev: ICodeBlock | null = null,
         parent: CCodeBlockWrapper | null = null
     ) {
-        super(offset);
+        super();
         this.next = next;
         this.prev = prev;
         this.parent = parent;
@@ -29,14 +28,7 @@ abstract class CCodeBlock extends DropZone implements ICodeBlock {
     }
 
     onLayoutHandler(x: number, y: number, w: number, h: number) {
-        this.setPositions(
-            x,
-            y,
-            w,
-            h,
-            this.parent?.elementX ? this.parent.elementX : 0,
-            this.parent?.elementY ? this.parent.elementY : 0
-        );
+        this.setPositions(x, y, w, h);
     }
 
     pushCodeBlockAfterThis(newBLock: ICodeBlock) {
@@ -46,7 +38,7 @@ abstract class CCodeBlock extends DropZone implements ICodeBlock {
             this.prev.next = this.next;
             this.next = this.prev;
             this.prev = tmpPrevPrev;
-            this.prev.prev = this;
+            //this.prev.prev = this;
         }
         let tmp = this.next;
         newBLock.next = this.next;

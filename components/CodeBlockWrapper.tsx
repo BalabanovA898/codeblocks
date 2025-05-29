@@ -17,6 +17,7 @@ const CodeBlockWrapper = (props: Props) => {
     let currentNode = props.firstElement;
     const [, rerender] = useReducer((e) => e - 1, 0);
     while (currentNode) {
+        console.log(currentNode);
         renderArray.push(
             currentNode.render({
                 key: uuidv4() + renderArray.length,

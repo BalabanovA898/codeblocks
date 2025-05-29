@@ -42,7 +42,6 @@ class CCodeBlockPrint
     onPickUp?: () => void;
 
     constructor(
-        offset: Position,
         wrapper: CCodeBlockWrapper,
         onDrop: (
             e: GestureResponderEvent,
@@ -56,7 +55,7 @@ class CCodeBlockPrint
         prev: CCodeBlock | null = null,
         parent: CCodeBlockWrapper | null = null
     ) {
-        super(offset, next, prev, parent);
+        super(next, prev, parent);
         this.onDrop = onDrop;
         this.wrapper = wrapper;
         this.globalOutput = go;
@@ -76,12 +75,11 @@ class CCodeBlockPrint
             this.removeThisCodeBLock();
             this.onDrop(e, g, this);
         } else {
-            let blockWrapper = new CCodeBlockWrapper(this.offset, null, null);
+            let blockWrapper = new CCodeBlockWrapper(null, null);
             this.onDrop(
                 e,
                 g,
                 new CCodeBlockPrint(
-                    { x: 0, y: 0 },
                     blockWrapper,
                     this.onDrop,
                     this.globalOutput,

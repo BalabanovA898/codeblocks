@@ -22,11 +22,6 @@ export default function App() {
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
     const [isDemolishAreaActive, setIsDemolishAreaActive] = useState(false);
 
-    const [codeBlocksZoneOffset, setCodeBlocksZoneOffset] = useState({
-        x: 0,
-        y: 0,
-    });
-
     const changeFunctionList = (fn: CodeBlockFunction) => {
         let res = [];
         for (let item = 0; item < functions.length; ++item)
@@ -39,7 +34,7 @@ export default function App() {
 
     const [functions, setFunctions] = useState<CodeBlockFunction[]>([
         new CodeBlockFunction(
-            new CCodeBlockWrapper(codeBlocksZoneOffset, null),
+            new CCodeBlockWrapper(null),
             changeFunctionList,
             TypeNumber,
             output,
@@ -51,15 +46,6 @@ export default function App() {
     const [countOfFunctions, setCountOfFunctions] = useState<number>(1);
 
     const [fileName, setFileName] = useState<string>("");
-
-    useEffect(() => {
-        let copy = functions;
-        functions[0].codeBlocks.offset = {
-            x: codeBlocksZoneOffset.x,
-            y: codeBlocksZoneOffset.y,
-        };
-        setFunctions({ ...copy });
-    }, [codeBlocksZoneOffset]);
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
@@ -83,10 +69,7 @@ export default function App() {
                 setCurrentFunction={setCurrentFunction}
                 countOfFunctions={countOfFunctions}
             />
-            <CodeblocksZone
-                setCBZO={setCodeBlocksZoneOffset}
-                blocks={functions[currentFunction].codeBlocks}
-            />
+            <CodeblocksZone blocks={functions[currentFunction].codeBlocks} />
             <Footer
                 executeCode={() => {
                     setOutput([]);

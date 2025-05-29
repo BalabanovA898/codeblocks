@@ -53,12 +53,8 @@ class CCodeBlockWrapper
     }) => React.JSX.Element = CodeBlockWrapper;
     parent: ICodeBlock | null;
 
-    constructor(
-        offset: Position,
-        content: ICodeBlock | null,
-        parent: ICodeBlock | null = null
-    ) {
-        super(offset);
+    constructor(content: ICodeBlock | null, parent: ICodeBlock | null = null) {
+        super();
         this.content = content;
         this.parent = parent;
     }

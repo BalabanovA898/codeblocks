@@ -37,7 +37,6 @@ export default class CCodeBlockWhile
     onPickUp?: () => void;
 
     constructor(
-        offset: Position,
         wrapperA: CCodeBlockWrapper,
         wrapperB: CCodeBlockWrapper,
         onDrop: (
@@ -50,7 +49,7 @@ export default class CCodeBlockWhile
         prev: CCodeBlock | null = null,
         parent: CCodeBlockWrapper | null = null
     ) {
-        super(offset, next, prev, parent);
+        super(next, prev, parent);
         this.onDrop = onDrop;
         this.onPickUp = onPickUp;
         this.wrapperWhile = wrapperA;
@@ -70,17 +69,12 @@ export default class CCodeBlockWhile
             this.removeThisCodeBLock();
             this.onDrop(e, g, this);
         } else {
-            let blockWrapperA = new CCodeBlockWrapper(this.offset, null, null);
-            let blockWrapperB = new CCodeBlockWrapper(this.offset, null, null);
+            let blockWrapperA = new CCodeBlockWrapper(null, null);
+            let blockWrapperB = new CCodeBlockWrapper(null, null);
             this.onDrop(
                 e,
                 g,
-                new CCodeBlockWhile(
-                    { x: 0, y: 0 },
-                    blockWrapperA,
-                    blockWrapperB,
-                    this.onDrop
-                )
+                new CCodeBlockWhile(blockWrapperA, blockWrapperB, this.onDrop)
             );
         }
     }
