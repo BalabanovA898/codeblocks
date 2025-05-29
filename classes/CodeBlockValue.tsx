@@ -82,15 +82,6 @@ export default class CCodeBlockValue
         return false;
     }
 
-    onLayoutHandler(x: number, y: number, w: number, h: number): void {
-        this.setPositions(x, y, w, h, 0, 0);
-        if (this.next)
-            this.next.offset = {
-                x: this.offset.x,
-                y: this.offset.y + (this.elementHeight || 0),
-            };
-    }
-
     setAssignmentState(value: string, type: string) {
         this.valueToAssign = value;
         this.typeToAssign = type;
@@ -104,7 +95,7 @@ export default class CCodeBlockValue
                 setValue={this.setAssignmentState.bind(this)}
                 rerender={props.rerender}
                 onDrop={this.onDropHandler.bind(this)}
-                onLayout={this.onLayoutHandler.bind(this)}></CodeBlockValue>
+                onLayout={this.setPositions.bind(this)}></CodeBlockValue>
         );
     }
 

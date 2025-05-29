@@ -101,23 +101,6 @@ export default class CCodeBlockMath
         return false;
     }
 
-    onLayoutHandler(x: number, y: number, w: number, h: number): void {
-        this.setPositions(x, y, w, h, 0, 0);
-        this.wrapperLeft.offset = {
-            x: this.elementX || 0 + this.offset.x,
-            y: this.offset.y,
-        };
-        this.wrapperRight.offset = {
-            x: this.elementX || 0 + this.offset.x,
-            y: this.offset.y,
-        };
-        if (this.next)
-            this.next.offset = {
-                x: this.offset.x,
-                y: this.offset.y + (this.elementHeight || 0),
-            };
-    }
-
     setOperator(value: string): void {
         this.operator = value;
     }
@@ -127,7 +110,7 @@ export default class CCodeBlockMath
             <CodeBlockMath
                 key={uuidv4()}
                 onDrop={this.onDropHandler.bind(this)}
-                onLayout={this.onLayoutHandler.bind(this)}
+                onLayout={this.setPositions.bind(this)}
                 wrapperLeft={this.wrapperLeft}
                 wrapperRight={this.wrapperRight}
                 operator={this.operator || ""}

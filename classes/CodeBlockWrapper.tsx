@@ -63,18 +63,9 @@ class CCodeBlockWrapper
         this.parent = parent;
     }
 
-    onLayoutHandler(x: number, y: number, w: number, h: number) {
-        this.setPositions(x, y, w, h, 0, this.parent?.offset.y || 0);
-        if (this.content)
-            this.content.offset = {
-                x: this.offset.x + x,
-                y: this.offset.y + y,
-            };
-    }
-
     render(props: Props) {
         return this.render_({
-            onLayout: this.onLayoutHandler.bind(this),
+            onLayout: this.setPositions.bind(this),
             key: uuidv4(),
             firstElement: this.content,
             rerender: props.rerender,

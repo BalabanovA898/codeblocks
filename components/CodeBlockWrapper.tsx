@@ -24,17 +24,18 @@ const CodeBlockWrapper = (props: Props) => {
         );
         currentNode = currentNode.next;
     }
+
+    let element: View | null;
+
     return (
         <View
             style={styles.container}
             key={props.key}
+            ref={(view) => (element = view)}
             onLayout={(e) => {
-                props.onLayout(
-                    e.nativeEvent.layout.x,
-                    e.nativeEvent.layout.y,
-                    e.nativeEvent.layout.width,
-                    e.nativeEvent.layout.height
-                );
+                element?.measure((x, y, w, h, px, py) => {
+                    props.onLayout(px, py, w, h);
+                });
             }}>
             {renderArray.length ? (
                 renderArray

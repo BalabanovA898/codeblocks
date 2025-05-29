@@ -84,15 +84,6 @@ export default class CCodeBlockGetVariableValue
         return false;
     }
 
-    onLayoutHandler(x: number, y: number, w: number, h: number): void {
-        this.setPositions(x, y, w, h, 0, 0);
-        if (this.next)
-            this.next.offset = {
-                x: this.offset.x + 4,
-                y: this.offset.y + (this.elementHeight || 0) + 4,
-            };
-    }
-
     setAssignmentState(value: string) {
         this.valueToGet = value;
     }
@@ -104,7 +95,7 @@ export default class CCodeBlockGetVariableValue
                 setValue={this.setAssignmentState.bind(this)}
                 rerender={props.rerender}
                 onDrop={this.onDropHandler.bind(this)}
-                onLayout={this.onLayoutHandler.bind(
+                onLayout={this.setPositions.bind(
                     this
                 )}></CodeBlockGetVariableValue>
         );

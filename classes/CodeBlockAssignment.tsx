@@ -106,19 +106,6 @@ class CCodeBlockAssignment
         this.nameToAssign = name;
     }
 
-    onLayoutHandler(x: number, y: number, w: number, h: number): void {
-        this.setPositions(x, y, w, h, 0, 0);
-        this.wrapper.offset = {
-            x: this.elementX || 0 + this.offset.x + 4,
-            y: this.offset.y + 4, //TODO: Make this gap as global var.
-        };
-        if (this.next)
-            this.next.offset = {
-                x: this.offset.x,
-                y: this.offset.y + (this.elementHeight || 0),
-            };
-    }
-
     override render(props: { key: Key; rerender: DispatchWithoutAction }) {
         return (
             <CodeBlockAssignment
@@ -127,7 +114,7 @@ class CCodeBlockAssignment
                 onDrop={this.onDropHandler.bind(this)}
                 onChange={this.setAssignmentState.bind(this)}
                 name={this.nameToAssign || ""}
-                onLayout={this.onLayoutHandler.bind(this)}
+                onLayout={this.setPositions.bind(this)}
                 wrapper={this.wrapper}></CodeBlockAssignment>
         );
     }
@@ -158,7 +145,7 @@ class CCodeBlockAssignment
                 !le.getValue(item.trim())
             )
                 throw new Error(
-                    "Ошибка блока присваивания. Невозможно присвоить значение неициализированному массиву."
+                    "Невозможно присвоить значание неинициализированному массиву."
                 );
             le.setValue(item.trim(), valueToAssign);
         });

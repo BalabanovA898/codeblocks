@@ -21,18 +21,12 @@ class DropZone implements IDropZone {
         this.offset = offset;
     }
 
-    setPositions(
-        x: number,
-        y: number,
-        w: number,
-        h: number,
-        offsetX: number,
-        offsetY: number
-    ) {
-        this.elementX = x + this.offset.x + offsetX;
-        this.elementY = y + this.offset.y + offsetY;
+    setPositions(x: number, y: number, w: number, h: number) {
+        this.elementX = x;
+        this.elementY = y;
         this.elementWidth = w;
         this.elementHeight = h;
+        console.log("OnLayout: ", x, y, w, h);
     }
 
     checkDropIn(g: PanResponderGestureState) {

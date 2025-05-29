@@ -27,18 +27,18 @@ interface Props {
 }
 
 const CodeBlockWhile = (props: Props & PropsWithChildren) => {
+    let element: View | null;
+
     return (
         <Draggable
             onDrop={props.onDrop}
             styles={styles.container}>
             <View
+                ref={(view) => (element = view)}
                 onLayout={(e) => {
-                    props.onLayout(
-                        e.nativeEvent.layout.x,
-                        e.nativeEvent.layout.y,
-                        e.nativeEvent.layout.width,
-                        e.nativeEvent.layout.height
-                    );
+                    element?.measure((x, y, w, h, px, py) => {
+                        props.onLayout(px, py, w, h);
+                    });
                 }}>
                 <Text style={styles.text}>While</Text>
                 {props.wrapperWhile.render({

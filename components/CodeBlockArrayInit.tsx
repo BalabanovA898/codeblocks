@@ -27,19 +27,19 @@ interface Props {
 }
 
 const CodeBlockArrayInit = (props: Props) => {
+    let element: View | null;
+
     return (
         <Draggable
             key={uuidv4()}
             onDrop={props.onDrop}
             styles={styles.container}>
             <View
+                ref={(view) => (element = view)}
                 onLayout={(e) => {
-                    props.onLayout(
-                        e.nativeEvent.layout.x,
-                        e.nativeEvent.layout.y,
-                        e.nativeEvent.layout.width,
-                        e.nativeEvent.layout.height
-                    );
+                    element?.measure((x, y, w, h, px, py) => {
+                        props.onLayout(px, py, w, h);
+                    });
                 }}
                 style={styles.name}>
                 <Select
