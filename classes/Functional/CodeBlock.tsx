@@ -32,14 +32,10 @@ abstract class CCodeBlock extends DropZone implements ICodeBlock {
     }
 
     pushCodeBlockAfterThis(newBLock: ICodeBlock) {
+        console.log("Adding from code block");
         if (this.next && newBLock.id === this.next.id) return;
-        if (this.prev && newBLock.id === this.prev.id) {
-            const tmpPrevPrev = this.prev.prev;
-            this.prev.next = this.next;
-            this.next = this.prev;
-            this.prev = tmpPrevPrev;
-            //this.prev.prev = this;
-        }
+        if (this.prev && newBLock.id === this.prev.id) return;
+        if (this.id == newBLock.id) return;
         let tmp = this.next;
         newBLock.next = this.next;
         newBLock.prev = this;

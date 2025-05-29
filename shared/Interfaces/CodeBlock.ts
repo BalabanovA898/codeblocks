@@ -13,5 +13,7 @@ export default interface ICodeBlock extends Renderable, Returnable, DropZone {
         g: PanResponderGestureState,
         block: ICodeBlock
     ): boolean;
+
+    removeThisCodeBLock(): void;
 }
 

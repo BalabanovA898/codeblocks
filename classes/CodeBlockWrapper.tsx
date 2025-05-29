@@ -69,12 +69,15 @@ class CCodeBlockWrapper
     }
 
     pushBackCodeBlock(newBlock: ICodeBlock) {
+        console.log("adding from wrapper");
         if (!this.content) return;
         let currentNode = this.content;
         while (currentNode.next) currentNode = currentNode.next;
+        if (currentNode.id == newBlock.id) return;
         currentNode.next = newBlock;
         newBlock.parent = this;
         newBlock.prev = currentNode;
+        newBlock.next = null;
     }
 
     insertCodeBlock(
@@ -87,6 +90,8 @@ class CCodeBlockWrapper
             if (this.content == null) {
                 this.content = block;
                 this.content.parent = this;
+                this.content.prev = null;
+                this.content.next = null;
                 return true;
             } else if (this.content !== null) {
                 if (this.content.insertCodeBlock(e, g, block)) return true;
