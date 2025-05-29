@@ -1,5 +1,12 @@
 import { Dispatch } from "react";
-import { ScrollView, Text, Pressable, StyleSheet } from "react-native";
+import {
+    ScrollView,
+    Text,
+    Pressable,
+    StyleSheet,
+    Dimensions,
+} from "react-native";
+import { uuidv4 } from "../shared/functions";
 
 interface Props {
     massages: string[];
@@ -17,7 +24,9 @@ const OutputWindow = (props: Props) => {
             }}>
             <ScrollView>
                 {props.massages.map((item) => (
-                    <Text style={styles.text}>
+                    <Text
+                        style={styles.text}
+                        key={uuidv4()}>
                         {">"} {item}
                     </Text>
                 ))}
@@ -28,11 +37,11 @@ const OutputWindow = (props: Props) => {
 
 const styles = StyleSheet.create({
     container: {
-        width: "100%",
-        height: "100%",
         position: "absolute",
+        width: "100%",
+        height: (Dimensions.get("window").height * 8) / 10,
+        top: Dimensions.get("window").height / 10,
         backgroundColor: "rgba(0, 0, 0, 0.8)",
-        top: 0,
         left: 0,
     },
     text: {

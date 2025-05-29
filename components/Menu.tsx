@@ -10,6 +10,7 @@ import { globalStyles } from "../shared/globalStyles";
 
 const LOAD = require("../assets/load.png");
 const SAVE = require("../assets/save.png");
+const BOOK = require("../assets/book.png");
 
 interface Props {
     isOpen: boolean;
@@ -39,7 +40,7 @@ const Menu = (props: Props) => {
                     onPress={() => console.log("TODO: Add functionality")}
                     style={styles.button}>
                     <Image
-                        source={LOAD}
+                        source={BOOK}
                         style={styles.buttonImage}></Image>
                     <Text style={styles.buttonText}>Руководство</Text>
                 </Pressable>

@@ -10,33 +10,35 @@ import { globalStyles } from "../shared/globalStyles";
 import { Dispatch } from "react";
 import ICodeBlock from "../shared/Interfaces/CodeBlock";
 
-const START = require("../assets/run.png");
-const DEBUG = require("../assets/debug.png");
+const NEXT = require("../assets/next.png");
+const CANCEL = require("../assets/cancel.png");
 
 interface Props {
-    executeCode: () => void;
+    nextStep: () => void;
     setIsDebugMode: Dispatch<boolean>;
+    setDebugBlock: Dispatch<ICodeBlock | null>;
 }
 
-const Footer = (props: Props) => {
+const Debug = (props: Props) => {
     return (
         <View style={styles.container}>
             <Pressable
                 style={styles.button}
                 onPress={() => {
-                    props.setIsDebugMode(true);
+                    props.setIsDebugMode(false);
+                    props.setDebugBlock(null);
                 }}>
                 <Image
-                    source={DEBUG}
+                    source={CANCEL}
                     style={styles.image}></Image>
-                <Text style={styles.buttonText}>Отладка</Text>
+                <Text style={styles.buttonText}>Закончить</Text>
             </Pressable>
             <Pressable
                 style={styles.button}
-                onPress={props.executeCode}>
-                <Text style={styles.buttonText}>Пуск</Text>
+                onPress={props.nextStep}>
+                <Text style={styles.buttonText}>Далее</Text>
                 <Image
-                    source={START}
+                    source={NEXT}
                     style={{
                         ...styles.image,
                         height: Dimensions.get("window").height / 32,
@@ -72,5 +74,5 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Footer;
+export default Debug;
 

@@ -135,7 +135,10 @@ export default class CCodeBlockIfStatement
             throw new Error(
                 "Ошибка условного оператора. Тип Void не может испольоваться как условие."
             );
-        if (new TypeBool().convertFromOtherType(statementResult.value))
+        let result = statementResult.value;
+        console.log(result);
+        console.log(new TypeBool().convertFromOtherType(result));
+        if (new TypeBool().convertFromOtherType(result))
             return this.wrapperThen.execute(new LexicalEnvironment(le));
         return this.wrapperElse.execute(new LexicalEnvironment(le));
     }

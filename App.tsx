@@ -6,13 +6,17 @@ import CodeblocksZone from "./components/CodeblocksZone";
 import Footer from "./components/Footer";
 import BlockList from "./components/BlockList";
 
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import CodeBlockFunction from "./classes/CodeBlockFunction";
 import CCodeBlockWrapper from "./classes/CodeBlockWrapper";
 import LexicalEnvironment from "./classes/Functional/LexicalEnvironment";
 import OutputWindow from "./components/OutoutWindow";
 import TypeNumber from "./classes/types/TypeNumber";
 import Menu from "./components/Menu";
+import Debug from "./components/Debug";
+import ICodeBlock from "./shared/Interfaces/CodeBlock";
+import { useSharedValue } from "react-native-reanimated";
+import { output } from "./shared/globals";
 
 export default function App() {
     const [isBlockListVisible, setIsBlockListVisible] =
@@ -20,7 +24,7 @@ export default function App() {
     const [isOutputWindowVisible, setIsOutputWindowVisible] =
         useState<boolean>(false);
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-    const [isDemolishAreaActive, setIsDemolishAreaActive] = useState(false);
+    const [isDebugMode, setIsDebugMode] = useState<boolean>(false);
 
     const changeFunctionList = (fn: CodeBlockFunction) => {
         let res = [];
@@ -29,23 +33,28 @@ export default function App() {
         setFunctions(res);
     };
 
+    const clearOutput = () => {
+        while (output.pop()) {}
+    };
+
     let globalLE = new LexicalEnvironment(null);
-    const [output, setOutput] = useState<string[]>([]);
 
     const [functions, setFunctions] = useState<CodeBlockFunction[]>([
         new CodeBlockFunction(
             new CCodeBlockWrapper(null),
             changeFunctionList,
             TypeNumber,
-            output,
-            setOutput,
             "main"
         ),
     ]);
     const [currentFunction, setCurrentFunction] = useState<number>(0);
     const [countOfFunctions, setCountOfFunctions] = useState<number>(1);
-
     const [fileName, setFileName] = useState<string>("");
+    const [debugBlock, setDebugBlock] = useState<ICodeBlock | null>(null);
+
+    useEffect(() => {
+        console.log("output: ", output);
+    }, [output]);
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
@@ -60,9 +69,7 @@ export default function App() {
                 onDrop={functions[0].insertNewCodeBlock.bind(functions[0])}
                 isVisible={isBlockListVisible}
                 setIsVisible={setIsBlockListVisible}
-                globalOutput={output}
-                globalSetOutput={setOutput}
-                setIsDemolishAreaActive={setIsDemolishAreaActive}></BlockList>
+            />
             <Menu isOpen={isMenuOpen}></Menu>
             <FunctionNavigator
                 functions={functions}
@@ -70,20 +77,53 @@ export default function App() {
                 countOfFunctions={countOfFunctions}
             />
             <CodeblocksZone blocks={functions[currentFunction].codeBlocks} />
-            <Footer
-                executeCode={() => {
-                    setOutput([]);
-                    try {
-                        globalLE = new LexicalEnvironment(null);
-                        functions[currentFunction].execute.bind(
-                            functions[currentFunction]
-                        )(globalLE);
-                    } catch (e: any) {
-                        setOutput([...output, e.message]);
-                    }
-                    setIsOutputWindowVisible(true);
-                }}
-            />
+            {!isDebugMode ? (
+                <Footer
+                    executeCode={() => {
+                        try {
+                            clearOutput();
+                            output.push(
+                                `Выполенение ${fileName} ${new Date(
+                                    Date.now()
+                                ).toString()}`
+                            );
+                            globalLE = new LexicalEnvironment(null);
+                            functions[currentFunction].execute.bind(
+                                functions[currentFunction]
+                            )(globalLE);
+                        } catch (e: any) {}
+                        setIsOutputWindowVisible(true);
+                    }}
+                    setIsDebugMode={setIsDebugMode}
+                />
+            ) : (
+                <Debug
+                    nextStep={() => {
+                        if (!debugBlock) {
+                            clearOutput();
+                            setDebugBlock(
+                                functions[currentFunction].codeBlocks.content
+                            );
+                            globalLE = new LexicalEnvironment(null);
+                            output.push("Начало сессии отладки.");
+                        } else {
+                            try {
+                                debugBlock.execute(globalLE);
+                                setDebugBlock(debugBlock.next);
+                                if (!debugBlock)
+                                    output.push(
+                                        "Программа завершила своё выполнение."
+                                    );
+                            } catch (e: any) {
+                                setDebugBlock(null);
+                            }
+                        }
+                        setIsOutputWindowVisible(true);
+                    }}
+                    setIsDebugMode={setIsDebugMode}
+                    setDebugBlock={setDebugBlock}
+                />
+            )}
             <OutputWindow
                 isActive={isOutputWindowVisible}
                 setIsActive={setIsOutputWindowVisible}

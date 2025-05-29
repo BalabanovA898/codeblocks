@@ -7,11 +7,13 @@ class TypeBool {
         return true;
     }
 
-    public convertFrom(value: string): boolean {
-        return value !== "" && value !== "0";
+    public convertFrom(value: string): number {
+        if (value === "true") return 1;
+        if (value === "false") return 0;
+        return value !== "" && value !== "0" ? 1 : 0;
     }
 
-    public convertFromOtherType<G extends ValidTypes>(value: G): boolean {
+    public convertFromOtherType<G extends ValidTypes>(value: G): number {
         const stringValue = value.toString();
         return this.convertFrom(stringValue);
     }

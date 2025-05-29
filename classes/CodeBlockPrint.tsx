@@ -20,11 +20,10 @@ import ICodeBlock from "../shared/Interfaces/CodeBlock";
 import TypeString from "./types/TypeString";
 import TypeVoid from "./types/TypeVoid";
 import { uuidv4 } from "../shared/functions";
+import { output } from "../shared/globals";
 
 interface ICodeBlockPrint {
     wrapper: CCodeBlockWrapper;
-    globalSetOutput: Dispatch<string[]>;
-    globalOutput: string[];
 }
 
 class CCodeBlockPrint
@@ -37,8 +36,6 @@ class CCodeBlockPrint
         block: CCodeBlock
     ) => void;
     wrapper: CCodeBlockWrapper;
-    globalOutput: string[];
-    globalSetOutput: Dispatch<string[]>;
     onPickUp?: () => void;
 
     constructor(
@@ -48,8 +45,6 @@ class CCodeBlockPrint
             g: PanResponderGestureState,
             block: CCodeBlock
         ) => void,
-        go: string[],
-        gso: Dispatch<string[]>,
         onPickUp?: () => void,
         next: CCodeBlock | null = null,
         prev: CCodeBlock | null = null,
@@ -58,8 +53,6 @@ class CCodeBlockPrint
         super(next, prev, parent);
         this.onDrop = onDrop;
         this.wrapper = wrapper;
-        this.globalOutput = go;
-        this.globalSetOutput = gso;
         this.onPickUp = onPickUp;
     }
     onDropHandler(
@@ -76,16 +69,7 @@ class CCodeBlockPrint
             this.onDrop(e, g, this);
         } else {
             let blockWrapper = new CCodeBlockWrapper(null, null);
-            this.onDrop(
-                e,
-                g,
-                new CCodeBlockPrint(
-                    blockWrapper,
-                    this.onDrop,
-                    this.globalOutput,
-                    this.globalSetOutput
-                )
-            );
+            this.onDrop(e, g, new CCodeBlockPrint(blockWrapper, this.onDrop));
         }
     }
 
@@ -119,14 +103,12 @@ class CCodeBlockPrint
         );
     }
     execute(le: LexicalEnvironment): Value {
-        let output = this.wrapper.execute(new LexicalEnvironment(le));
-        if (output.type === TypeVoid) {
+        let WrapperOutput = this.wrapper.execute(new LexicalEnvironment(le));
+        if (WrapperOutput.type === TypeVoid) {
             throw new Error("Значение для печати имеет тип void.");
         }
-        this.globalSetOutput([
-            ...this.globalOutput,
-            new TypeString().convertFromOtherType(output.value),
-        ]);
+
+        output.push(new TypeString().convertFromOtherType(WrapperOutput.value));
 
         return new Value(TypeVoid, "");
     }
