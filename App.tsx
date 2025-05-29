@@ -1,4 +1,4 @@
-import { SafeAreaView, View } from "react-native";
+import { Dimensions, SafeAreaView, View } from "react-native";
 
 import Header from "./components/Header";
 import FunctionNavigator from "./components/FunctionNavigator";
@@ -20,11 +20,7 @@ export default function App() {
     const [isOutputWindowVisible, setIsOutputWindowVisible] =
         useState<boolean>(false);
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-
-    const [codeBlocksZoneOffset, setCodeBlocksZoneOffset] = useState({
-        x: 0,
-        y: 0,
-    });
+    const [isDemolishAreaActive, setIsDemolishAreaActive] = useState(false);
 
     const changeFunctionList = (fn: CodeBlockFunction) => {
         let res = [];
@@ -38,7 +34,7 @@ export default function App() {
 
     const [functions, setFunctions] = useState<CodeBlockFunction[]>([
         new CodeBlockFunction(
-            new CCodeBlockWrapper(codeBlocksZoneOffset, null),
+            new CCodeBlockWrapper(null),
             changeFunctionList,
             TypeNumber,
             output,
@@ -50,15 +46,6 @@ export default function App() {
     const [countOfFunctions, setCountOfFunctions] = useState<number>(1);
 
     const [fileName, setFileName] = useState<string>("");
-
-    useEffect(() => {
-        let copy = functions;
-        functions[0].codeBlocks.offset = {
-            x: codeBlocksZoneOffset.x,
-            y: codeBlocksZoneOffset.y,
-        };
-        setFunctions({ ...copy });
-    }, [codeBlocksZoneOffset]);
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
@@ -72,18 +59,17 @@ export default function App() {
             <BlockList
                 onDrop={functions[0].insertNewCodeBlock.bind(functions[0])}
                 isVisible={isBlockListVisible}
+                setIsVisible={setIsBlockListVisible}
                 globalOutput={output}
-                globalSetOutput={setOutput}></BlockList>
+                globalSetOutput={setOutput}
+                setIsDemolishAreaActive={setIsDemolishAreaActive}></BlockList>
             <Menu isOpen={isMenuOpen}></Menu>
             <FunctionNavigator
                 functions={functions}
                 setCurrentFunction={setCurrentFunction}
                 countOfFunctions={countOfFunctions}
             />
-            <CodeblocksZone
-                setCBZO={setCodeBlocksZoneOffset}
-                blocks={functions[currentFunction].codeBlocks}
-            />
+            <CodeblocksZone blocks={functions[currentFunction].codeBlocks} />
             <Footer
                 executeCode={() => {
                     setOutput([]);

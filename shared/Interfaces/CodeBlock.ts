@@ -7,12 +7,13 @@ import DropZone from "../../classes/Functional/DropZone";
 export default interface ICodeBlock extends Renderable, Returnable, DropZone {
     next: ICodeBlock | null;
     prev: ICodeBlock | null;
-    offset: Position;
     id: string;
     insertCodeBlock(
         e: GestureResponderEvent,
         g: PanResponderGestureState,
         block: ICodeBlock
     ): boolean;
+
+    removeThisCodeBLock(): void;
 }
 

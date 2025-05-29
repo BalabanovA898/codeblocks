@@ -28,12 +28,14 @@ const SelectBlock = (props: Props & PropsWithChildren) => {
                 <Text style={styles.text}>{`▾${props.text}`}</Text>
             </Pressable>
             {props.isOpen &&
-                props.blocks.map((item) =>
-                    item.render({
-                        rerender: props.rerender,
-                        key: uuidv4(),
-                    })
-                )}
+                props.blocks.map((item) => (
+                    <View key={uuidv4()}>
+                        {item.render({
+                            rerender: props.rerender,
+                            key: uuidv4(),
+                        })}
+                    </View>
+                ))}
         </View>
     );
 };
@@ -44,7 +46,9 @@ const styles = StyleSheet.create({
         fontFamily: globalStyles.fontFamily,
         color: globalStyles.backgroundColor,
     },
-    container: {},
+    container: {
+        overflow: "visible",
+    },
 });
 
 export default SelectBlock;

@@ -14,25 +14,22 @@ const BACKGROUND = require("../assets/background.png");
 
 interface Props {
     blocks: CCodeBlockWrapper;
-    setCBZO: Dispatch<{ x: number; y: number }>;
 }
 
-const CodeblocksZone = ({ blocks, setCBZO }: Props) => {
+const CodeblocksZone = ({ blocks }: Props) => {
     const [, forceUpdate] = useReducer((x) => x + 1, 0);
     return (
         <View
             style={{ ...styles.container }} //TODO: Починить адаптивность.
-            onLayout={(e) => {
-                setCBZO({
-                    x: e.nativeEvent.layout.x,
-                    y: e.nativeEvent.layout.y,
-                });
-            }}>
+        >
             <ImageBackground
                 source={BACKGROUND}
                 style={styles.backgroundImage}>
                 <ScrollView>
-                    {blocks.render({ key: uuidv4(), rerender: forceUpdate })}
+                    {blocks.render({
+                        key: uuidv4(),
+                        rerender: forceUpdate,
+                    })}
                 </ScrollView>
             </ImageBackground>
         </View>

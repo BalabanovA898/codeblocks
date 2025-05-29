@@ -24,6 +24,7 @@ export default class CCodeBlockArrayInit
     nameToAssign: string | null = null;
     typeToAssign: string | null = null;
     numberOfElement: string | null = null;
+    onPickUp?: () => void;
 
     onDrop: (
         e: GestureResponderEvent,
@@ -32,18 +33,19 @@ export default class CCodeBlockArrayInit
     ) => void;
 
     constructor(
-        offset: Position,
         onDrop: (
             e: GestureResponderEvent,
             g: PanResponderGestureState,
             block: CCodeBlock
         ) => void,
+        onPickUp?: () => void,
         next: ICodeBlock | null = null,
         prev: ICodeBlock | null = null,
         parent: CCodeBlockWrapper | null = null
     ) {
-        super(offset, next, prev, parent);
+        super(next, prev, parent);
         this.onDrop = onDrop;
+        this.onPickUp = onPickUp;
     }
 
     onDropHandler(
@@ -54,12 +56,7 @@ export default class CCodeBlockArrayInit
         if (this.parent) {
             this.removeThisCodeBLock();
             this.onDrop(e, g, this);
-        } else
-            this.onDrop(
-                e,
-                g,
-                new CCodeBlockArrayInit({ x: 0, y: 0 }, this.onDrop, null)
-            );
+        } else this.onDrop(e, g, new CCodeBlockArrayInit(this.onDrop));
     }
 
     override insertCodeBlock(
@@ -79,15 +76,6 @@ export default class CCodeBlockArrayInit
         return false;
     }
 
-    onLayoutHandler(x: number, y: number, w: number, h: number): void {
-        this.setPositions(x, y, w, h, 0, 0);
-        if (this.next)
-            this.next.offset = {
-                x: this.offset.x,
-                y: this.offset.y + (this.elementHeight || 0),
-            };
-    }
-
     setAssignmentState(name: string, type: string, numberOfElement: string) {
         this.nameToAssign = name;
         this.typeToAssign = type;
@@ -103,7 +91,8 @@ export default class CCodeBlockArrayInit
                 setValue={this.setAssignmentState.bind(this)}
                 rerender={props.rerender}
                 onDrop={this.onDropHandler.bind(this)}
-                onLayout={this.onLayoutHandler.bind(this)}></CodeBlockArrayInit>
+                onLayout={this.setPositions.bind(this)}
+                onPickUp={this.onPickUp}></CodeBlockArrayInit>
         );
     }
 

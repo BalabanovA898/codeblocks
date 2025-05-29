@@ -33,22 +33,24 @@ class CCodeBlockLogicNot
         block: CCodeBlock
     ) => void;
     wrapper: CCodeBlockWrapper;
+    onPickUp?: () => void;
 
     constructor(
-        offset: Position,
         wrapper: CCodeBlockWrapper,
         onDrop: (
             e: GestureResponderEvent,
             g: PanResponderGestureState,
             block: CCodeBlock
         ) => void,
+        onPickUp?: () => void,
         next: CCodeBlock | null = null,
         prev: CCodeBlock | null = null,
         parent: CCodeBlockWrapper | null = null
     ) {
-        super(offset, next, prev, parent);
+        super(next, prev, parent);
         this.onDrop = onDrop;
         this.wrapper = wrapper;
+        this.onPickUp = onPickUp;
     }
     onDropHandler(
         e: GestureResponderEvent,
@@ -63,15 +65,11 @@ class CCodeBlockLogicNot
             this.removeThisCodeBLock();
             this.onDrop(e, g, this);
         } else {
-            let blockWrapper = new CCodeBlockWrapper(this.offset, null, null);
+            let blockWrapper = new CCodeBlockWrapper(null, null);
             this.onDrop(
                 e,
                 g,
-                new CCodeBlockLogicNot(
-                    { x: 0, y: 0 },
-                    blockWrapper,
-                    this.onDrop
-                )
+                new CCodeBlockLogicNot(blockWrapper, this.onDrop)
             );
         }
     }
@@ -94,27 +92,15 @@ class CCodeBlockLogicNot
         return false;
     }
 
-    onLayoutHandler(x: number, y: number, w: number, h: number): void {
-        this.setPositions(x, y, w, h, 0, 0);
-        this.wrapper.offset = {
-            x: this.elementX || 0 + this.offset.x,
-            y: this.offset.y,
-        };
-        if (this.next)
-            this.next.offset = {
-                x: this.offset.x,
-                y: this.offset.y + (this.elementHeight || 0),
-            };
-    }
-
     render(props: any): JSX.Element {
         return (
             <CodeBlockLogicNot
                 key={uuidv4()}
                 onDrop={this.onDropHandler.bind(this)}
-                onLayout={this.onLayoutHandler.bind(this)}
+                onLayout={this.setPositions.bind(this)}
                 wrapper={this.wrapper}
-                rerender={props.rerender}></CodeBlockLogicNot>
+                rerender={props.rerender}
+                onPickUp={this.onPickUp}></CodeBlockLogicNot>
         );
     }
     execute(le: LexicalEnvironment): Value {

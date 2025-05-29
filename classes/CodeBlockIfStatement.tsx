@@ -30,13 +30,13 @@ export default class CCodeBlockIfStatement
         g: PanResponderGestureState,
         block: CCodeBlock
     ) => void;
+    onPickUp?: () => void;
     wrapperIf: CCodeBlockWrapper;
     wrapperThen: CCodeBlockWrapper;
     wrapperElse: CCodeBlockWrapper;
     operator: string | null = null;
 
     constructor(
-        offset: Position,
         wrapperA: CCodeBlockWrapper,
         wrapperB: CCodeBlockWrapper,
         wrapperC: CCodeBlockWrapper,
@@ -45,12 +45,14 @@ export default class CCodeBlockIfStatement
             g: PanResponderGestureState,
             block: CCodeBlock
         ) => void,
+        onPickUp?: () => void,
         next: CCodeBlock | null = null,
         prev: CCodeBlock | null = null,
         parent: CCodeBlockWrapper | null = null
     ) {
-        super(offset, next, prev, parent);
+        super(next, prev, parent);
         this.onDrop = onDrop;
+        this.onPickUp = onPickUp;
         this.wrapperIf = wrapperA;
         this.wrapperThen = wrapperB;
         this.wrapperElse = wrapperC;
@@ -70,14 +72,13 @@ export default class CCodeBlockIfStatement
 
             this.onDrop(e, g, this);
         } else {
-            let blockWrapperA = new CCodeBlockWrapper(this.offset, null, null);
-            let blockWrapperB = new CCodeBlockWrapper(this.offset, null, null);
-            let blockWrapperC = new CCodeBlockWrapper(this.offset, null, null);
+            let blockWrapperA = new CCodeBlockWrapper(null, null);
+            let blockWrapperB = new CCodeBlockWrapper(null, null);
+            let blockWrapperC = new CCodeBlockWrapper(null, null);
             this.onDrop(
                 e,
                 g,
                 new CCodeBlockIfStatement(
-                    { x: 0, y: 0 },
                     blockWrapperA,
                     blockWrapperB,
                     blockWrapperC,
@@ -108,27 +109,6 @@ export default class CCodeBlockIfStatement
         return false;
     }
 
-    onLayoutHandler(x: number, y: number, w: number, h: number): void {
-        this.setPositions(x, y, w, h, 0, 0);
-        this.wrapperIf.offset = {
-            x: this.elementX || 0 + this.offset.x,
-            y: this.offset.y,
-        };
-        this.wrapperThen.offset = {
-            x: this.elementX || 0 + this.offset.x,
-            y: this.offset.y,
-        };
-        this.wrapperElse.offset = {
-            x: this.elementX || 0 + this.offset.x,
-            y: this.offset.y,
-        };
-        if (this.next)
-            this.next.offset = {
-                x: this.offset.x,
-                y: this.offset.y + (this.elementHeight || 0),
-            };
-    }
-
     setOperator(value: string): void {
         this.operator = value;
     }
@@ -138,11 +118,12 @@ export default class CCodeBlockIfStatement
             <CodeBlockIfStatement
                 key={uuidv4()}
                 onDrop={this.onDropHandler.bind(this)}
-                onLayout={this.onLayoutHandler.bind(this)}
+                onLayout={this.setPositions.bind(this)}
                 wrapperIf={this.wrapperIf}
                 wrapperThen={this.wrapperThen}
                 wrapperElse={this.wrapperElse}
-                rerender={props.rerender}></CodeBlockIfStatement>
+                rerender={props.rerender}
+                onPickUp={this.onPickUp}></CodeBlockIfStatement>
         );
     }
 

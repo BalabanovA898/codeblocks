@@ -25,6 +25,7 @@ export default class CCodeBlockGetVariableValue
     implements ICodeBlockValue, Renderable, Returnable, Droppable, ICodeBlock
 {
     valueToGet: string | null = null;
+    onPickUp?: () => void;
 
     onDrop: (
         e: GestureResponderEvent,
@@ -33,18 +34,19 @@ export default class CCodeBlockGetVariableValue
     ) => void;
 
     constructor(
-        offset: Position,
         onDrop: (
             e: GestureResponderEvent,
             g: PanResponderGestureState,
             block: CCodeBlock
         ) => void,
+        onPickUp?: () => void,
         next: ICodeBlock | null = null,
         prev: ICodeBlock | null = null,
         parent: CCodeBlockWrapper | null = null
     ) {
-        super(offset, next, prev, parent);
+        super(next, prev, parent);
         this.onDrop = onDrop;
+        this.onPickUp = onPickUp;
     }
 
     onDropHandler(
@@ -55,16 +57,7 @@ export default class CCodeBlockGetVariableValue
         if (this.parent) {
             this.removeThisCodeBLock();
             this.onDrop(e, g, this);
-        } else
-            this.onDrop(
-                e,
-                g,
-                new CCodeBlockGetVariableValue(
-                    { x: 0, y: 0 },
-                    this.onDrop,
-                    null
-                )
-            );
+        } else this.onDrop(e, g, new CCodeBlockGetVariableValue(this.onDrop));
     }
 
     override insertCodeBlock(
@@ -84,15 +77,6 @@ export default class CCodeBlockGetVariableValue
         return false;
     }
 
-    onLayoutHandler(x: number, y: number, w: number, h: number): void {
-        this.setPositions(x, y, w, h, 0, 0);
-        if (this.next)
-            this.next.offset = {
-                x: this.offset.x + 4,
-                y: this.offset.y + (this.elementHeight || 0) + 4,
-            };
-    }
-
     setAssignmentState(value: string) {
         this.valueToGet = value;
     }
@@ -104,9 +88,8 @@ export default class CCodeBlockGetVariableValue
                 setValue={this.setAssignmentState.bind(this)}
                 rerender={props.rerender}
                 onDrop={this.onDropHandler.bind(this)}
-                onLayout={this.onLayoutHandler.bind(
-                    this
-                )}></CodeBlockGetVariableValue>
+                onLayout={this.setPositions.bind(this)}
+                onPickUp={this.onPickUp}></CodeBlockGetVariableValue>
         );
     }
 

@@ -23,22 +23,24 @@ interface Props {
         position: Animated.ValueXY
     ) => void;
     onLayout: (x: number, y: number, w: number, h: number) => void;
+    onPickUp?: () => void;
 }
 
 const CodeBlockValue = (props: Props) => {
+    let element: View | null;
+
     return (
         <Draggable
             key={uuidv4()}
             onDrop={props.onDrop}
-            styles={styles.container}>
+            styles={styles.container}
+            onPickUp={props.onPickUp}>
             <View
+                ref={(view) => (element = view)}
                 onLayout={(e) => {
-                    props.onLayout(
-                        e.nativeEvent.layout.x,
-                        e.nativeEvent.layout.y,
-                        e.nativeEvent.layout.width,
-                        e.nativeEvent.layout.height
-                    );
+                    element?.measure((x, y, w, h, px, py) => {
+                        props.onLayout(px, py, w, h);
+                    });
                 }}
                 style={styles.value}>
                 <Select

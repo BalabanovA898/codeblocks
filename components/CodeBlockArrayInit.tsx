@@ -7,7 +7,7 @@ import {
     View,
 } from "react-native";
 import Select from "./Select";
-import { DispatchWithoutAction, useState } from "react";
+import { DispatchWithoutAction, useState, VoidFunctionComponent } from "react";
 import Draggable from "./Draggable";
 import { uuidv4 } from "../shared/functions";
 import { globalStyles } from "../shared/globalStyles";
@@ -24,22 +24,24 @@ interface Props {
         position: Animated.ValueXY
     ) => void;
     onLayout: (x: number, y: number, w: number, h: number) => void;
+    onPickUp?: () => void;
 }
 
 const CodeBlockArrayInit = (props: Props) => {
+    let element: View | null;
+
     return (
         <Draggable
             key={uuidv4()}
             onDrop={props.onDrop}
-            styles={styles.container}>
+            styles={styles.container}
+            onPickUp={props.onPickUp}>
             <View
+                ref={(view) => (element = view)}
                 onLayout={(e) => {
-                    props.onLayout(
-                        e.nativeEvent.layout.x,
-                        e.nativeEvent.layout.y,
-                        e.nativeEvent.layout.width,
-                        e.nativeEvent.layout.height
-                    );
+                    element?.measure((x, y, w, h, px, py) => {
+                        props.onLayout(px, py, w, h);
+                    });
                 }}
                 style={styles.name}>
                 <Select

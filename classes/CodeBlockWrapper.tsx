@@ -53,28 +53,15 @@ class CCodeBlockWrapper
     }) => React.JSX.Element = CodeBlockWrapper;
     parent: ICodeBlock | null;
 
-    constructor(
-        offset: Position,
-        content: ICodeBlock | null,
-        parent: ICodeBlock | null = null
-    ) {
-        super(offset);
+    constructor(content: ICodeBlock | null, parent: ICodeBlock | null = null) {
+        super();
         this.content = content;
         this.parent = parent;
     }
 
-    onLayoutHandler(x: number, y: number, w: number, h: number) {
-        this.setPositions(x, y, w, h, 0, this.parent?.offset.y || 0);
-        if (this.content)
-            this.content.offset = {
-                x: this.offset.x + x,
-                y: this.offset.y + y,
-            };
-    }
-
     render(props: Props) {
         return this.render_({
-            onLayout: this.onLayoutHandler.bind(this),
+            onLayout: this.setPositions.bind(this),
             key: uuidv4(),
             firstElement: this.content,
             rerender: props.rerender,
@@ -82,12 +69,15 @@ class CCodeBlockWrapper
     }
 
     pushBackCodeBlock(newBlock: ICodeBlock) {
+        console.log("adding from wrapper");
         if (!this.content) return;
         let currentNode = this.content;
         while (currentNode.next) currentNode = currentNode.next;
+        if (currentNode.id == newBlock.id) return;
         currentNode.next = newBlock;
         newBlock.parent = this;
         newBlock.prev = currentNode;
+        newBlock.next = null;
     }
 
     insertCodeBlock(
@@ -100,6 +90,8 @@ class CCodeBlockWrapper
             if (this.content == null) {
                 this.content = block;
                 this.content.parent = this;
+                this.content.prev = null;
+                this.content.next = null;
                 return true;
             } else if (this.content !== null) {
                 if (this.content.insertCodeBlock(e, g, block)) return true;

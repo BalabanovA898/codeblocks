@@ -34,9 +34,9 @@ export default class CCodeBlockWhile
     wrapperWhile: CCodeBlockWrapper;
     wrapperDo: CCodeBlockWrapper;
     operator: string | null = null;
+    onPickUp?: () => void;
 
     constructor(
-        offset: Position,
         wrapperA: CCodeBlockWrapper,
         wrapperB: CCodeBlockWrapper,
         onDrop: (
@@ -44,12 +44,14 @@ export default class CCodeBlockWhile
             g: PanResponderGestureState,
             block: CCodeBlock
         ) => void,
+        onPickUp?: () => void,
         next: CCodeBlock | null = null,
         prev: CCodeBlock | null = null,
         parent: CCodeBlockWrapper | null = null
     ) {
-        super(offset, next, prev, parent);
+        super(next, prev, parent);
         this.onDrop = onDrop;
+        this.onPickUp = onPickUp;
         this.wrapperWhile = wrapperA;
         this.wrapperDo = wrapperB;
     }
@@ -67,17 +69,12 @@ export default class CCodeBlockWhile
             this.removeThisCodeBLock();
             this.onDrop(e, g, this);
         } else {
-            let blockWrapperA = new CCodeBlockWrapper(this.offset, null, null);
-            let blockWrapperB = new CCodeBlockWrapper(this.offset, null, null);
+            let blockWrapperA = new CCodeBlockWrapper(null, null);
+            let blockWrapperB = new CCodeBlockWrapper(null, null);
             this.onDrop(
                 e,
                 g,
-                new CCodeBlockWhile(
-                    { x: 0, y: 0 },
-                    blockWrapperA,
-                    blockWrapperB,
-                    this.onDrop
-                )
+                new CCodeBlockWhile(blockWrapperA, blockWrapperB, this.onDrop)
             );
         }
     }
@@ -101,23 +98,6 @@ export default class CCodeBlockWhile
         return false;
     }
 
-    onLayoutHandler(x: number, y: number, w: number, h: number): void {
-        this.setPositions(x, y, w, h, 0, 0);
-        this.wrapperWhile.offset = {
-            x: this.elementX || 0 + this.offset.x,
-            y: this.offset.y,
-        };
-        this.wrapperDo.offset = {
-            x: this.elementX || 0 + this.offset.x,
-            y: this.offset.y,
-        };
-        if (this.next)
-            this.next.offset = {
-                x: this.offset.x,
-                y: this.offset.y + (this.elementHeight || 0),
-            };
-    }
-
     setOperator(value: string): void {
         this.operator = value;
     }
@@ -127,10 +107,11 @@ export default class CCodeBlockWhile
             <CodeBlockWhile
                 key={uuidv4()}
                 onDrop={this.onDropHandler.bind(this)}
-                onLayout={this.onLayoutHandler.bind(this)}
+                onLayout={this.setPositions.bind(this)}
                 wrapperWhile={this.wrapperWhile}
                 wrapperDo={this.wrapperDo}
-                rerender={props.rerender}></CodeBlockWhile>
+                rerender={props.rerender}
+                onPickUp={this.onPickUp}></CodeBlockWhile>
         );
     }
 

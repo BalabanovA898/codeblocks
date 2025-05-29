@@ -26,6 +26,7 @@ class CCodeBlockBreak
     extends CCodeBlock
     implements Returnable, Renderable, Droppable
 {
+    onPickUp?: () => void;
     onDrop: (
         e: GestureResponderEvent,
         g: PanResponderGestureState,
@@ -33,18 +34,19 @@ class CCodeBlockBreak
     ) => void;
 
     constructor(
-        offset: Position,
         onDrop: (
             e: GestureResponderEvent,
             g: PanResponderGestureState,
             block: CCodeBlock
         ) => void,
+        onPickUp?: () => void,
         next: CCodeBlock | null = null,
         prev: CCodeBlock | null = null,
         parent: CCodeBlockWrapper | null = null
     ) {
-        super(offset, next, prev, parent);
+        super(next, prev, parent);
         this.onDrop = onDrop;
+        this.onPickUp = onPickUp;
     }
     onDropHandler(
         e: GestureResponderEvent,
@@ -59,7 +61,7 @@ class CCodeBlockBreak
             this.removeThisCodeBLock();
             this.onDrop(e, g, this);
         } else {
-            this.onDrop(e, g, new CCodeBlockBreak({ x: 0, y: 0 }, this.onDrop));
+            this.onDrop(e, g, new CCodeBlockBreak(this.onDrop));
         }
     }
 
@@ -78,22 +80,14 @@ class CCodeBlockBreak
         return false;
     }
 
-    onLayoutHandler(x: number, y: number, w: number, h: number): void {
-        this.setPositions(x, y, w, h, 0, 0);
-        if (this.next)
-            this.next.offset = {
-                x: this.offset.x,
-                y: this.offset.y + (this.elementHeight || 0),
-            };
-    }
-
     render(props: any): JSX.Element {
         return (
             <CodeBlockBreak
                 key={uuidv4()}
                 onDrop={this.onDropHandler.bind(this)}
-                onLayout={this.onLayoutHandler.bind(this)}
-                rerender={props.rerender}></CodeBlockBreak>
+                onLayout={this.setPositions.bind(this)}
+                rerender={props.rerender}
+                onPickUp={this.onPickUp}></CodeBlockBreak>
         );
     }
     execute(le: LexicalEnvironment): Value {

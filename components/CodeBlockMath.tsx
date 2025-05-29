@@ -25,21 +25,22 @@ interface Props {
     operator: string;
     setValue: (operator: string) => void;
     rerender: DispatchWithoutAction;
+    onPickUp?: () => void;
 }
 
 const CodeBlockMath = (props: Props & PropsWithChildren) => {
+    let element: View | null;
     return (
         <Draggable
             onDrop={props.onDrop}
-            styles={styles.container}>
+            styles={styles.container}
+            onPickUp={props.onPickUp}>
             <View
+                ref={(view) => (element = view)}
                 onLayout={(e) => {
-                    props.onLayout(
-                        e.nativeEvent.layout.x,
-                        e.nativeEvent.layout.y,
-                        e.nativeEvent.layout.width,
-                        e.nativeEvent.layout.height
-                    );
+                    element?.measure((x, y, w, h, px, py) => {
+                        props.onLayout(px, py, w, h);
+                    });
                 }}>
                 {props.wrapperLeft.render({
                     key: uuidv4(),

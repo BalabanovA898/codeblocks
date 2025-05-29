@@ -4,6 +4,7 @@ import CCodeBlock from "../classes/Functional/CodeBlock";
 import ICodeBlock from "../shared/Interfaces/CodeBlock";
 import { uuidv4 } from "../shared/functions";
 import Draggable from "./Draggable";
+import { processColorsInProps } from "react-native-reanimated/lib/typescript/Colors";
 
 interface Props {
     key: Key;
@@ -16,6 +17,7 @@ const CodeBlockWrapper = (props: Props) => {
     let currentNode = props.firstElement;
     const [, rerender] = useReducer((e) => e - 1, 0);
     while (currentNode) {
+        console.log(currentNode);
         renderArray.push(
             currentNode.render({
                 key: uuidv4() + renderArray.length,
@@ -24,17 +26,23 @@ const CodeBlockWrapper = (props: Props) => {
         );
         currentNode = currentNode.next;
     }
+
+    let element: View | null;
+
     return (
         <View
-            style={styles.container}
+            style={{
+                ...styles.container,
+                width: renderArray.length
+                    ? props.firstElement?.elementWidth
+                    : 250,
+            }}
             key={props.key}
+            ref={(view) => (element = view)}
             onLayout={(e) => {
-                props.onLayout(
-                    e.nativeEvent.layout.x,
-                    e.nativeEvent.layout.y,
-                    e.nativeEvent.layout.width,
-                    e.nativeEvent.layout.height
-                );
+                element?.measure((x, y, w, h, px, py) => {
+                    props.onLayout(px, py, w, h);
+                });
             }}>
             {renderArray.length ? (
                 renderArray

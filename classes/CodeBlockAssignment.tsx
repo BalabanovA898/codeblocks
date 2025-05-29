@@ -39,24 +39,26 @@ class CCodeBlockAssignment
     ) => void;
     nameToAssign: string | null;
     wrapper: CCodeBlockWrapper;
+    onPickUp?: () => void;
 
     constructor(
-        offset: Position,
         wrapper: CCodeBlockWrapper,
         onDrop: (
             e: GestureResponderEvent,
             g: PanResponderGestureState,
             block: ICodeBlock
         ) => void,
+        onPickUp?: () => void,
         next: CCodeBlock | null = null,
         prev: CCodeBlock | null = null,
         parent: CCodeBlockWrapper | null = null
     ) {
-        super(offset, next, prev, parent);
+        super(next, prev, parent);
         this.render_ = CodeBlockAssignment;
         this.onDrop = onDrop;
         this.nameToAssign = null;
         this.wrapper = wrapper;
+        this.onPickUp = onPickUp;
     }
 
     onDropHandler(
@@ -68,16 +70,11 @@ class CCodeBlockAssignment
             this.removeThisCodeBLock.call(this);
             this.onDrop(e, g, this);
         } else {
-            let blockWrapper = new CCodeBlockWrapper(this.offset, null, null);
+            let blockWrapper = new CCodeBlockWrapper(null, null);
             this.onDrop(
                 e,
                 g,
-                new CCodeBlockAssignment(
-                    { x: 0, y: 0 },
-                    blockWrapper,
-                    this.onDrop,
-                    null
-                )
+                new CCodeBlockAssignment(blockWrapper, this.onDrop)
             );
         }
     }
@@ -106,19 +103,6 @@ class CCodeBlockAssignment
         this.nameToAssign = name;
     }
 
-    onLayoutHandler(x: number, y: number, w: number, h: number): void {
-        this.setPositions(x, y, w, h, 0, 0);
-        this.wrapper.offset = {
-            x: this.elementX || 0 + this.offset.x + 4,
-            y: this.offset.y + 4, //TODO: Make this gap as global var.
-        };
-        if (this.next)
-            this.next.offset = {
-                x: this.offset.x,
-                y: this.offset.y + (this.elementHeight || 0),
-            };
-    }
-
     override render(props: { key: Key; rerender: DispatchWithoutAction }) {
         return (
             <CodeBlockAssignment
@@ -127,8 +111,9 @@ class CCodeBlockAssignment
                 onDrop={this.onDropHandler.bind(this)}
                 onChange={this.setAssignmentState.bind(this)}
                 name={this.nameToAssign || ""}
-                onLayout={this.onLayoutHandler.bind(this)}
-                wrapper={this.wrapper}></CodeBlockAssignment>
+                onLayout={this.setPositions.bind(this)}
+                wrapper={this.wrapper}
+                onPickUp={this.onPickUp}></CodeBlockAssignment>
         );
     }
     execute(le: LexicalEnvironment, contextReturn?: Value): Value {
@@ -158,7 +143,7 @@ class CCodeBlockAssignment
                 !le.getValue(item.trim())
             )
                 throw new Error(
-                    "Ошибка блока присваивания. Невозможно присвоить значение неициализированному массиву."
+                    "Невозможно присвоить значание неинициализированному массиву."
                 );
             le.setValue(item.trim(), valueToAssign);
         });

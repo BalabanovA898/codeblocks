@@ -39,9 +39,9 @@ class CCodeBlockPrint
     wrapper: CCodeBlockWrapper;
     globalOutput: string[];
     globalSetOutput: Dispatch<string[]>;
+    onPickUp?: () => void;
 
     constructor(
-        offset: Position,
         wrapper: CCodeBlockWrapper,
         onDrop: (
             e: GestureResponderEvent,
@@ -50,15 +50,17 @@ class CCodeBlockPrint
         ) => void,
         go: string[],
         gso: Dispatch<string[]>,
+        onPickUp?: () => void,
         next: CCodeBlock | null = null,
         prev: CCodeBlock | null = null,
         parent: CCodeBlockWrapper | null = null
     ) {
-        super(offset, next, prev, parent);
+        super(next, prev, parent);
         this.onDrop = onDrop;
         this.wrapper = wrapper;
         this.globalOutput = go;
         this.globalSetOutput = gso;
+        this.onPickUp = onPickUp;
     }
     onDropHandler(
         e: GestureResponderEvent,
@@ -73,12 +75,11 @@ class CCodeBlockPrint
             this.removeThisCodeBLock();
             this.onDrop(e, g, this);
         } else {
-            let blockWrapper = new CCodeBlockWrapper(this.offset, null, null);
+            let blockWrapper = new CCodeBlockWrapper(null, null);
             this.onDrop(
                 e,
                 g,
                 new CCodeBlockPrint(
-                    { x: 0, y: 0 },
                     blockWrapper,
                     this.onDrop,
                     this.globalOutput,
@@ -106,27 +107,15 @@ class CCodeBlockPrint
         return false;
     }
 
-    onLayoutHandler(x: number, y: number, w: number, h: number): void {
-        this.setPositions(x, y, w, h, 0, 0);
-        this.wrapper.offset = {
-            x: this.elementX || 0 + this.offset.x,
-            y: this.offset.y,
-        };
-        if (this.next)
-            this.next.offset = {
-                x: this.offset.x,
-                y: this.offset.y + (this.elementHeight || 0),
-            };
-    }
-
     render(props: any): JSX.Element {
         return (
             <CodeBlockPrint
                 key={uuidv4()}
                 onDrop={this.onDropHandler.bind(this)}
-                onLayout={this.onLayoutHandler.bind(this)}
+                onLayout={this.setPositions.bind(this)}
                 wrapper={this.wrapper}
-                rerender={props.rerender}></CodeBlockPrint>
+                rerender={props.rerender}
+                onPickUp={this.onPickUp}></CodeBlockPrint>
         );
     }
     execute(le: LexicalEnvironment): Value {

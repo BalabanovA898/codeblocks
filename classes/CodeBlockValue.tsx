@@ -27,6 +27,7 @@ export default class CCodeBlockValue
 {
     valueToAssign: string | null = null;
     typeToAssign: string | null = null;
+    onPickUp?: () => void;
 
     onDrop: (
         e: GestureResponderEvent,
@@ -35,18 +36,19 @@ export default class CCodeBlockValue
     ) => void;
 
     constructor(
-        offset: Position,
         onDrop: (
             e: GestureResponderEvent,
             g: PanResponderGestureState,
             block: CCodeBlock
         ) => void,
+        onPickUp?: () => void,
         next: ICodeBlock | null = null,
         prev: ICodeBlock | null = null,
         parent: CCodeBlockWrapper | null = null
     ) {
-        super(offset, next, prev, parent);
+        super(next, prev, parent);
         this.onDrop = onDrop;
+        this.onPickUp = onPickUp;
     }
 
     onDropHandler(
@@ -57,12 +59,7 @@ export default class CCodeBlockValue
         if (this.parent) {
             this.removeThisCodeBLock();
             this.onDrop(e, g, this);
-        } else
-            this.onDrop(
-                e,
-                g,
-                new CCodeBlockValue({ x: 0, y: 0 }, this.onDrop, null)
-            );
+        } else this.onDrop(e, g, new CCodeBlockValue(this.onDrop));
     }
 
     override insertCodeBlock(
@@ -82,15 +79,6 @@ export default class CCodeBlockValue
         return false;
     }
 
-    onLayoutHandler(x: number, y: number, w: number, h: number): void {
-        this.setPositions(x, y, w, h, 0, 0);
-        if (this.next)
-            this.next.offset = {
-                x: this.offset.x,
-                y: this.offset.y + (this.elementHeight || 0),
-            };
-    }
-
     setAssignmentState(value: string, type: string) {
         this.valueToAssign = value;
         this.typeToAssign = type;
@@ -104,7 +92,8 @@ export default class CCodeBlockValue
                 setValue={this.setAssignmentState.bind(this)}
                 rerender={props.rerender}
                 onDrop={this.onDropHandler.bind(this)}
-                onLayout={this.onLayoutHandler.bind(this)}></CodeBlockValue>
+                onLayout={this.setPositions.bind(this)}
+                onPickUp={this.onPickUp}></CodeBlockValue>
         );
     }
 
