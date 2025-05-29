@@ -31,6 +31,7 @@ export default class CCodeBlockLogic
     wrapperLeft: CCodeBlockWrapper;
     wrapperRight: CCodeBlockWrapper;
     operator: string | null = null;
+    onPickUp?: () => void;
 
     constructor(
         offset: Position,
@@ -41,6 +42,7 @@ export default class CCodeBlockLogic
             g: PanResponderGestureState,
             block: CCodeBlock
         ) => void,
+        onPickUp?: () => void,
         next: CCodeBlock | null = null,
         prev: CCodeBlock | null = null,
         parent: CCodeBlockWrapper | null = null
@@ -49,6 +51,7 @@ export default class CCodeBlockLogic
         this.onDrop = onDrop;
         this.wrapperLeft = wrapperA;
         this.wrapperRight = wrapperB;
+        this.onPickUp = onPickUp;
     }
 
     onDropHandler(
@@ -114,7 +117,8 @@ export default class CCodeBlockLogic
                 wrapperRight={this.wrapperRight}
                 operator={this.operator || ""}
                 setValue={this.setOperator.bind(this)}
-                rerender={props.rerender}></CodeBlockLogic>
+                rerender={props.rerender}
+                onPickUp={this.onPickUp}></CodeBlockLogic>
         );
     }
 

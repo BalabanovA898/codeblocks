@@ -1,4 +1,10 @@
-import { Dispatch, DispatchWithoutAction, useReducer, useState } from "react";
+import {
+    Dispatch,
+    DispatchWithoutAction,
+    useReducer,
+    useRef,
+    useState,
+} from "react";
 import {
     StyleSheet,
     View,
@@ -6,6 +12,7 @@ import {
     GestureResponderEvent,
     ScrollView,
     Dimensions,
+    Animated,
 } from "react-native";
 import CCodeBlockAsigment from "../classes/CodeBlockAssignment";
 import CCodeBlock from "../classes/Functional/CodeBlock";
@@ -27,6 +34,7 @@ import CCodeBlockArrayInit from "../classes/CodeBlockArrayInit";
 
 interface Props {
     isVisible: Boolean;
+    setIsVisible: Dispatch<Boolean>;
     onDrop: (
         e: GestureResponderEvent,
         g: PanResponderGestureState,
@@ -34,59 +42,94 @@ interface Props {
     ) => void;
     globalOutput: string[];
     globalSetOutput: Dispatch<string[]>;
+    setIsDemolishAreaActive: Dispatch<boolean>;
 }
 
 const BlockList = (props: Props) => {
+    const onPickUp = () => {
+        Animated.spring(windowOpacity, {
+            toValue: 0,
+            useNativeDriver: true,
+        }).start();
+        console.log(windowOpacity);
+    };
+
+    const onDropHandler = (
+        e: GestureResponderEvent,
+        g: PanResponderGestureState,
+        block: ICodeBlock
+    ) => {
+        Animated.spring(windowOpacity, {
+            toValue: 1,
+            useNativeDriver: true,
+        }).start();
+        props.onDrop(e, g, block);
+    };
+
+    let windowOpacity = useRef(new Animated.Value(1)).current;
+
+    const opacity = windowOpacity.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0.1, 1],
+    });
+
     const flowControl: Renderable[] = [
         new CCodeBlockIfStatement(
             { x: 0, y: 0 },
             new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
             new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
             new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
-            props.onDrop
+            onDropHandler,
+            onPickUp
         ),
         new CCodeBlockWhile(
             { x: 0, y: 0 },
             new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
             new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
-            props.onDrop
+            onDropHandler,
+            onPickUp
         ),
-        new CCodeBlockBreak({ x: 0, y: 0 }, props.onDrop),
+        new CCodeBlockBreak({ x: 0, y: 0 }, onDropHandler, onPickUp),
     ];
     const utility = [
         new CCodeBlockAsigment(
             { x: 0, y: 0 },
             new CCodeBlockWrapper({ x: 0, y: 0 }, null),
-            props.onDrop
+            onDropHandler,
+            onPickUp
         ),
         new CCodeBlockPrint(
             { x: 0, y: 0 },
             new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
-            props.onDrop,
+            onDropHandler,
             props.globalOutput,
-            props.globalSetOutput
+            props.globalSetOutput,
+            onPickUp
         ),
-        new CCodeBlockValue({ x: 0, y: 0 }, props.onDrop),
-        new CCodeBlockArrayInit({ x: 0, y: 0 }, props.onDrop),
-        new CCodeBlockGetVariableValue({ x: 0, y: 0 }, props.onDrop),
+        new CCodeBlockValue({ x: 0, y: 0 }, onDropHandler, onPickUp),
+        new CCodeBlockArrayInit({ x: 0, y: 0 }, onDropHandler, onPickUp),
+        new CCodeBlockGetVariableValue({ x: 0, y: 0 }, onDropHandler, onPickUp),
     ];
     const operators = [
         new CCodeBlockLogic(
             { x: 0, y: 0 },
             new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
             new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
-            props.onDrop
+            onDropHandler,
+            onPickUp
         ),
         new CCodeBlockMath(
             { x: 0, y: 0 },
             new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
             new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
-            props.onDrop
+            onDropHandler,
+            onPickUp
         ),
         new CCodeBlockLogicNot(
             { x: 0, y: 0 },
             new CCodeBlockWrapper({ x: 0, y: 0 }, null, null),
-            props.onDrop
+            onDropHandler,
+            onPickUp
         ),
     ];
     const [isUtilityOpen, setIsUtilityOpen] = useState(false);
@@ -94,10 +137,11 @@ const BlockList = (props: Props) => {
     const [isOperatorsOpen, setIsOperatorsOpen] = useState(false);
     const [, renderer] = useReducer((e) => e - 1, 0);
     return (
-        <ScrollView
+        <Animated.View
             style={{
                 display: props.isVisible ? "flex" : "none",
                 ...styles.container,
+                opacity: opacity,
             }}>
             <SelectBlock
                 blocks={utility}
@@ -120,7 +164,7 @@ const BlockList = (props: Props) => {
                 setIsOpen={setIsOperatorsOpen}
                 rerender={renderer}
             />
-        </ScrollView>
+        </Animated.View>
     );
 };
 
@@ -131,7 +175,7 @@ const styles = StyleSheet.create({
         top: Dimensions.get("window").height / 10,
         padding: 10,
         overflow: "visible",
-        backgroundColor: "rgba(255, 255, 255, 0.5)",
+        backgroundColor: "rgba(255, 255, 255, 0.7)",
         zIndex: 2,
     },
 });

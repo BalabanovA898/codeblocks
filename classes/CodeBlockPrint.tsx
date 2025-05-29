@@ -39,6 +39,7 @@ class CCodeBlockPrint
     wrapper: CCodeBlockWrapper;
     globalOutput: string[];
     globalSetOutput: Dispatch<string[]>;
+    onPickUp?: () => void;
 
     constructor(
         offset: Position,
@@ -50,6 +51,7 @@ class CCodeBlockPrint
         ) => void,
         go: string[],
         gso: Dispatch<string[]>,
+        onPickUp?: () => void,
         next: CCodeBlock | null = null,
         prev: CCodeBlock | null = null,
         parent: CCodeBlockWrapper | null = null
@@ -59,6 +61,7 @@ class CCodeBlockPrint
         this.wrapper = wrapper;
         this.globalOutput = go;
         this.globalSetOutput = gso;
+        this.onPickUp = onPickUp;
     }
     onDropHandler(
         e: GestureResponderEvent,
@@ -113,7 +116,8 @@ class CCodeBlockPrint
                 onDrop={this.onDropHandler.bind(this)}
                 onLayout={this.setPositions.bind(this)}
                 wrapper={this.wrapper}
-                rerender={props.rerender}></CodeBlockPrint>
+                rerender={props.rerender}
+                onPickUp={this.onPickUp}></CodeBlockPrint>
         );
     }
     execute(le: LexicalEnvironment): Value {

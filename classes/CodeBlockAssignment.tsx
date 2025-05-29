@@ -39,6 +39,7 @@ class CCodeBlockAssignment
     ) => void;
     nameToAssign: string | null;
     wrapper: CCodeBlockWrapper;
+    onPickUp?: () => void;
 
     constructor(
         offset: Position,
@@ -48,6 +49,7 @@ class CCodeBlockAssignment
             g: PanResponderGestureState,
             block: ICodeBlock
         ) => void,
+        onPickUp?: () => void,
         next: CCodeBlock | null = null,
         prev: CCodeBlock | null = null,
         parent: CCodeBlockWrapper | null = null
@@ -57,6 +59,7 @@ class CCodeBlockAssignment
         this.onDrop = onDrop;
         this.nameToAssign = null;
         this.wrapper = wrapper;
+        this.onPickUp = onPickUp;
     }
 
     onDropHandler(
@@ -75,8 +78,7 @@ class CCodeBlockAssignment
                 new CCodeBlockAssignment(
                     { x: 0, y: 0 },
                     blockWrapper,
-                    this.onDrop,
-                    null
+                    this.onDrop
                 )
             );
         }
@@ -115,7 +117,8 @@ class CCodeBlockAssignment
                 onChange={this.setAssignmentState.bind(this)}
                 name={this.nameToAssign || ""}
                 onLayout={this.setPositions.bind(this)}
-                wrapper={this.wrapper}></CodeBlockAssignment>
+                wrapper={this.wrapper}
+                onPickUp={this.onPickUp}></CodeBlockAssignment>
         );
     }
     execute(le: LexicalEnvironment, contextReturn?: Value): Value {

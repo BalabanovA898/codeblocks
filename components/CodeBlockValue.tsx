@@ -23,6 +23,7 @@ interface Props {
         position: Animated.ValueXY
     ) => void;
     onLayout: (x: number, y: number, w: number, h: number) => void;
+    onPickUp?: () => void;
 }
 
 const CodeBlockValue = (props: Props) => {
@@ -32,7 +33,8 @@ const CodeBlockValue = (props: Props) => {
         <Draggable
             key={uuidv4()}
             onDrop={props.onDrop}
-            styles={styles.container}>
+            styles={styles.container}
+            onPickUp={props.onPickUp}>
             <View
                 ref={(view) => (element = view)}
                 onLayout={(e) => {

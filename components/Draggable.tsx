@@ -18,6 +18,7 @@ interface Props {
         position: Animated.ValueXY
     ) => void;
     styles: any;
+    onPickUp?: () => void;
 }
 
 const Draggable = (props: PropsWithChildren & Props) => {
@@ -26,6 +27,9 @@ const Draggable = (props: PropsWithChildren & Props) => {
         PanResponder.create({
             onStartShouldSetPanResponder: () => true,
             onMoveShouldSetPanResponder: () => false,
+            onPanResponderStart: () => {
+                if (props.onPickUp) props.onPickUp();
+            },
             onPanResponderMove: Animated.event(
                 [
                     null,

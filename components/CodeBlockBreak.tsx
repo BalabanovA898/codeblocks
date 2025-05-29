@@ -19,6 +19,7 @@ interface Props {
     ) => void;
     onLayout: (x: number, y: number, w: number, h: number) => void;
     rerender: DispatchWithoutAction;
+    onPickUp?: () => void;
 }
 
 const CodeBlockBreak = (props: Props & PropsWithChildren) => {
@@ -26,7 +27,8 @@ const CodeBlockBreak = (props: Props & PropsWithChildren) => {
     return (
         <Draggable
             onDrop={props.onDrop}
-            styles={styles.container}>
+            styles={styles.container}
+            onPickUp={props.onPickUp}>
             <View
                 ref={(view) => (element = view)}
                 onLayout={(e) => {

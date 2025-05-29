@@ -33,6 +33,7 @@ class CCodeBlockLogicNot
         block: CCodeBlock
     ) => void;
     wrapper: CCodeBlockWrapper;
+    onPickUp?: () => void;
 
     constructor(
         offset: Position,
@@ -42,6 +43,7 @@ class CCodeBlockLogicNot
             g: PanResponderGestureState,
             block: CCodeBlock
         ) => void,
+        onPickUp?: () => void,
         next: CCodeBlock | null = null,
         prev: CCodeBlock | null = null,
         parent: CCodeBlockWrapper | null = null
@@ -49,6 +51,7 @@ class CCodeBlockLogicNot
         super(offset, next, prev, parent);
         this.onDrop = onDrop;
         this.wrapper = wrapper;
+        this.onPickUp = onPickUp;
     }
     onDropHandler(
         e: GestureResponderEvent,
@@ -101,7 +104,8 @@ class CCodeBlockLogicNot
                 onDrop={this.onDropHandler.bind(this)}
                 onLayout={this.setPositions.bind(this)}
                 wrapper={this.wrapper}
-                rerender={props.rerender}></CodeBlockLogicNot>
+                rerender={props.rerender}
+                onPickUp={this.onPickUp}></CodeBlockLogicNot>
         );
     }
     execute(le: LexicalEnvironment): Value {

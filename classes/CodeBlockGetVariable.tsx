@@ -25,6 +25,7 @@ export default class CCodeBlockGetVariableValue
     implements ICodeBlockValue, Renderable, Returnable, Droppable, ICodeBlock
 {
     valueToGet: string | null = null;
+    onPickUp?: () => void;
 
     onDrop: (
         e: GestureResponderEvent,
@@ -39,12 +40,14 @@ export default class CCodeBlockGetVariableValue
             g: PanResponderGestureState,
             block: CCodeBlock
         ) => void,
+        onPickUp?: () => void,
         next: ICodeBlock | null = null,
         prev: ICodeBlock | null = null,
         parent: CCodeBlockWrapper | null = null
     ) {
         super(offset, next, prev, parent);
         this.onDrop = onDrop;
+        this.onPickUp = onPickUp;
     }
 
     onDropHandler(
@@ -59,11 +62,7 @@ export default class CCodeBlockGetVariableValue
             this.onDrop(
                 e,
                 g,
-                new CCodeBlockGetVariableValue(
-                    { x: 0, y: 0 },
-                    this.onDrop,
-                    null
-                )
+                new CCodeBlockGetVariableValue({ x: 0, y: 0 }, this.onDrop)
             );
     }
 
@@ -95,9 +94,8 @@ export default class CCodeBlockGetVariableValue
                 setValue={this.setAssignmentState.bind(this)}
                 rerender={props.rerender}
                 onDrop={this.onDropHandler.bind(this)}
-                onLayout={this.setPositions.bind(
-                    this
-                )}></CodeBlockGetVariableValue>
+                onLayout={this.setPositions.bind(this)}
+                onPickUp={this.onPickUp}></CodeBlockGetVariableValue>
         );
     }
 

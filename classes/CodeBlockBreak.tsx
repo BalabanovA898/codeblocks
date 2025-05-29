@@ -26,6 +26,7 @@ class CCodeBlockBreak
     extends CCodeBlock
     implements Returnable, Renderable, Droppable
 {
+    onPickUp?: () => void;
     onDrop: (
         e: GestureResponderEvent,
         g: PanResponderGestureState,
@@ -39,12 +40,14 @@ class CCodeBlockBreak
             g: PanResponderGestureState,
             block: CCodeBlock
         ) => void,
+        onPickUp?: () => void,
         next: CCodeBlock | null = null,
         prev: CCodeBlock | null = null,
         parent: CCodeBlockWrapper | null = null
     ) {
         super(offset, next, prev, parent);
         this.onDrop = onDrop;
+        this.onPickUp = onPickUp;
     }
     onDropHandler(
         e: GestureResponderEvent,
@@ -84,7 +87,8 @@ class CCodeBlockBreak
                 key={uuidv4()}
                 onDrop={this.onDropHandler.bind(this)}
                 onLayout={this.setPositions.bind(this)}
-                rerender={props.rerender}></CodeBlockBreak>
+                rerender={props.rerender}
+                onPickUp={this.onPickUp}></CodeBlockBreak>
         );
     }
     execute(le: LexicalEnvironment): Value {

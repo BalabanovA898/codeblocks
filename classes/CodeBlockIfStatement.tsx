@@ -30,6 +30,7 @@ export default class CCodeBlockIfStatement
         g: PanResponderGestureState,
         block: CCodeBlock
     ) => void;
+    onPickUp?: () => void;
     wrapperIf: CCodeBlockWrapper;
     wrapperThen: CCodeBlockWrapper;
     wrapperElse: CCodeBlockWrapper;
@@ -45,12 +46,14 @@ export default class CCodeBlockIfStatement
             g: PanResponderGestureState,
             block: CCodeBlock
         ) => void,
+        onPickUp?: () => void,
         next: CCodeBlock | null = null,
         prev: CCodeBlock | null = null,
         parent: CCodeBlockWrapper | null = null
     ) {
         super(offset, next, prev, parent);
         this.onDrop = onDrop;
+        this.onPickUp = onPickUp;
         this.wrapperIf = wrapperA;
         this.wrapperThen = wrapperB;
         this.wrapperElse = wrapperC;
@@ -121,7 +124,8 @@ export default class CCodeBlockIfStatement
                 wrapperIf={this.wrapperIf}
                 wrapperThen={this.wrapperThen}
                 wrapperElse={this.wrapperElse}
-                rerender={props.rerender}></CodeBlockIfStatement>
+                rerender={props.rerender}
+                onPickUp={this.onPickUp}></CodeBlockIfStatement>
         );
     }
 

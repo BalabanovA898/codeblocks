@@ -25,6 +25,7 @@ interface Props {
     operator: string;
     setValue: (operator: string) => void;
     rerender: DispatchWithoutAction;
+    onPickUp?: () => void;
 }
 
 const CodeBlockLogic = (props: Props & PropsWithChildren) => {
@@ -32,7 +33,8 @@ const CodeBlockLogic = (props: Props & PropsWithChildren) => {
     return (
         <Draggable
             onDrop={props.onDrop}
-            styles={styles.container}>
+            styles={styles.container}
+            onPickUp={props.onPickUp}>
             <View
                 ref={(view) => (element = view)}
                 onLayout={(e) => {

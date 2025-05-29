@@ -27,6 +27,7 @@ export default class CCodeBlockValue
 {
     valueToAssign: string | null = null;
     typeToAssign: string | null = null;
+    onPickUp?: () => void;
 
     onDrop: (
         e: GestureResponderEvent,
@@ -41,12 +42,14 @@ export default class CCodeBlockValue
             g: PanResponderGestureState,
             block: CCodeBlock
         ) => void,
+        onPickUp?: () => void,
         next: ICodeBlock | null = null,
         prev: ICodeBlock | null = null,
         parent: CCodeBlockWrapper | null = null
     ) {
         super(offset, next, prev, parent);
         this.onDrop = onDrop;
+        this.onPickUp = onPickUp;
     }
 
     onDropHandler(
@@ -58,11 +61,7 @@ export default class CCodeBlockValue
             this.removeThisCodeBLock();
             this.onDrop(e, g, this);
         } else
-            this.onDrop(
-                e,
-                g,
-                new CCodeBlockValue({ x: 0, y: 0 }, this.onDrop, null)
-            );
+            this.onDrop(e, g, new CCodeBlockValue({ x: 0, y: 0 }, this.onDrop));
     }
 
     override insertCodeBlock(
@@ -95,7 +94,8 @@ export default class CCodeBlockValue
                 setValue={this.setAssignmentState.bind(this)}
                 rerender={props.rerender}
                 onDrop={this.onDropHandler.bind(this)}
-                onLayout={this.setPositions.bind(this)}></CodeBlockValue>
+                onLayout={this.setPositions.bind(this)}
+                onPickUp={this.onPickUp}></CodeBlockValue>
         );
     }
 

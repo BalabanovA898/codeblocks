@@ -1,4 +1,4 @@
-import { SafeAreaView, View } from "react-native";
+import { Dimensions, SafeAreaView, View } from "react-native";
 
 import Header from "./components/Header";
 import FunctionNavigator from "./components/FunctionNavigator";
@@ -20,6 +20,7 @@ export default function App() {
     const [isOutputWindowVisible, setIsOutputWindowVisible] =
         useState<boolean>(false);
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+    const [isDemolishAreaActive, setIsDemolishAreaActive] = useState(false);
 
     const [codeBlocksZoneOffset, setCodeBlocksZoneOffset] = useState({
         x: 0,
@@ -72,8 +73,10 @@ export default function App() {
             <BlockList
                 onDrop={functions[0].insertNewCodeBlock.bind(functions[0])}
                 isVisible={isBlockListVisible}
+                setIsVisible={setIsBlockListVisible}
                 globalOutput={output}
-                globalSetOutput={setOutput}></BlockList>
+                globalSetOutput={setOutput}
+                setIsDemolishAreaActive={setIsDemolishAreaActive}></BlockList>
             <Menu isOpen={isMenuOpen}></Menu>
             <FunctionNavigator
                 functions={functions}

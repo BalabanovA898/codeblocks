@@ -24,6 +24,7 @@ interface Props {
     wrapperWhile: CCodeBlockWrapper;
     wrapperDo: CCodeBlockWrapper;
     rerender: DispatchWithoutAction;
+    onPickUp?: () => void;
 }
 
 const CodeBlockWhile = (props: Props & PropsWithChildren) => {
@@ -32,7 +33,8 @@ const CodeBlockWhile = (props: Props & PropsWithChildren) => {
     return (
         <Draggable
             onDrop={props.onDrop}
-            styles={styles.container}>
+            styles={styles.container}
+            onPickUp={props.onPickUp}>
             <View
                 ref={(view) => (element = view)}
                 onLayout={(e) => {

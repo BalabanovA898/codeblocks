@@ -32,7 +32,10 @@ const CodeblocksZone = ({ blocks, setCBZO }: Props) => {
                 source={BACKGROUND}
                 style={styles.backgroundImage}>
                 <ScrollView>
-                    {blocks.render({ key: uuidv4(), rerender: forceUpdate })}
+                    {blocks.render({
+                        key: uuidv4(),
+                        rerender: forceUpdate,
+                    })}
                 </ScrollView>
             </ImageBackground>
         </View>

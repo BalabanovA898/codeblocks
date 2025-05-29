@@ -37,8 +37,12 @@ const Select = (props: Props) => {
 };
 
 const styles = StyleSheet.create({
-    select: {},
-    option: {},
+    select: {
+        overflow: "visible",
+    },
+    option: {
+        overflow: "visible",
+    },
     text: {
         fontSize: globalStyles.fontSize,
         fontFamily: globalStyles.fontFamily,
