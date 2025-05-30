@@ -6,6 +6,7 @@ import LexicalEnvironment from "./LexicalEnvironment";
 import CodeBlockEnvironment from "../../shared/Interfaces/CodeBlockEnvironment";
 import ICodeBlock from "../../shared/Interfaces/CodeBlock";
 import Value from "./Value";
+import SerializedBlock from "./shared/serializationTypes";
 import TypeNumber from "../types/TypeNumber";
 import { uuidv4 } from "../../shared/functions";
 
@@ -30,6 +31,8 @@ abstract class CCodeBlock extends DropZone implements ICodeBlock {
     onLayoutHandler(x: number, y: number, w: number, h: number) {
         this.setPositions(x, y, w, h);
     }
+
+    serialize(): SerializedBlock;
 
     pushCodeBlockAfterThis(newBLock: ICodeBlock) {
         console.log("Adding from code block");
@@ -63,6 +66,17 @@ abstract class CCodeBlock extends DropZone implements ICodeBlock {
         return false;
     }
 
+
+    abstract serialize(): any;
+    
+    updateEventHandlers(onDrop: any, onPickUp?: any) {
+        this.onDrop = onDrop;
+        if (onPickUp && this.onPickUp) this.onPickUp = onPickUp;
+        if (this.next) {
+            this.next.updateEventHandlers(onDrop, onPickUp);
+        }
+    }
+
     removeThisCodeBLock() {
         console.log(this);
         if (this.prev) this.prev.next = this.next;
@@ -72,4 +86,5 @@ abstract class CCodeBlock extends DropZone implements ICodeBlock {
 }
 
 export default CCodeBlock;
+
 
