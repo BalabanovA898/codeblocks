@@ -31,6 +31,8 @@ import CCodeBlockBreak from "../classes/CodeBlockBreak";
 import SelectBlock from "./SelectBlock";
 import CCodeBlockLogicNot from "../classes/CodeBlockLogicNot";
 import CCodeBlockArrayInit from "../classes/CodeBlockArrayInit";
+import CCodeBlockGetArrayElement from "../classes/CodeBlockGetArrayElement";
+import CCodeBlockSetArrayElement from "../classes/CodeBlockSetArrayBlock";
 
 interface Props {
     isVisible: Boolean;
@@ -92,14 +94,28 @@ const BlockList = (props: Props) => {
             onDropHandler,
             onPickUp
         ),
+
         new CCodeBlockPrint(
             new CCodeBlockWrapper(null, null),
             onDropHandler,
             onPickUp
         ),
         new CCodeBlockValue(onDropHandler, onPickUp),
-        new CCodeBlockArrayInit(onDropHandler, onPickUp),
         new CCodeBlockGetVariableValue(onDropHandler, onPickUp),
+    ];
+    const arrays = [
+        new CCodeBlockGetArrayElement(
+            new CCodeBlockWrapper(null),
+            onDropHandler,
+            onPickUp
+        ),
+        new CCodeBlockArrayInit(onDropHandler, onPickUp),
+        new CCodeBlockSetArrayElement(
+            new CCodeBlockWrapper(null),
+            new CCodeBlockWrapper(null),
+            onDropHandler,
+            onPickUp
+        ),
     ];
     const operators = [
         new CCodeBlockLogic(
@@ -121,6 +137,7 @@ const BlockList = (props: Props) => {
         ),
     ];
     const [isUtilityOpen, setIsUtilityOpen] = useState(false);
+    const [isArraysOpen, setIsArraysOpen] = useState(false);
     const [isFlowControlOpen, setIsFlowControlOpen] = useState(false);
     const [isOperatorsOpen, setIsOperatorsOpen] = useState(false);
     const [, renderer] = useReducer((e) => e - 1, 0);
@@ -136,6 +153,13 @@ const BlockList = (props: Props) => {
                 text="Утилитарные"
                 isOpen={isUtilityOpen}
                 setIsOpen={setIsUtilityOpen}
+                rerender={renderer}
+            />
+            <SelectBlock
+                blocks={arrays}
+                text="Работа с массивами"
+                isOpen={isArraysOpen}
+                setIsOpen={setIsArraysOpen}
                 rerender={renderer}
             />
             <SelectBlock
