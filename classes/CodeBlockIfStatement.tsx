@@ -109,6 +109,41 @@ export default class CCodeBlockIfStatement
         return false;
     }
 
+    serialize() {
+        return {
+            type: "CCodeBlockIfStatement",
+            id: this.id,
+            operator: this.operator,
+            wrapperIf: this.wrapperIf.serialize(),
+            wrapperThen: this.wrapperThen.serialize(),
+            wrapperElse: this.wrapperElse.serialize(),
+            next: this.next ? this.next.serialize() : null,
+        };
+    }
+
+    // Добавить статический метод десериализации только если он есть во втором коде
+    static async deserialize(data: any, onDrop: any, onPickUp?: any): Promise<CCodeBlockIfStatement> {
+        const wrapperIf = await CCodeBlockWrapper.deserialize(data.wrapperIf);
+        const wrapperThen = await CCodeBlockWrapper.deserialize(data.wrapperThen);
+        const wrapperElse = await CCodeBlockWrapper.deserialize(data.wrapperElse);
+        const block = new CCodeBlockIfStatement(
+            wrapperIf,
+            wrapperThen,
+            wrapperElse,
+            onDrop,
+            onPickUp
+        );
+        block.id = data.id;
+        block.operator = data.operator;
+
+        if (data.next) {
+            // предполагается, что next тоже нужно десериализовать, если есть
+            // тут нужно знать, есть ли в вашем втором коде такой метод
+            // если нет, то его не добавляю
+        }
+        return block;
+    }
+
     setOperator(value: string): void {
         this.operator = value;
     }
@@ -135,12 +170,8 @@ export default class CCodeBlockIfStatement
             throw new Error(
                 "Ошибка условного оператора. Тип Void не может испольоваться как условие."
             );
-        let result = statementResult.value;
-        console.log(result);
-        console.log(new TypeBool().convertFromOtherType(result));
-        if (new TypeBool().convertFromOtherType(result))
+        if (new TypeBool().convertFromOtherType(statementResult.value))
             return this.wrapperThen.execute(new LexicalEnvironment(le));
         return this.wrapperElse.execute(new LexicalEnvironment(le));
     }
 }
-
