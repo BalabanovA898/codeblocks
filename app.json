@@ -1,6 +1,6 @@
 {
     "expo": {
-        "name": "codeblocks",
+        "name": "Code - blocks!",
         "slug": "codeblocks",
         "version": "1.0.0",
         "orientation": "portrait",
@@ -15,12 +15,7 @@
         "ios": {
             "supportsTablet": true
         },
-        "android": {
-            "adaptiveIcon": {
-                "foregroundImage": "./assets/adaptive-icon.png",
-                "backgroundColor": "#ffffff"
-            }
-        },
+        "android": {},
         "web": {
             "favicon": "./assets/favicon.png"
         }

@@ -1,6 +1,7 @@
 import {
     Dimensions,
     Image,
+    Linking,
     Pressable,
     StyleSheet,
     Text,
@@ -37,7 +38,11 @@ const Menu = (props: Props) => {
                     <Text style={styles.buttonText}>Сохранить</Text>
                 </Pressable>
                 <Pressable
-                    onPress={() => console.log("TODO: Add functionality")}
+                    onPress={() =>
+                        Linking.openURL(
+                            "https://docs.google.com/document/d/1eHpwdFwr6AqbWtenDK0-cQ5lLrQ4fF3I3z4serbzOSI/edit?usp=sharing"
+                        )
+                    }
                     style={styles.button}>
                     <Image
                         source={BOOK}
