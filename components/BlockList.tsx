@@ -31,6 +31,7 @@ import CCodeBlockBreak from "../classes/CodeBlockBreak";
 import SelectBlock from "./SelectBlock";
 import CCodeBlockLogicNot from "../classes/CodeBlockLogicNot";
 import CCodeBlockArrayInit from "../classes/CodeBlockArrayInit";
+import CCodeBlockGetArrayElement from "../classes/CodeBlockGetArrayElement";
 
 interface Props {
     isVisible: Boolean;
@@ -88,6 +89,11 @@ const BlockList = (props: Props) => {
     ];
     const utility = [
         new CCodeBlockAsigment(
+            new CCodeBlockWrapper(null),
+            onDropHandler,
+            onPickUp
+        ),
+        new CCodeBlockGetArrayElement(
             new CCodeBlockWrapper(null),
             onDropHandler,
             onPickUp
