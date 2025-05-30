@@ -3,6 +3,7 @@ import {
     PanResponderGestureState,
     Animated,
 } from "react-native";
+
 import ICodeBlock from "../shared/Interfaces/CodeBlock";
 import Droppable from "../shared/Interfaces/Droppable";
 import Renderable from "../shared/Interfaces/Renderable";
@@ -20,13 +21,9 @@ interface ICodeBlockValue {
     valueToGet: string | null;
 }
 
-export default class CCodeBlockGetVariableValue
-    extends CCodeBlock
-    implements ICodeBlockValue, Renderable, Returnable, Droppable, ICodeBlock
-{
+export default class CCodeBlockGetVariableValue extends CCodeBlock implements ICodeBlockValue, Renderable, Returnable, Droppable, ICodeBlock {
     valueToGet: string | null = null;
     onPickUp?: () => void;
-
     onDrop: (
         e: GestureResponderEvent,
         g: PanResponderGestureState,
@@ -48,6 +45,8 @@ export default class CCodeBlockGetVariableValue
         this.onDrop = onDrop;
         this.onPickUp = onPickUp;
     }
+
+    // Вставляю функции из второго кода без изменений, чтобы они работали в первом классе
 
     onDropHandler(
         e: GestureResponderEvent,
@@ -104,7 +103,7 @@ export default class CCodeBlockGetVariableValue
             )
         )
             throw new Error(
-                "Неправильное наименование переменнjq. Переменная должна начинаться с буквы, далее сожержать только буквы латинского алфавита и цифры. Для присвоения значения элементу массива неоходимо указать индекс в квадратных скобках без пробелов после имени переменной."
+                "Неправильное наименование переменнjq. Переменная должна начинаться с буквы, далее содержать только буквы латинского алфавита и цифры. Для присвоения значения элементу массива неоходимо указать индекс в квадратных скобках без пробелов после имени переменной."
             );
 
         let res = le.getValue(this.valueToGet);
@@ -115,4 +114,3 @@ export default class CCodeBlockGetVariableValue
         return res;
     }
 }
-
