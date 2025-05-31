@@ -52,29 +52,6 @@ class CCodeBlockLogicNot
         this.wrapper = wrapper;
         this.onPickUp = onPickUp;
     }
-    serialize() {
-        return {
-            type: "CCodeBlockLogicNot",
-            id: this.id,
-            wrapper: this.wrapper.serialize(),
-            next: this.next ? this.next.serialize() : null,
-        };
-    }
-
-    static async deserialize(data: any, onDrop: any, onPickUp?: any): Promise<CCodeBlockLogicNot> {
-        const wrapper = await CCodeBlockWrapper.deserialize(data.wrapper);
-        const block = new CCodeBlockLogicNot(wrapper, onDrop, onPickUp);
-        block.id = data.id;
-
-        if (data.next) {
-            block.next = await this.deserialize(data.next, onDrop, onPickUp);
-            if (block.next) {
-                block.next.prev = block;
-            }
-        }
-        
-        return block;
-    }
     onDropHandler(
         e: GestureResponderEvent,
         g: PanResponderGestureState,

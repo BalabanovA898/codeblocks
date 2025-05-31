@@ -84,35 +84,6 @@ export default class CCodeBlockValue
         this.typeToAssign = type;
     }
 
-    // Добавить метод сериализации
-    serialize() {
-        return {
-            type: "CCodeBlockValue",
-            id: this.id,
-            valueToAssign: this.valueToAssign,
-            typeToAssign: this.typeToAssign,
-            next: this.next ? this.next.serialize() : null,
-        };
-    }
-
-    // Добавить статический метод десериализации
-    static deserialize(data: any, onDrop: any, onPickUp?: any): CCodeBlockValue {
-        const block = new CCodeBlockValue(onDrop, onPickUp);
-        block.id = data.id;
-        block.valueToAssign = data.valueToAssign;
-        block.typeToAssign = data.typeToAssign;
-        
-        // Рекурсивно восстанавливаем цепочку
-        if (data.next) {
-            block.next = this.deserialize(data.next, onDrop, onPickUp);
-            if (block.next) {
-                block.next.prev = block;
-            }
-        }
-        
-        return block;
-    }
-
     render(props: any) {
         return (
             <CodeBlockValue

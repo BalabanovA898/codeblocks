@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import { globalStyles } from "../shared/globalStyles";
 import { Dispatch, useRef } from "react";
-import Menu from "./Menu";
 const MENU = require("../assets/menu.png");
 const ADD_BLOCK = require("../assets/addBlock.png");
 
@@ -20,10 +19,6 @@ interface Props {
     isMenuOpen: boolean;
     setIsMenuOpen: Dispatch<boolean>;
     fileName?: string;
-    onSave: () => void;
-    onLoad: () => void;
-    isSaving: boolean;
-    isLoading: boolean;
 }
 
 const Header = (props: Props) => {
@@ -38,7 +33,10 @@ const Header = (props: Props) => {
     return (
         <>
             <SafeAreaView />
-            <View style={{ ...styles.container }}>
+            <View
+                style={{
+                    ...styles.container,
+                }}>
                 <Pressable
                     style={styles.button}
                     onPress={() => {
@@ -55,13 +53,11 @@ const Header = (props: Props) => {
                             transform: [{ scaleY: MenuScaleValue }],
                         }}></Animated.Image>
                 </Pressable>
-                
                 <Pressable style={styles.button}>
                     <Text style={styles.buttonText}>
                         {props.fileName || "Новый файл"}
                     </Text>
                 </Pressable>
-                
                 <Pressable
                     style={styles.button}
                     onPress={(e) => {
@@ -69,6 +65,7 @@ const Header = (props: Props) => {
                             toValue: props.isBlockListVisible ? 0 : 1,
                             useNativeDriver: true,
                         }).start();
+
                         props.setBlockListVisible(!props.isBlockListVisible);
                     }}>
                     <Animated.Image
@@ -80,15 +77,6 @@ const Header = (props: Props) => {
                         }}></Animated.Image>
                 </Pressable>
             </View>
-            
-            {/* Добавьте Menu сюда с нужными пропсами */}
-            <Menu 
-                isOpen={props.isMenuOpen}
-                onSave={props.onSave}
-                onLoad={props.onLoad}
-                isSaving={props.isSaving}
-                isLoading={props.isLoading}
-            />
         </>
     );
 };
@@ -120,3 +108,4 @@ const styles = StyleSheet.create({
 });
 
 export default Header;
+
