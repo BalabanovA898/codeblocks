@@ -3,7 +3,6 @@ import {
     PanResponderGestureState,
     Animated,
 } from "react-native";
-
 import ICodeBlock from "../shared/Interfaces/CodeBlock";
 import Droppable from "../shared/Interfaces/Droppable";
 import Renderable from "../shared/Interfaces/Renderable";
@@ -21,9 +20,13 @@ interface ICodeBlockValue {
     valueToGet: string | null;
 }
 
-export default class CCodeBlockGetVariableValue extends CCodeBlock implements ICodeBlockValue, Renderable, Returnable, Droppable, ICodeBlock {
+export default class CCodeBlockGetVariableValue
+    extends CCodeBlock
+    implements ICodeBlockValue, Renderable, Returnable, Droppable, ICodeBlock
+{
     valueToGet: string | null = null;
     onPickUp?: () => void;
+
     onDrop: (
         e: GestureResponderEvent,
         g: PanResponderGestureState,
@@ -46,7 +49,31 @@ export default class CCodeBlockGetVariableValue extends CCodeBlock implements IC
         this.onPickUp = onPickUp;
     }
 
-    // Вставляю функции из второго кода без изменений, чтобы они работали в первом классе
+     serialize() {
+        return {
+            type: "CCodeBlockGetVariableValue",
+            id: this.id,
+            valueToGet: this.valueToGet,
+            next: this.next ? this.next.serialize() : null,
+        };
+    }
+
+    // Добавить статический метод десериализации
+    static deserialize(data: any, onDrop: any, onPickUp?: any): CCodeBlockGetVariableValue {
+        const block = new CCodeBlockGetVariableValue(onDrop, onPickUp);
+        block.id = data.id;
+        block.valueToGet = data.valueToGet;
+        
+        // Рекурсивно восстанавливаем цепочку
+        if (data.next) {
+            block.next = this.deserialize(data.next, onDrop, onPickUp);
+            if (block.next) {
+                block.next.prev = block;
+            }
+        }
+        
+        return block;
+    }
 
     onDropHandler(
         e: GestureResponderEvent,
@@ -103,7 +130,7 @@ export default class CCodeBlockGetVariableValue extends CCodeBlock implements IC
             )
         )
             throw new Error(
-                "Неправильное наименование переменнjq. Переменная должна начинаться с буквы, далее содержать только буквы латинского алфавита и цифры. Для присвоения значения элементу массива неоходимо указать индекс в квадратных скобках без пробелов после имени переменной."
+                "Неправильное наименование переменнjq. Переменная должна начинаться с буквы, далее сожержать только буквы латинского алфавита и цифры. Для присвоения значения элементу массива неоходимо указать индекс в квадратных скобках без пробелов после имени переменной."
             );
 
         let res = le.getValue(this.valueToGet);
@@ -114,3 +141,4 @@ export default class CCodeBlockGetVariableValue extends CCodeBlock implements IC
         return res;
     }
 }
+
