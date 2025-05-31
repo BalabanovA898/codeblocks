@@ -13,8 +13,6 @@ export default interface ICodeBlock extends Renderable, Returnable, DropZone {
 
     updateEventHandlers?(onDrop: any, onPickUp?: any): void;
 
-
-
     insertCodeBlock(
         e: GestureResponderEvent,
         g: PanResponderGestureState,
