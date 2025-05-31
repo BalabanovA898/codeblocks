@@ -17,7 +17,7 @@ import CCodeBlockWrapper from "./CodeBlockWrapper";
 import ICodeBlock from "../shared/Interfaces/CodeBlock";
 import TypeVoid from "./types/TypeVoid";
 import { uuidv4 } from "../shared/functions";
-import {deserializeAnyBlock} from "./BlockDeserializer";
+import { deserializeAnyBlock } from "./Functional/BlockDeserializer";
 
 interface ICodeBlockAssignment {
     nameToAssign: string | null;
@@ -92,7 +92,7 @@ class CCodeBlockAssignment
     }
 
     serialize() {
-         return {
+        return {
             type: "CCodeBlockAssignment",
             id: this.id,
             nameToAssign: this.nameToAssign,
@@ -101,51 +101,53 @@ class CCodeBlockAssignment
         };
     }
 
-   static async deserialize(data: any, onDrop: any, onPickUp?: any): Promise<CCodeBlockAssignment> {
-    // Защита от отсутствия wrapper
-    if (!data.wrapper) {
-        console.warn("CCodeBlockAssignment: wrapper data missing, creating new");
-        data.wrapper = {
-            type: "CCodeBlockWrapper",
-            content: null,
-            next: []
-        };
-    }
-
-    const wrapper = await CCodeBlockWrapper.deserialize(data.wrapper);
-    
-    const block = new CCodeBlockAssignment(
-        wrapper, 
-        onDrop, 
-        onPickUp
-    );
-    
-    // Восстановление ID
-    block.id = data.id || uuidv4(); // Генерация ID если отсутствует
-    
-    // Защита от отсутствия nameToAssign
-    if (data.nameToAssign !== undefined) {
-        block.setAssignmentState(data.nameToAssign);
-    }
-    
-    // Рекурсивно восстанавливаем цепочку
-    if (data.next) {
-        // Используем универсальный десериализатор
-        block.next = await deserializeAnyBlock(data.next, onDrop, onPickUp);
-        if (block.next) {
-            block.next.prev = block;
-            block.next.parent = block.parent; // Восстанавливаем связь
+    static async deserialize(
+        data: any,
+        onDrop: any,
+        onPickUp?: any
+    ): Promise<CCodeBlockAssignment> {
+        // Защита от отсутствия wrapper
+        if (!data.wrapper) {
+            console.warn(
+                "CCodeBlockAssignment: wrapper data missing, creating new"
+            );
+            data.wrapper = {
+                type: "CCodeBlockWrapper",
+                content: null,
+                next: [],
+            };
         }
+
+        const wrapper = await CCodeBlockWrapper.deserialize(data.wrapper);
+
+        const block = new CCodeBlockAssignment(wrapper, onDrop, onPickUp);
+
+        // Восстановление ID
+        block.id = data.id || uuidv4(); // Генерация ID если отсутствует
+
+        // Защита от отсутствия nameToAssign
+        if (data.nameToAssign !== undefined) {
+            block.setAssignmentState(data.nameToAssign);
+        }
+
+        // Рекурсивно восстанавливаем цепочку
+        if (data.next) {
+            // Используем универсальный десериализатор
+            block.next = await deserializeAnyBlock(data.next, onDrop, onPickUp);
+            if (block.next) {
+                block.next.prev = block;
+                block.next.parent = block.parent; // Восстанавливаем связь
+            }
+        }
+
+        // Обновление обработчиков
+        block.wrapper.updateEventHandlers(
+            block.insertCodeBlock.bind(block), // Исправлено имя метода
+            block.onPickUp
+        );
+
+        return block;
     }
-    
-    // Обновление обработчиков
-    block.wrapper.updateEventHandlers(
-        block.insertCodeBlock.bind(block), // Исправлено имя метода
-        block.onPickUp
-    );
-    
-    return block;
-}
 
     override insertCodeBlock(
         e: GestureResponderEvent,
@@ -184,7 +186,7 @@ class CCodeBlockAssignment
                 onPickUp={this.onPickUp}></CodeBlockAssignment>
         );
     }
-    
+
     execute(le: LexicalEnvironment, contextReturn?: Value): Value {
         if (!this.nameToAssign)
             throw new Error(
@@ -222,3 +224,4 @@ class CCodeBlockAssignment
 }
 
 export default CCodeBlockAssignment;
+

@@ -21,24 +21,16 @@ import TypeString from "./types/TypeString";
 import TypeVoid from "./types/TypeVoid";
 import { uuidv4 } from "../shared/functions";
 
-interface ICodeBlockPrint {
-    wrapper: CCodeBlockWrapper;
-    globalSetOutput: Dispatch<string[]>;
-    globalOutput: string[];
-}
-
 class CCodeBlockPrint
     extends CCodeBlock
-    implements Returnable, Renderable, Droppable, ICodeBlockPrint
+    implements Returnable, Renderable, Droppable
 {
     onDrop: (
         e: GestureResponderEvent,
         g: PanResponderGestureState,
-        block: CCodeBlock
+        block: ICodeBlock
     ) => void;
     wrapper: CCodeBlockWrapper;
-    globalOutput: string[];
-    globalSetOutput: Dispatch<string[]>;
     onPickUp?: () => void;
 
     constructor(
@@ -46,20 +38,16 @@ class CCodeBlockPrint
         onDrop: (
             e: GestureResponderEvent,
             g: PanResponderGestureState,
-            block: CCodeBlock
+            block: ICodeBlock
         ) => void,
-        go: string[],
-        gso: Dispatch<string[]>,
         onPickUp?: () => void,
-        next: CCodeBlock | null = null,
-        prev: CCodeBlock | null = null,
+        next: ICodeBlock | null = null,
+        prev: ICodeBlock | null = null,
         parent: CCodeBlockWrapper | null = null
     ) {
         super(next, prev, parent);
         this.onDrop = onDrop;
         this.wrapper = wrapper;
-        this.globalOutput = go;
-        this.globalSetOutput = gso;
         this.onPickUp = onPickUp;
     }
     onDropHandler(
@@ -76,16 +64,7 @@ class CCodeBlockPrint
             this.onDrop(e, g, this);
         } else {
             let blockWrapper = new CCodeBlockWrapper(null, null);
-            this.onDrop(
-                e,
-                g,
-                new CCodeBlockPrint(
-                    blockWrapper,
-                    this.onDrop,
-                    this.globalOutput,
-                    this.globalSetOutput
-                )
-            );
+            this.onDrop(e, g, new CCodeBlockPrint(blockWrapper, this.onDrop));
         }
     }
 
@@ -99,52 +78,52 @@ class CCodeBlockPrint
     }
 
     updateEventHandlers(onDrop: any, onPickUp?: any): void {
-    this.onDrop = onDrop;
-    this.onPickUp = onPickUp;
-    
-    if (this.wrapper) {
-        this.wrapper.updateEventHandlers(onDrop, onPickUp);
-    }
-    
-    if (this.next) {
-        this.next.updateEventHandlers?.(onDrop, onPickUp);
-    }
-}
+        this.onDrop = onDrop;
+        this.onPickUp = onPickUp;
 
-    static async deserialize(
-    data: any,
-    onDrop: any,
-    go: string[],
-    gso: Dispatch<string[]>,
-    onPickUp?: any
-): Promise<CCodeBlockPrint> {
-    // Десериализуем обертку асинхронно
-    const wrapper = await CCodeBlockWrapper.deserialize(data.wrapper);
-    
-    const block = new CCodeBlockPrint(wrapper, onDrop, go, gso, onPickUp);
-    block.id = data.id;
-    
-    // Восстановление прототипа
-    Object.setPrototypeOf(block, CCodeBlockPrint.prototype);
-    
-    // Привязка методов
-    block.render = block.render.bind(block);
-    block.execute = block.execute.bind(block);
-    block.serialize = block.serialize.bind(block);
-    block.insertCodeBlock = block.insertCodeBlock.bind(block);
-    block.onDropHandler = block.onDropHandler.bind(block);
-    
-    // Десериализация следующего блока
-    if (data.next) {
-        block.next = await CCodeBlockWrapper.deserializeCodeBlock(data.next);
-        if (block.next) {
-            block.next.prev = block;
-            block.next.parent = block.parent;
+        if (this.wrapper) {
+            this.wrapper.updateEventHandlers(onDrop, onPickUp);
+        }
+
+        if (this.next) {
+            this.next.updateEventHandlers?.(onDrop, onPickUp);
         }
     }
-    
-    return block;
-}
+
+    static async deserialize(
+        data: any,
+        onDrop: any,
+        onPickUp?: any
+    ): Promise<CCodeBlockPrint> {
+        // Десериализуем обертку асинхронно
+        const wrapper = await CCodeBlockWrapper.deserialize(data.wrapper);
+
+        const block = new CCodeBlockPrint(wrapper, onDrop, onPickUp);
+        block.id = data.id;
+
+        // Восстановление прототипа
+        Object.setPrototypeOf(block, CCodeBlockPrint.prototype);
+
+        // Привязка методов
+        block.render = block.render.bind(block);
+        block.execute = block.execute.bind(block);
+        block.serialize = block.serialize.bind(block);
+        block.insertCodeBlock = block.insertCodeBlock.bind(block);
+        block.onDropHandler = block.onDropHandler.bind(block);
+
+        // Десериализация следующего блока
+        if (data.next) {
+            block.next = await CCodeBlockWrapper.deserializeCodeBlock(
+                data.next
+            );
+            if (block.next) {
+                block.next.prev = block;
+                block.next.parent = block.parent;
+            }
+        }
+
+        return block;
+    }
 
     override insertCodeBlock(
         e: GestureResponderEvent,
@@ -162,6 +141,10 @@ class CCodeBlockPrint
         }
         if (this.next) return this.next.insertCodeBlock(e, g, block);
         return false;
+    }
+
+    execute(le: LexicalEnvironment) {
+        return new Value(TypeVoid, "");
     }
 
     render(props: any): JSX.Element {

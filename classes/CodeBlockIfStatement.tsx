@@ -28,7 +28,7 @@ export default class CCodeBlockIfStatement
     onDrop: (
         e: GestureResponderEvent,
         g: PanResponderGestureState,
-        block: CCodeBlock
+        block: ICodeBlock
     ) => void;
     onPickUp?: () => void;
     wrapperIf: CCodeBlockWrapper;
@@ -43,7 +43,7 @@ export default class CCodeBlockIfStatement
         onDrop: (
             e: GestureResponderEvent,
             g: PanResponderGestureState,
-            block: CCodeBlock
+            block: ICodeBlock
         ) => void,
         onPickUp?: () => void,
         next: CCodeBlock | null = null,
@@ -122,11 +122,19 @@ export default class CCodeBlockIfStatement
     }
 
     // Добавить статический метод десериализации
-    static async deserialize(data: any, onDrop: any, onPickUp?: any): Promise<CCodeBlockIfStatement> {
+    static async deserialize(
+        data: any,
+        onDrop: any,
+        onPickUp?: any
+    ): Promise<CCodeBlockIfStatement> {
         const wrapperIf = await CCodeBlockWrapper.deserialize(data.wrapperIf);
-        const wrapperThen = await CCodeBlockWrapper.deserialize(data.wrapperThen);
-        const wrapperElse = await CCodeBlockWrapper.deserialize(data.wrapperElse);
-        
+        const wrapperThen = await CCodeBlockWrapper.deserialize(
+            data.wrapperThen
+        );
+        const wrapperElse = await CCodeBlockWrapper.deserialize(
+            data.wrapperElse
+        );
+
         const block = new CCodeBlockIfStatement(
             wrapperIf,
             wrapperThen,
@@ -136,14 +144,14 @@ export default class CCodeBlockIfStatement
         );
         block.id = data.id;
         block.operator = data.operator;
-        
+
         if (data.next) {
             block.next = await this.deserialize(data.next, onDrop, onPickUp);
             if (block.next) {
                 block.next.prev = block;
             }
         }
-        
+
         return block;
     }
 

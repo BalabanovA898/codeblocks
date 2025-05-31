@@ -27,7 +27,7 @@ export default class CCodeBlockMath
     onDrop: (
         e: GestureResponderEvent,
         g: PanResponderGestureState,
-        block: CCodeBlock
+        block: ICodeBlock
     ) => void;
     wrapperLeft: CCodeBlockWrapper;
     wrapperRight: CCodeBlockWrapper;
@@ -40,7 +40,7 @@ export default class CCodeBlockMath
         onDrop: (
             e: GestureResponderEvent,
             g: PanResponderGestureState,
-            block: CCodeBlock
+            block: ICodeBlock
         ) => void,
         onPickUp?: () => void,
         next: CCodeBlock | null = null,
@@ -88,10 +88,18 @@ export default class CCodeBlockMath
     }
 
     // Добавить статический метод десериализации
-    static async deserialize(data: any, onDrop: any, onPickUp?: any): Promise<CCodeBlockMath> {
-        const wrapperLeft = await CCodeBlockWrapper.deserialize(data.wrapperLeft);
-        const wrapperRight = await CCodeBlockWrapper.deserialize(data.wrapperRight);
-        
+    static async deserialize(
+        data: any,
+        onDrop: any,
+        onPickUp?: any
+    ): Promise<CCodeBlockMath> {
+        const wrapperLeft = await CCodeBlockWrapper.deserialize(
+            data.wrapperLeft
+        );
+        const wrapperRight = await CCodeBlockWrapper.deserialize(
+            data.wrapperRight
+        );
+
         const block = new CCodeBlockMath(
             wrapperLeft,
             wrapperRight,
@@ -100,7 +108,7 @@ export default class CCodeBlockMath
         );
         block.id = data.id;
         block.operator = data.operator;
-        
+
         // Рекурсивно восстанавливаем цепочку
         if (data.next) {
             block.next = await this.deserialize(data.next, onDrop, onPickUp);
@@ -108,7 +116,7 @@ export default class CCodeBlockMath
                 block.next.prev = block;
             }
         }
-        
+
         return block;
     }
 

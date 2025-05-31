@@ -10,37 +10,23 @@ import TypeNumber from "./types/TypeNumber";
 import TypeBool from "./types/TypeBool";
 import TypeString from "./types/TypeString";
 import TypeVoid from "./types/TypeVoid";
+import { output } from "../shared/globals";
 
-interface ICodeBlockFunction {
+class CodeBlockFunction implements Returnable {
     codeBlocksWrapper_: CCodeBlockWrapper;
     cfl: (fn: CodeBlockFunction) => void;
     returnType: Class<InterpreterTypes>;
-    output: string[];
-    setOutput: Dispatch<string[]>;
-    name: string;
-}
-
-class CodeBlockFunction implements ICodeBlockFunction, Returnable {
-    codeBlocksWrapper_: CCodeBlockWrapper;
-    cfl: (fn: CodeBlockFunction) => void;
-    returnType: Class<InterpreterTypes>;
-    output: string[];
-    setOutput: Dispatch<string[]>;
     name: string;
 
     constructor(
         codeBlocksTree: CCodeBlockWrapper,
         changeFunctionList: (fn: CodeBlockFunction) => void,
         returnType: Class<InterpreterTypes>,
-        output: string[],
-        setOutput: Dispatch<string[]>,
         name: string
     ) {
         this.codeBlocksWrapper_ = codeBlocksTree;
         this.cfl = changeFunctionList;
         this.returnType = returnType;
-        this.output = output;
-        this.setOutput = setOutput;
         this.name = name;
     }
 
@@ -64,10 +50,9 @@ class CodeBlockFunction implements ICodeBlockFunction, Returnable {
         try {
             return this.codeBlocks.execute(new LexicalEnvironment(le));
         } catch (e: any) {
-            this.setOutput([
-                ...this.output,
-                `Произошла ошибка в функции ${this.name}. Текст ошибки: ${e.message}`,
-            ]);
+            output.push(
+                `Произошла ошибка в функции ${this.name}. Текст ошибки: ${e.message}`
+            );
             throw new Error(
                 `Произошла ошибка в функции ${this.name}. Текст ошибки: ${e.message}`
             );
@@ -89,45 +74,44 @@ class CodeBlockFunction implements ICodeBlockFunction, Returnable {
         setOutput: (output: string[]) => void
     ): Promise<CodeBlockFunction> {
         const typeMap: Record<string, Class<InterpreterTypes>> = {
-            'TypeNumber': TypeNumber,
-            'TypeBool': TypeBool,
-            'TypeString': TypeString,
-            'TypeVoid': TypeVoid,
+            TypeNumber: TypeNumber,
+            TypeBool: TypeBool,
+            TypeString: TypeString,
+            TypeVoid: TypeVoid,
         };
 
         const returnType = typeMap[data.returnType] || TypeVoid;
-        
+
         if (!data.codeBlocks) {
             console.warn("Missing codeBlocks, creating default");
             data.codeBlocks = { type: "CCodeBlockWrapper", content: null };
         }
-        
+
         const codeBlocks = await CCodeBlockWrapper.deserialize(data.codeBlocks);
 
         const fn = new CodeBlockFunction(
             codeBlocks,
             changeFunctionList,
             returnType,
-            output,
-            setOutput,
             data.name || "Unnamed"
         );
 
         fn.codeBlocks.updateEventHandlers(
-            (e: any, g: any, block: ICodeBlock) => fn.insertNewCodeBlock(e, g, block),
+            (e: any, g: any, block: ICodeBlock) =>
+                fn.insertNewCodeBlock(e, g, block),
             undefined
         );
 
         return fn;
     }
 
-
     updateEventHandlers() {
         this.codeBlocks.updateEventHandlers(
             this.insertNewCodeBlock.bind(this),
-            undefined 
+            undefined
         );
     }
 }
 
 export default CodeBlockFunction;
+

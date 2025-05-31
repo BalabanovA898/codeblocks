@@ -30,18 +30,18 @@ class CCodeBlockBreak
     onDrop: (
         e: GestureResponderEvent,
         g: PanResponderGestureState,
-        block: CCodeBlock
+        block: ICodeBlock
     ) => void;
 
     constructor(
         onDrop: (
             e: GestureResponderEvent,
             g: PanResponderGestureState,
-            block: CCodeBlock
+            block: ICodeBlock
         ) => void,
         onPickUp?: () => void,
-        next: CCodeBlock | null = null,
-        prev: CCodeBlock | null = null,
+        next: ICodeBlock | null = null,
+        prev: ICodeBlock | null = null,
         parent: CCodeBlockWrapper | null = null
     ) {
         super(next, prev, parent);
@@ -65,7 +65,7 @@ class CCodeBlockBreak
         }
     }
 
-     serialize() {
+    serialize() {
         return {
             type: "CCodeBlockBreak",
             id: this.id,
@@ -73,17 +73,21 @@ class CCodeBlockBreak
         };
     }
 
-    static async deserialize(data: any, onDrop: any, onPickUp?: any): Promise<CCodeBlockBreak> {
+    static async deserialize(
+        data: any,
+        onDrop: any,
+        onPickUp?: any
+    ): Promise<CCodeBlockBreak> {
         const block = new CCodeBlockBreak(onDrop, onPickUp);
         block.id = data.id;
-        
+
         if (data.next) {
             block.next = await this.deserialize(data.next, onDrop, onPickUp);
             if (block.next) {
                 block.next.prev = block;
             }
         }
-        
+
         return block;
     }
 

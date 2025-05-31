@@ -29,7 +29,7 @@ export default class CCodeBlockWhile
     onDrop: (
         e: GestureResponderEvent,
         g: PanResponderGestureState,
-        block: CCodeBlock
+        block: ICodeBlock
     ) => void;
     wrapperWhile: CCodeBlockWrapper;
     wrapperDo: CCodeBlockWrapper;
@@ -42,7 +42,7 @@ export default class CCodeBlockWhile
         onDrop: (
             e: GestureResponderEvent,
             g: PanResponderGestureState,
-            block: CCodeBlock
+            block: ICodeBlock
         ) => void,
         onPickUp?: () => void,
         next: CCodeBlock | null = null,
@@ -113,10 +113,16 @@ export default class CCodeBlockWhile
         };
     }
 
-    static async deserialize(data: any, onDrop: any, onPickUp?: any): Promise<CCodeBlockWhile> {
-        const wrapperWhile = await CCodeBlockWrapper.deserialize(data.wrapperWhile);
+    static async deserialize(
+        data: any,
+        onDrop: any,
+        onPickUp?: any
+    ): Promise<CCodeBlockWhile> {
+        const wrapperWhile = await CCodeBlockWrapper.deserialize(
+            data.wrapperWhile
+        );
         const wrapperDo = await CCodeBlockWrapper.deserialize(data.wrapperDo);
-        
+
         const block = new CCodeBlockWhile(
             wrapperWhile,
             wrapperDo,
@@ -125,14 +131,14 @@ export default class CCodeBlockWhile
         );
         block.id = data.id;
         block.operator = data.operator;
-        
+
         if (data.next) {
             block.next = await this.deserialize(data.next, onDrop, onPickUp);
             if (block.next) {
                 block.next.prev = block;
             }
         }
-        
+
         return block;
     }
 

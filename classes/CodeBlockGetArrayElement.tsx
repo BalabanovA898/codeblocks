@@ -88,7 +88,9 @@ class CCodeBlockGetArrayElement
     setAssignmentState(name: string) {
         this.nameToAssign = name;
     }
-
+    serialize() {
+        //TODO
+    }
     override render(props: { key: Key; rerender: DispatchWithoutAction }) {
         return (
             <CodeBlockGetArrayElement

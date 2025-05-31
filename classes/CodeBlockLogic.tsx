@@ -26,7 +26,7 @@ export default class CCodeBlockLogic
     onDrop: (
         e: GestureResponderEvent,
         g: PanResponderGestureState,
-        block: CCodeBlock
+        block: ICodeBlock
     ) => void;
     wrapperLeft: CCodeBlockWrapper;
     wrapperRight: CCodeBlockWrapper;
@@ -39,7 +39,7 @@ export default class CCodeBlockLogic
         onDrop: (
             e: GestureResponderEvent,
             g: PanResponderGestureState,
-            block: CCodeBlock
+            block: ICodeBlock
         ) => void,
         onPickUp?: () => void,
         next: CCodeBlock | null = null,
@@ -87,10 +87,18 @@ export default class CCodeBlockLogic
         };
     }
 
-    static async deserialize(data: any, onDrop: any, onPickUp?: any): Promise<CCodeBlockLogic> {
-        const wrapperLeft = await CCodeBlockWrapper.deserialize(data.wrapperLeft);
-        const wrapperRight = await CCodeBlockWrapper.deserialize(data.wrapperRight);
-        
+    static async deserialize(
+        data: any,
+        onDrop: any,
+        onPickUp?: any
+    ): Promise<CCodeBlockLogic> {
+        const wrapperLeft = await CCodeBlockWrapper.deserialize(
+            data.wrapperLeft
+        );
+        const wrapperRight = await CCodeBlockWrapper.deserialize(
+            data.wrapperRight
+        );
+
         const block = new CCodeBlockLogic(
             wrapperLeft,
             wrapperRight,
@@ -99,14 +107,14 @@ export default class CCodeBlockLogic
         );
         block.id = data.id;
         block.operator = data.operator;
-        
+
         if (data.next) {
             block.next = await this.deserialize(data.next, onDrop, onPickUp);
             if (block.next) {
                 block.next.prev = block;
             }
         }
-        
+
         return block;
     }
 

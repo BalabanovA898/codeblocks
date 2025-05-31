@@ -15,75 +15,75 @@ import Debug from "./components/Debug";
 import ICodeBlock from "./shared/Interfaces/CodeBlock";
 import { useSharedValue } from "react-native-reanimated";
 import { output } from "./shared/globals";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import LoadDialog from "./components/LoadDialog";
 import SaveDialog from "./components/SaveDialog";
 
 interface SerializedProject {
-  meta: {
-    version: string;
-    savedAt: string;
-  };
-  fileName: string;
-  currentFunction: number;
-  functions: any[];
+    meta: {
+        version: string;
+        savedAt: string;
+    };
+    fileName: string;
+    currentFunction: number;
+    functions: any[];
 }
 
 const serializeProject = (
-  functions: CodeBlockFunction[],
-  currentFunction: number,
-  fileName: string
+    functions: CodeBlockFunction[],
+    currentFunction: number,
+    fileName: string
 ): SerializedProject => {
-  return {
-    meta: {
-      version: "1.0",
-      savedAt: new Date().toISOString(),
-    },
-    fileName,
-    currentFunction,
-    functions: functions.map(fn => fn.serialize()),
-  };
+    return {
+        meta: {
+            version: "1.0",
+            savedAt: new Date().toISOString(),
+        },
+        fileName,
+        currentFunction,
+        functions: functions.map((fn) => fn.serialize()),
+    };
 };
 
 const deserializeProject = async (
-  data: SerializedProject,
-  changeFunctionList: (fn: CodeBlockFunction) => void
+    data: SerializedProject,
+    changeFunctionList: (fn: CodeBlockFunction) => void
 ): Promise<{
-  functions: CodeBlockFunction[];
-  currentFunction: number;
-  fileName: string;
+    functions: CodeBlockFunction[];
+    currentFunction: number;
+    fileName: string;
 }> => {
-  const functions = await Promise.all(
-    data.functions.map(async fnData => 
-      await CodeBlockFunction.deserialize(fnData, changeFunctionList)
-    )
-  );
+    const functions = await Promise.all(
+        data.functions.map(
+            async (fnData) =>
+                await CodeBlockFunction.deserialize(fnData, changeFunctionList)
+        )
+    );
 
-  return {
-    functions,
-    currentFunction: Math.min(data.currentFunction, functions.length - 1),
-    fileName: data.fileName,
-  };
+    return {
+        functions,
+        currentFunction: Math.min(data.currentFunction, functions.length - 1),
+        fileName: data.fileName,
+    };
 };
 
 const PROJECT_KEY = "current_project";
 
 const saveProject = async (project: SerializedProject) => {
-  try {
-    await AsyncStorage.setItem(PROJECT_KEY, JSON.stringify(project));
-  } catch (e) {
-    console.error("Failed to save project", e);
-  }
+    try {
+        await AsyncStorage.setItem(PROJECT_KEY, JSON.stringify(project));
+    } catch (e) {
+        console.error("Failed to save project", e);
+    }
 };
 
 const loadProject = async (): Promise<SerializedProject | null> => {
-  try {
-    const data = await AsyncStorage.getItem(PROJECT_KEY);
-    return data ? JSON.parse(data) : null;
-  } catch (e) {
-    console.error("Failed to load project", e);
-    return null;
-  }
+    try {
+        const data = await AsyncStorage.getItem(PROJECT_KEY);
+        return data ? JSON.parse(data) : null;
+    } catch (e) {
+        console.error("Failed to load project", e);
+        return null;
+    }
 };
 
 export default function App() {
@@ -105,7 +105,7 @@ export default function App() {
             res.push(item != currentFunction ? functions[item] : fn);
         setFunctions(res);
     };
-    
+
     const changeFunctionListRef = useRef(changeFunctionList);
     useEffect(() => {
         changeFunctionListRef.current = changeFunctionList;
@@ -133,19 +133,23 @@ export default function App() {
     useEffect(() => {
         console.log("output: ", output);
     }, [output]);
-    
+
     const fetchProjectList = useCallback(async () => {
-      try {
-        const keys = await AsyncStorage.getAllKeys();
-        const projectKeys = keys.filter(key => key.startsWith("project_"));
-        setProjectList(projectKeys.map(key => key.replace("project_", "")));
-      } catch (e) {
-        console.error("Failed to fetch project list", e);
-      }
+        try {
+            const keys = await AsyncStorage.getAllKeys();
+            const projectKeys = keys.filter((key) =>
+                key.startsWith("project_")
+            );
+            setProjectList(
+                projectKeys.map((key) => key.replace("project_", ""))
+            );
+        } catch (e) {
+            console.error("Failed to fetch project list", e);
+        }
     }, []);
-    
+
     useEffect(() => {
-      fetchProjectList();
+        fetchProjectList();
     }, []);
 
     useEffect(() => {
@@ -157,72 +161,84 @@ export default function App() {
     const handleSave = useCallback(async () => {
         setIsSaving(true);
         try {
-          const project = serializeProject(functions, currentFunction, fileName);
-          await saveProject(project);
-          setFileName(fileName || "saved_project");
+            const project = serializeProject(
+                functions,
+                currentFunction,
+                fileName
+            );
+            await saveProject(project);
+            setFileName(fileName || "saved_project");
         } finally {
-          setIsSaving(false);
+            setIsSaving(false);
         }
     }, [functions, currentFunction, fileName]);
 
     const handleLoad = useCallback(async () => {
         setIsLoading(true);
         try {
-          const project = await loadProject();
-          if (project) {
-            const { functions: loadedFunctions, ...rest } = 
-              await deserializeProject(
-                project,
-                (fn) => changeFunctionListRef.current(fn)
-              );
-    
-            setFunctions(loadedFunctions);
-            setCurrentFunction(rest.currentFunction);
-            setFileName(rest.fileName);
-          }
+            const project = await loadProject();
+            if (project) {
+                const { functions: loadedFunctions, ...rest } =
+                    await deserializeProject(project, (fn) =>
+                        changeFunctionListRef.current(fn)
+                    );
+
+                setFunctions(loadedFunctions);
+                setCurrentFunction(rest.currentFunction);
+                setFileName(rest.fileName);
+            }
         } catch (e) {
-          console.error("Load error:", e);
+            console.error("Load error:", e);
         } finally {
-          setIsLoading(false);
+            setIsLoading(false);
         }
     }, []);
 
-    const handleSaveAs = useCallback(async (projectName: string) => {
-      setIsSaving(true);
-      try {
-        const project = serializeProject(functions, currentFunction, projectName);
-        await AsyncStorage.setItem(`project_${projectName}`, JSON.stringify(project));
-        setFileName(projectName);
-        fetchProjectList();
-      } finally {
-        setIsSaving(false);
-        setIsSaveDialogOpen(false);
-      }
-    }, [functions, currentFunction]);
+    const handleSaveAs = useCallback(
+        async (projectName: string) => {
+            setIsSaving(true);
+            try {
+                const project = serializeProject(
+                    functions,
+                    currentFunction,
+                    projectName
+                );
+                await AsyncStorage.setItem(
+                    `project_${projectName}`,
+                    JSON.stringify(project)
+                );
+                setFileName(projectName);
+                fetchProjectList();
+            } finally {
+                setIsSaving(false);
+                setIsSaveDialogOpen(false);
+            }
+        },
+        [functions, currentFunction]
+    );
 
     const handleLoadFrom = useCallback(async (projectName: string) => {
-      setIsLoading(true);
-      try {
-        const data = await AsyncStorage.getItem(`project_${projectName}`);
-        if (data) {
-          const project = JSON.parse(data) as SerializedProject;
-          const { functions: loadedFunctions, ...rest } = 
-            await deserializeProject(
-              project,
-              (fn) => changeFunctionListRef.current(fn)
-            );
-    
-          setFunctions(loadedFunctions);
-          setCurrentFunction(rest.currentFunction);
-          setFileName(rest.fileName);
+        setIsLoading(true);
+        try {
+            const data = await AsyncStorage.getItem(`project_${projectName}`);
+            if (data) {
+                const project = JSON.parse(data) as SerializedProject;
+                const { functions: loadedFunctions, ...rest } =
+                    await deserializeProject(project, (fn) =>
+                        changeFunctionListRef.current(fn)
+                    );
+
+                setFunctions(loadedFunctions);
+                setCurrentFunction(rest.currentFunction);
+                setFileName(rest.fileName);
+            }
+        } catch (e) {
+            console.error("Load failed:", e);
+        } finally {
+            setIsLoading(false);
+            setIsLoadDialogOpen(false);
         }
-      } catch (e) {
-        console.error("Load failed:", e);
-      } finally {
-        setIsLoading(false);
-        setIsLoadDialogOpen(false);
-      }
-    }, []); 
+    }, []);
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
@@ -242,7 +258,7 @@ export default function App() {
                 isVisible={isBlockListVisible}
                 setIsVisible={setIsBlockListVisible}
             />
-            <Menu 
+            <Menu
                 isOpen={isMenuOpen}
                 onSave={() => handleSave()}
                 onSaveAs={() => setIsSaveDialogOpen(true)}
@@ -252,16 +268,16 @@ export default function App() {
                 isLoading={isLoading}
             />
             <SaveDialog
-              visible={isSaveDialogOpen}
-              onSave={handleSaveAs}
-              onCancel={() => setIsSaveDialogOpen(false)}
-              projectList={projectList}
+                visible={isSaveDialogOpen}
+                onSave={handleSaveAs}
+                onCancel={() => setIsSaveDialogOpen(false)}
+                projectList={projectList}
             />
             <LoadDialog
-              visible={isLoadDialogOpen}
-              onLoad={handleLoadFrom}
-              onCancel={() => setIsLoadDialogOpen(false)}
-              projectList={projectList}
+                visible={isLoadDialogOpen}
+                onLoad={handleLoadFrom}
+                onCancel={() => setIsLoadDialogOpen(false)}
+                projectList={projectList}
             />
             <FunctionNavigator
                 functions={functions}
@@ -323,3 +339,4 @@ export default function App() {
         </SafeAreaView>
     );
 }
+

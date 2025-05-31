@@ -56,6 +56,7 @@ class CCodeBlockSetArrayElement
         this.onPickUp = onPickUp;
     }
 
+    serialize() {}
     onDropHandler(e: GestureResponderEvent, g: PanResponderGestureState) {
         if (this.parent) {
             this.removeThisCodeBLock.call(this);

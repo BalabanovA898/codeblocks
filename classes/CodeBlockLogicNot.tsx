@@ -30,7 +30,7 @@ class CCodeBlockLogicNot
     onDrop: (
         e: GestureResponderEvent,
         g: PanResponderGestureState,
-        block: CCodeBlock
+        block: ICodeBlock
     ) => void;
     wrapper: CCodeBlockWrapper;
     onPickUp?: () => void;
@@ -40,7 +40,7 @@ class CCodeBlockLogicNot
         onDrop: (
             e: GestureResponderEvent,
             g: PanResponderGestureState,
-            block: CCodeBlock
+            block: ICodeBlock
         ) => void,
         onPickUp?: () => void,
         next: CCodeBlock | null = null,
@@ -61,7 +61,11 @@ class CCodeBlockLogicNot
         };
     }
 
-    static async deserialize(data: any, onDrop: any, onPickUp?: any): Promise<CCodeBlockLogicNot> {
+    static async deserialize(
+        data: any,
+        onDrop: any,
+        onPickUp?: any
+    ): Promise<CCodeBlockLogicNot> {
         const wrapper = await CCodeBlockWrapper.deserialize(data.wrapper);
         const block = new CCodeBlockLogicNot(wrapper, onDrop, onPickUp);
         block.id = data.id;
@@ -72,7 +76,7 @@ class CCodeBlockLogicNot
                 block.next.prev = block;
             }
         }
-        
+
         return block;
     }
     onDropHandler(

@@ -29,14 +29,14 @@ export default class CCodeBlockArrayInit
     onDrop: (
         e: GestureResponderEvent,
         g: PanResponderGestureState,
-        block: CCodeBlock
+        block: ICodeBlock
     ) => void;
 
     constructor(
         onDrop: (
             e: GestureResponderEvent,
             g: PanResponderGestureState,
-            block: CCodeBlock
+            block: ICodeBlock
         ) => void,
         onPickUp?: () => void,
         next: ICodeBlock | null = null,
@@ -59,22 +59,26 @@ export default class CCodeBlockArrayInit
         };
     }
 
-    static deserialize(data: any, onDrop: any, onPickUp?: any): CCodeBlockArrayInit {
+    static deserialize(
+        data: any,
+        onDrop: any,
+        onPickUp?: any
+    ): CCodeBlockArrayInit {
         const block = new CCodeBlockArrayInit(onDrop, onPickUp);
         block.id = data.id;
         block.setAssignmentState(
-            data.nameToAssign, 
-            data.typeToAssign, 
+            data.nameToAssign,
+            data.typeToAssign,
             data.numberOfElement
         );
-        
+
         if (data.next) {
             block.next = this.deserialize(data.next, onDrop, onPickUp);
             if (block.next) {
                 block.next.prev = block;
             }
         }
-        
+
         return block;
     }
 
@@ -160,3 +164,4 @@ export default class CCodeBlockArrayInit
         return new Value(TypeVoid, "");
     }
 }
+

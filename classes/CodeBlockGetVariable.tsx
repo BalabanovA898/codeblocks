@@ -30,14 +30,14 @@ export default class CCodeBlockGetVariableValue
     onDrop: (
         e: GestureResponderEvent,
         g: PanResponderGestureState,
-        block: CCodeBlock
+        block: ICodeBlock
     ) => void;
 
     constructor(
         onDrop: (
             e: GestureResponderEvent,
             g: PanResponderGestureState,
-            block: CCodeBlock
+            block: ICodeBlock
         ) => void,
         onPickUp?: () => void,
         next: ICodeBlock | null = null,
@@ -49,7 +49,7 @@ export default class CCodeBlockGetVariableValue
         this.onPickUp = onPickUp;
     }
 
-     serialize() {
+    serialize() {
         return {
             type: "CCodeBlockGetVariableValue",
             id: this.id,
@@ -59,11 +59,15 @@ export default class CCodeBlockGetVariableValue
     }
 
     // Добавить статический метод десериализации
-    static deserialize(data: any, onDrop: any, onPickUp?: any): CCodeBlockGetVariableValue {
+    static deserialize(
+        data: any,
+        onDrop: any,
+        onPickUp?: any
+    ): CCodeBlockGetVariableValue {
         const block = new CCodeBlockGetVariableValue(onDrop, onPickUp);
         block.id = data.id;
         block.valueToGet = data.valueToGet;
-        
+
         // Рекурсивно восстанавливаем цепочку
         if (data.next) {
             block.next = this.deserialize(data.next, onDrop, onPickUp);
@@ -71,7 +75,7 @@ export default class CCodeBlockGetVariableValue
                 block.next.prev = block;
             }
         }
-        
+
         return block;
     }
 

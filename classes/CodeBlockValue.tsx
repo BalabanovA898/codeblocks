@@ -32,14 +32,14 @@ export default class CCodeBlockValue
     onDrop: (
         e: GestureResponderEvent,
         g: PanResponderGestureState,
-        block: CCodeBlock
+        block: ICodeBlock
     ) => void;
 
     constructor(
         onDrop: (
             e: GestureResponderEvent,
             g: PanResponderGestureState,
-            block: CCodeBlock
+            block: ICodeBlock
         ) => void,
         onPickUp?: () => void,
         next: ICodeBlock | null = null,
@@ -96,12 +96,16 @@ export default class CCodeBlockValue
     }
 
     // Добавить статический метод десериализации
-    static deserialize(data: any, onDrop: any, onPickUp?: any): CCodeBlockValue {
+    static deserialize(
+        data: any,
+        onDrop: any,
+        onPickUp?: any
+    ): CCodeBlockValue {
         const block = new CCodeBlockValue(onDrop, onPickUp);
         block.id = data.id;
         block.valueToAssign = data.valueToAssign;
         block.typeToAssign = data.typeToAssign;
-        
+
         // Рекурсивно восстанавливаем цепочку
         if (data.next) {
             block.next = this.deserialize(data.next, onDrop, onPickUp);
@@ -109,7 +113,7 @@ export default class CCodeBlockValue
                 block.next.prev = block;
             }
         }
-        
+
         return block;
     }
 
