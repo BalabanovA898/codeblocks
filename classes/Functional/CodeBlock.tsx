@@ -3,10 +3,8 @@ import { Position } from "../../shared/types";
 import CCodeBlockWrapper from "../CodeBlockWrapper";
 import DropZone from "./DropZone";
 import LexicalEnvironment from "./LexicalEnvironment";
-import CodeBlockEnvironment from "../../shared/Interfaces/CodeBlockEnvironment";
 import ICodeBlock from "../../shared/Interfaces/CodeBlock";
 import Value from "./Value";
-import SerializedBlock from "./shared/serializationTypes";
 import TypeNumber from "../types/TypeNumber";
 import { uuidv4 } from "../../shared/functions";
 
@@ -15,6 +13,13 @@ abstract class CCodeBlock extends DropZone implements ICodeBlock {
     prev: ICodeBlock | null;
     parent: CCodeBlockWrapper | null;
     id: string;
+    
+    onDrop?: (
+        e: GestureResponderEvent,
+        g: PanResponderGestureState,
+        block: ICodeBlock
+    ) => void;
+    onPickUp?: () => void;
 
     constructor(
         next: ICodeBlock | null = null,
@@ -32,18 +37,18 @@ abstract class CCodeBlock extends DropZone implements ICodeBlock {
         this.setPositions(x, y, w, h);
     }
 
-    serialize(): SerializedBlock;
-
     pushCodeBlockAfterThis(newBLock: ICodeBlock) {
         console.log("Adding from code block");
         if (this.next && newBLock.id === this.next.id) return;
         if (this.prev && newBLock.id === this.prev.id) return;
         if (this.id == newBLock.id) return;
+        
         let tmp = this.next;
         newBLock.next = this.next;
         newBLock.prev = this;
         newBLock.parent = this.parent;
         this.next = newBLock;
+        
         if (tmp) tmp.prev = newBLock;
         console.log(newBLock);
     }
@@ -51,28 +56,31 @@ abstract class CCodeBlock extends DropZone implements ICodeBlock {
     render(props: any) {
         return <></>;
     }
+    
     execute(le: LexicalEnvironment, contextReturn?: Value): Value {
         return new Value(TypeNumber, "-1");
     }
+    
     insertCodeBlock(
         e: GestureResponderEvent,
         g: PanResponderGestureState,
         block: ICodeBlock
     ): boolean {
-        //if (this.checkDropIn(g)) {
-        //    this.pushCodeBlockAfterThis(block);
-        //    return true;
-        //}
         return false;
     }
-
 
     abstract serialize(): any;
     
     updateEventHandlers(onDrop: any, onPickUp?: any) {
-        this.onDrop = onDrop;
-        if (onPickUp && this.onPickUp) this.onPickUp = onPickUp;
-        if (this.next) {
+        if (onDrop) {
+            this.onDrop = onDrop;
+        }
+        
+        if (onPickUp) {
+            this.onPickUp = onPickUp;
+        }
+        
+        if (this.next && this.next.updateEventHandlers) {
             this.next.updateEventHandlers(onDrop, onPickUp);
         }
     }
@@ -86,5 +94,4 @@ abstract class CCodeBlock extends DropZone implements ICodeBlock {
 }
 
 export default CCodeBlock;
-
 
