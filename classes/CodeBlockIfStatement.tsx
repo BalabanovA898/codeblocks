@@ -121,11 +121,12 @@ export default class CCodeBlockIfStatement
         };
     }
 
-    // Добавить статический метод десериализации только если он есть во втором коде
+    // Добавить статический метод десериализации
     static async deserialize(data: any, onDrop: any, onPickUp?: any): Promise<CCodeBlockIfStatement> {
         const wrapperIf = await CCodeBlockWrapper.deserialize(data.wrapperIf);
         const wrapperThen = await CCodeBlockWrapper.deserialize(data.wrapperThen);
         const wrapperElse = await CCodeBlockWrapper.deserialize(data.wrapperElse);
+        
         const block = new CCodeBlockIfStatement(
             wrapperIf,
             wrapperThen,
@@ -135,13 +136,14 @@ export default class CCodeBlockIfStatement
         );
         block.id = data.id;
         block.operator = data.operator;
-
+        
         if (data.next) {
             block.next = await this.deserialize(data.next, onDrop, onPickUp);
             if (block.next) {
                 block.next.prev = block;
             }
-        }// Он всё же есть
+        }
+        
         return block;
     }
 
@@ -176,3 +178,4 @@ export default class CCodeBlockIfStatement
         return this.wrapperElse.execute(new LexicalEnvironment(le));
     }
 }
+
