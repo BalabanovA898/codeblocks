@@ -102,40 +102,6 @@ export default class CCodeBlockWhile
         this.operator = value;
     }
 
-    serialize() {
-        return {
-            type: "CCodeBlockWhile",
-            id: this.id,
-            operator: this.operator,
-            wrapperWhile: this.wrapperWhile.serialize(),
-            wrapperDo: this.wrapperDo.serialize(),
-            next: this.next ? this.next.serialize() : null,
-        };
-    }
-
-    static async deserialize(data: any, onDrop: any, onPickUp?: any): Promise<CCodeBlockWhile> {
-        const wrapperWhile = await CCodeBlockWrapper.deserialize(data.wrapperWhile);
-        const wrapperDo = await CCodeBlockWrapper.deserialize(data.wrapperDo);
-        
-        const block = new CCodeBlockWhile(
-            wrapperWhile,
-            wrapperDo,
-            onDrop,
-            onPickUp
-        );
-        block.id = data.id;
-        block.operator = data.operator;
-        
-        if (data.next) {
-            block.next = await this.deserialize(data.next, onDrop, onPickUp);
-            if (block.next) {
-                block.next.prev = block;
-            }
-        }
-        
-        return block;
-    }
-
     render(props: any): JSX.Element {
         return (
             <CodeBlockWhile
