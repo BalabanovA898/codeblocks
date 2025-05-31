@@ -65,6 +65,28 @@ class CCodeBlockBreak
         }
     }
 
+     serialize() {
+        return {
+            type: "CCodeBlockBreak",
+            id: this.id,
+            next: this.next ? this.next.serialize() : null,
+        };
+    }
+
+    static async deserialize(data: any, onDrop: any, onPickUp?: any): Promise<CCodeBlockBreak> {
+        const block = new CCodeBlockBreak(onDrop, onPickUp);
+        block.id = data.id;
+        
+        if (data.next) {
+            block.next = await this.deserialize(data.next, onDrop, onPickUp);
+            if (block.next) {
+                block.next.prev = block;
+            }
+        }
+        
+        return block;
+    }
+
     override insertCodeBlock(
         e: GestureResponderEvent,
         g: PanResponderGestureState,

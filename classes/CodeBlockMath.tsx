@@ -76,6 +76,41 @@ export default class CCodeBlockMath
             );
         }
     }
+    serialize() {
+        return {
+            type: "CCodeBlockMath",
+            id: this.id,
+            operator: this.operator,
+            wrapperLeft: this.wrapperLeft.serialize(),
+            wrapperRight: this.wrapperRight.serialize(),
+            next: this.next ? this.next.serialize() : null,
+        };
+    }
+
+    // Добавить статический метод десериализации
+    static async deserialize(data: any, onDrop: any, onPickUp?: any): Promise<CCodeBlockMath> {
+        const wrapperLeft = await CCodeBlockWrapper.deserialize(data.wrapperLeft);
+        const wrapperRight = await CCodeBlockWrapper.deserialize(data.wrapperRight);
+        
+        const block = new CCodeBlockMath(
+            wrapperLeft,
+            wrapperRight,
+            onDrop,
+            onPickUp
+        );
+        block.id = data.id;
+        block.operator = data.operator;
+        
+        // Рекурсивно восстанавливаем цепочку
+        if (data.next) {
+            block.next = await this.deserialize(data.next, onDrop, onPickUp);
+            if (block.next) {
+                block.next.prev = block;
+            }
+        }
+        
+        return block;
+    }
 
     override insertCodeBlock(
         e: GestureResponderEvent,

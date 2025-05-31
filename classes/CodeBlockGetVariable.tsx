@@ -49,6 +49,32 @@ export default class CCodeBlockGetVariableValue
         this.onPickUp = onPickUp;
     }
 
+     serialize() {
+        return {
+            type: "CCodeBlockGetVariableValue",
+            id: this.id,
+            valueToGet: this.valueToGet,
+            next: this.next ? this.next.serialize() : null,
+        };
+    }
+
+    // Добавить статический метод десериализации
+    static deserialize(data: any, onDrop: any, onPickUp?: any): CCodeBlockGetVariableValue {
+        const block = new CCodeBlockGetVariableValue(onDrop, onPickUp);
+        block.id = data.id;
+        block.valueToGet = data.valueToGet;
+        
+        // Рекурсивно восстанавливаем цепочку
+        if (data.next) {
+            block.next = this.deserialize(data.next, onDrop, onPickUp);
+            if (block.next) {
+                block.next.prev = block;
+            }
+        }
+        
+        return block;
+    }
+
     onDropHandler(
         e: GestureResponderEvent,
         g: PanResponderGestureState,

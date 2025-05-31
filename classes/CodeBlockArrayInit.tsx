@@ -48,6 +48,36 @@ export default class CCodeBlockArrayInit
         this.onPickUp = onPickUp;
     }
 
+    serialize() {
+        return {
+            type: "CCodeBlockArrayInit",
+            id: this.id,
+            nameToAssign: this.nameToAssign,
+            typeToAssign: this.typeToAssign,
+            numberOfElement: this.numberOfElement,
+            next: this.next ? this.next.serialize() : null,
+        };
+    }
+
+    static deserialize(data: any, onDrop: any, onPickUp?: any): CCodeBlockArrayInit {
+        const block = new CCodeBlockArrayInit(onDrop, onPickUp);
+        block.id = data.id;
+        block.setAssignmentState(
+            data.nameToAssign, 
+            data.typeToAssign, 
+            data.numberOfElement
+        );
+        
+        if (data.next) {
+            block.next = this.deserialize(data.next, onDrop, onPickUp);
+            if (block.next) {
+                block.next.prev = block;
+            }
+        }
+        
+        return block;
+    }
+
     onDropHandler(
         e: GestureResponderEvent,
         g: PanResponderGestureState,
@@ -130,4 +160,3 @@ export default class CCodeBlockArrayInit
         return new Value(TypeVoid, "");
     }
 }
-

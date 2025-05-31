@@ -20,10 +20,11 @@ import ICodeBlock from "../shared/Interfaces/CodeBlock";
 import TypeString from "./types/TypeString";
 import TypeVoid from "./types/TypeVoid";
 import { uuidv4 } from "../shared/functions";
-import { output } from "../shared/globals";
 
 interface ICodeBlockPrint {
     wrapper: CCodeBlockWrapper;
+    globalSetOutput: Dispatch<string[]>;
+    globalOutput: string[];
 }
 
 class CCodeBlockPrint
@@ -36,6 +37,8 @@ class CCodeBlockPrint
         block: CCodeBlock
     ) => void;
     wrapper: CCodeBlockWrapper;
+    globalOutput: string[];
+    globalSetOutput: Dispatch<string[]>;
     onPickUp?: () => void;
 
     constructor(
@@ -45,6 +48,8 @@ class CCodeBlockPrint
             g: PanResponderGestureState,
             block: CCodeBlock
         ) => void,
+        go: string[],
+        gso: Dispatch<string[]>,
         onPickUp?: () => void,
         next: CCodeBlock | null = null,
         prev: CCodeBlock | null = null,
@@ -53,6 +58,8 @@ class CCodeBlockPrint
         super(next, prev, parent);
         this.onDrop = onDrop;
         this.wrapper = wrapper;
+        this.globalOutput = go;
+        this.globalSetOutput = gso;
         this.onPickUp = onPickUp;
     }
     onDropHandler(
@@ -69,9 +76,75 @@ class CCodeBlockPrint
             this.onDrop(e, g, this);
         } else {
             let blockWrapper = new CCodeBlockWrapper(null, null);
-            this.onDrop(e, g, new CCodeBlockPrint(blockWrapper, this.onDrop));
+            this.onDrop(
+                e,
+                g,
+                new CCodeBlockPrint(
+                    blockWrapper,
+                    this.onDrop,
+                    this.globalOutput,
+                    this.globalSetOutput
+                )
+            );
         }
     }
+
+    serialize() {
+        return {
+            type: "CCodeBlockPrint",
+            id: this.id,
+            wrapper: this.wrapper.serialize(),
+            next: this.next ? this.next.serialize() : null,
+        };
+    }
+
+    updateEventHandlers(onDrop: any, onPickUp?: any): void {
+    this.onDrop = onDrop;
+    this.onPickUp = onPickUp;
+    
+    if (this.wrapper) {
+        this.wrapper.updateEventHandlers(onDrop, onPickUp);
+    }
+    
+    if (this.next) {
+        this.next.updateEventHandlers?.(onDrop, onPickUp);
+    }
+}
+
+    static async deserialize(
+    data: any,
+    onDrop: any,
+    go: string[],
+    gso: Dispatch<string[]>,
+    onPickUp?: any
+): Promise<CCodeBlockPrint> {
+    // Десериализуем обертку асинхронно
+    const wrapper = await CCodeBlockWrapper.deserialize(data.wrapper);
+    
+    const block = new CCodeBlockPrint(wrapper, onDrop, go, gso, onPickUp);
+    block.id = data.id;
+    
+    // Восстановление прототипа
+    Object.setPrototypeOf(block, CCodeBlockPrint.prototype);
+    
+    // Привязка методов
+    block.render = block.render.bind(block);
+    block.execute = block.execute.bind(block);
+    block.serialize = block.serialize.bind(block);
+    block.insertCodeBlock = block.insertCodeBlock.bind(block);
+    block.onDropHandler = block.onDropHandler.bind(block);
+    
+    // Десериализация следующего блока
+    if (data.next) {
+        block.next = await CCodeBlockWrapper.deserializeCodeBlock(data.next);
+        if (block.next) {
+            block.next.prev = block;
+            block.next.parent = block.parent;
+        }
+    }
+    
+    return block;
+}
 
     override insertCodeBlock(
         e: GestureResponderEvent,
@@ -101,16 +174,6 @@ class CCodeBlockPrint
                 rerender={props.rerender}
                 onPickUp={this.onPickUp}></CodeBlockPrint>
         );
-    }
-    execute(le: LexicalEnvironment): Value {
-        let WrapperOutput = this.wrapper.execute(new LexicalEnvironment(le));
-        if (WrapperOutput.type === TypeVoid) {
-            throw new Error("Значение для печати имеет тип void.");
-        }
-
-        output.push(new TypeString().convertFromOtherType(WrapperOutput.value));
-
-        return new Value(TypeVoid, "");
     }
 }
 

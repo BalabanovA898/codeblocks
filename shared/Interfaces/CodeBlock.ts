@@ -8,6 +8,11 @@ export default interface ICodeBlock extends Renderable, Returnable, DropZone {
     next: ICodeBlock | null;
     prev: ICodeBlock | null;
     id: string;
+
+    serialize(): any;
+
+    updateEventHandlers?(onDrop: any, onPickUp?: any): void;
+
     insertCodeBlock(
         e: GestureResponderEvent,
         g: PanResponderGestureState,
