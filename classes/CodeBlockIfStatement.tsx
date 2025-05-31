@@ -137,10 +137,11 @@ export default class CCodeBlockIfStatement
         block.operator = data.operator;
 
         if (data.next) {
-            // предполагается, что next тоже нужно десериализовать, если есть
-            // тут нужно знать, есть ли в вашем втором коде такой метод
-            // если нет, то его не добавляю
-        }
+            block.next = await this.deserialize(data.next, onDrop, onPickUp);
+            if (block.next) {
+                block.next.prev = block;
+            }
+        }// Он всё же есть
         return block;
     }
 
