@@ -48,7 +48,6 @@ export default class CCodeBlockArrayInit
         this.onPickUp = onPickUp;
     }
 
-    // Добавлено из второго кода (сериализация)
     serialize() {
         return {
             type: "CCodeBlockArrayInit",
@@ -60,7 +59,6 @@ export default class CCodeBlockArrayInit
         };
     }
 
-    // Добавлено из второго кода (десериализация)
     static deserialize(data: any, onDrop: any, onPickUp?: any): CCodeBlockArrayInit {
         const block = new CCodeBlockArrayInit(onDrop, onPickUp);
         block.id = data.id;
@@ -143,4 +141,22 @@ export default class CCodeBlockArrayInit
             );
         if (
             !/^ *[a-zA-Z][a-zA-Z0-9]* *( *, *[a-zA-Z][a-zA-Z0-9]* *)*\b/.test(
-                this.nameTo
+                this.nameToAssign
+            )
+        )
+            throw new Error(
+                "Неправильное наименование переменных. Переменная должна начинаться с буквы, далее сожержать только буквы латинского алфавита и цифры. Допускается передача нескольих имен переменных через запятую."
+            );
+        if (!/[1-9]\d*/.test(this.numberOfElement))
+            throw new Error(
+                "Ошибка блока инициализации массива. Количество элементов должно быть натуральным числом."
+            );
+        for (let i = 0; i < Number(this.numberOfElement); ++i) {
+            le.setValue(
+                `${this.nameToAssign}[${i}]`,
+                new Value(getTypeByString(this.typeToAssign), "0")
+            );
+        }
+        return new Value(TypeVoid, "");
+    }
+}
