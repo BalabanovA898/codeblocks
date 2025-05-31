@@ -2,6 +2,8 @@ import {
     GestureResponderEvent,
     PanResponderGestureState,
     Animated,
+    View,
+    Text,
 } from "react-native";
 import CodeBlockPrint from "../components/CodeBlockPrrint";
 import Droppable from "../shared/Interfaces/Droppable";
@@ -12,8 +14,11 @@ import LexicalEnvironment from "./Functional/LexicalEnvironment";
 import Value from "./Functional/Value";
 import TypeNumber from "./types/TypeNumber";
 import CCodeBlockWrapper from "./CodeBlockWrapper";
+import { Dispatch, DispatchWithoutAction, Key, useReducer } from "react";
 import { Position } from "../shared/types";
 import ICodeBlock from "../shared/Interfaces/CodeBlock";
+import TypeString from "./types/TypeString";
+import TypeVoid from "./types/TypeVoid";
 import { uuidv4 } from "../shared/functions";
 import CodeBlockBreak from "../components/CodeBlockBreak";
 
@@ -43,51 +48,6 @@ class CCodeBlockBreak
         this.onDrop = onDrop;
         this.onPickUp = onPickUp;
     }
-    
-    serialize() {
-        return {
-            type: "CCodeBlockBreak",
-            id: this.id,
-            next: this.next ? this.next.serialize() : null,
-        };
-    }
-
-    static async deserialize(
-        data: any,
-        onDrop: any,
-        onPickUp?: any
-    ): Promise<CCodeBlockBreak> {
-        const block = new CCodeBlockBreak(onDrop, onPickUp);
-        block.id = data.id;
-
-        if (data.next) {
-            if (data.next.type === "CCodeBlockBreak") {
-                block.next = await CCodeBlockBreak.deserialize(data.next, onDrop, onPickUp);
-            } else {
-            }
-            if (block.next) {
-                block.next.prev = block;
-            }
-        }
-        return block;
-    }
-
-
-    override insertCodeBlock(
-        e: GestureResponderEvent,
-        g: PanResponderGestureState,
-        block: ICodeBlock
-    ): boolean {
-        console.log("Добавление в Break");
-        if (this.checkDropIn(g)) {
-            if (block.id === this.id) return true;
-            this.pushCodeBlockAfterThis(block);
-            return true;
-        }
-        if (this.next) return this.next.insertCodeBlock(e, g, block);
-        return false;
-    }
-
     onDropHandler(
         e: GestureResponderEvent,
         g: PanResponderGestureState,
@@ -105,6 +65,43 @@ class CCodeBlockBreak
         }
     }
 
+     serialize() {
+        return {
+            type: "CCodeBlockBreak",
+            id: this.id,
+            next: this.next ? this.next.serialize() : null,
+        };
+    }
+
+    static async deserialize(data: any, onDrop: any, onPickUp?: any): Promise<CCodeBlockBreak> {
+        const block = new CCodeBlockBreak(onDrop, onPickUp);
+        block.id = data.id;
+        
+        if (data.next) {
+            block.next = await this.deserialize(data.next, onDrop, onPickUp);
+            if (block.next) {
+                block.next.prev = block;
+            }
+        }
+        
+        return block;
+    }
+
+    override insertCodeBlock(
+        e: GestureResponderEvent,
+        g: PanResponderGestureState,
+        block: ICodeBlock
+    ): boolean {
+        console.log("Добавление в Break");
+        if (this.checkDropIn(g)) {
+            if (block.id === this.id) return true;
+            this.pushCodeBlockAfterThis(block);
+            return true;
+        }
+        if (this.next) return this.next.insertCodeBlock(e, g, block);
+        return false;
+    }
+
     render(props: any): JSX.Element {
         return (
             <CodeBlockBreak
@@ -115,11 +112,10 @@ class CCodeBlockBreak
                 onPickUp={this.onPickUp}></CodeBlockBreak>
         );
     }
-
     execute(le: LexicalEnvironment): Value {
         return new Value(TypeNumber, "1");
     }
 }
+
 export default CCodeBlockBreak;
-}
 
